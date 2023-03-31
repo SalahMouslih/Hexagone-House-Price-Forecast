@@ -1,16 +1,42 @@
 import numpy as np
+import pandas as pd
 from sklearn.neighbors import BallTree
 from sklearn.linear_model import LinearRegression
+
+# Import the table which defines the metrpole (EPCI)
+path=#enter path
+metropoles = pd.read_csv(path, delimiter=';', header=5)
+
+def get_top_zones(df, nb_top_zones):
+
+    """Select zones where the highest number mutations"""
+
+    # Correct the spelling of regions
+    df.loc[df.nom_commune.str.startswith('Marseille '), 'nom_commune'] = 'Marseille'
+    df.loc[df.nom_commune.str.startswith('Lyon '), 'nom_commune'] = 'Lyon'
+    df.loc[df.nom_commune.str.startswith('Paris '), 'nom_commune'] = 'Paris'
+
+    # Merge dvf and metropole
+    df = df.merge(metropoles, how='left', left_on='nom_commune', right_on='LIBGEO')
+
+    # Pick the areas with the highest number of transactions
+    most_frequent = df['LIBEPCI'].value_counts().head(nb_top_zones).index.to_list()
+    df = df.loc[df['LIBEPCI'].isin(most_frequent)]
+
+    return df
+
 
 def convert_gpd(df):
     return gpd.GeoDataFrame(
         df, geometry = gpd.points_from_xy(df.longitude, df.latitude))
+
 
 def get_k_nearest_neighbors(source_points, candidate_points, k_neighbors):
     """Find the k nearest neighbors for all source points from a set of candidate points"""
     tree = BallTree(candidate_points, leaf_size=15, metric='haversine')
     distances, indices = tree.query(source_points, k=k_neighbors)
     return indices, distances
+
 
 def get_nearest_neighbors(left_gdf, right_gdf, k_neighbors, return_distances=False):
     """
@@ -40,6 +66,7 @@ def get_nearest_neighbors(left_gdf, right_gdf, k_neighbors, return_distances=Fal
     else:
         return indices
 
+
 def calculate_closest_metric(dvf, table_info, k_neighbors, metric_of_interest, new_metric_name, apply_regression=False):
     """Compute the new metric based on the k-nearest neighbors in table_info dataframe."""
     dvf[new_metric_name] = np.nan
@@ -60,3 +87,4 @@ def calculate_closest_metric(dvf, table_info, k_neighbors, metric_of_interest, n
         dvf[new_metric_name] = dvf['indices'].apply(lambda indices: table_info[metric_of_interest].iloc[indices].mean())
 
     return dvf
+
