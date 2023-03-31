@@ -2,7 +2,7 @@ import argparse
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Description of your program')
+    parser = argparse.ArgumentParser(description='Enter file to preprocesss')
     parser.add_argument('--filename', '-i', type=str, help='Input file')
     args = parser.parse_args()
     
