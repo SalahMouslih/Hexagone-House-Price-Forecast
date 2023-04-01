@@ -47,12 +47,31 @@ def preprocess_dvf_data(data_paths, trimestre_actu='2022-T2', test_trimestre=['2
     dvf_geo = convert_gpd(dvf_train)
 
     # Create the variable "prix moyen au m2 des 10 biens les plus proches"
-    dvf_geo = my_choose_closest(dvf = dvf_geo, table_info = dvf_geo[~dvf_geo['trimestre_vente'].isin(test_trimestre)],
+    dvf_geo = calculate_closest_metric(dvf = dvf_geo, table_info = dvf_geo[~dvf_geo['trimestre_vente'].isin(test_trimestre)],
             k_neighbors = 10,
-            metric_interest = 'prix_m2_actualise',
-            name_new_metric = 'prix_m2_zone')
+            metric_of_interest = 'prix_m2_actualise',
+            new_metric_name = 'prix_m2_zone')
 
     dvf_geo = dvf_geo.reset_index(drop=True)
+
+    ##..
+    #lyc_gen_geo = prep_lyc(lyc, geo_etab)
+    #dvf_geo = calculate_closest_metric(dvf = dvf_geo,
+     #          table_info = lyc_gen_geo,
+     #          k_neighbors = 3,
+     #          metric_interest = 'taux_mention',
+     #          name_new_metric = 'moyenne')
+
+    ## Ecoles
+    # Get the taux de mention for each collège + geographical coordinates of schools
+    #brevet_geo = prep_brevet(brevet, geo_etab)
+
+    # We get for each good the average taux de mention of the 3 closest collèges
+    #dvf_geo = calculate_closest_metric(dvf = dvf_geo,
+    #                table_info = brevet_geo,
+    #                k_neighbors = 3,
+    #                metric_interest = 'taux_mention',
+     #               name_new_metric = 'moyenne_brevet')
 
     # Save the processed data
     output_dir = "data/processed"
@@ -60,5 +79,9 @@ def preprocess_dvf_data(data_paths, trimestre_actu='2022-T2', test_trimestre=['2
         os.makedirs(output_dir)
     output_file = os.path.join(output_dir, "processed_data.csv")
     pd.DataFrame(dvf_geo).to_csv(output_file, index=False)
+    
+    print('Finished pre-processing')
+    print('************************')
+    print('Processed data saved to', output_dir)
 
     return True

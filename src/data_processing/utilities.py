@@ -23,7 +23,7 @@ def read_dvfs(data_paths):
         data = pd.concat(map(pd.read_csv, data_paths))
 
         print('Ready to start preprocessing')
-        print('*****')
+        print('************************')
 
         return data
     
@@ -106,8 +106,11 @@ def get_nearest_neighbors(left_gdf, right_gdf, k_neighbors, return_distances=Fal
 
 def calculate_closest_metric(dvf, table_info, k_neighbors, metric_of_interest, new_metric_name, apply_regression=False):
     """Compute the new metric based on the k-nearest neighbors in table_info dataframe."""
+
+    print(f"Computing {new_metric_name}...")
     dvf[new_metric_name] = np.nan
     closest_indices = get_nearest_neighbors(left_gdf=dvf, right_gdf=table_info, k_neighbors=k_neighbors)
+    dvf['indices'] = list(closest_indices)
 
     if apply_regression:
         def apply_linear_regression(row, metric_of_interest):
