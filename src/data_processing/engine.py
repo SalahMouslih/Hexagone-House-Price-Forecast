@@ -4,12 +4,20 @@ from discount import *
 from utilities import *
 
 
-test_trimestre=['2021-T3','2021-T4','2022-T1','2022-T2']
+def preprocess_dvf_data(data_path, trimestre_actu='2022-T2', test_trimestre=['2021-T3','2021-T4','2022-T1','2022-T2']):
+    """
+    Preprocesses DVF data and returns a geopandas dataframe.
 
-def preprocess(filename):
-    
+    Args:
+        data_path (str): Path to input DVF data.
+        trimestre_actu (str): The trimester to use for the final price calculation.
+        test_trimestre (list): List of trimesters to use for testing data split. Default is ['2021-T3','2021-T4','2022-T1','2022-T2'].
+
+    Returns:
+        dvf_geo (geopandas.DataFrame): Preprocessed DVF data as a geopandas dataframe.
+    """
     # Import DVFs
-    data=pd.concat(map(pd.read_csv, glob.glob(os.path.join('', "/Challenge/GROUP4/TEDONZE/base_de_données/datadvf20*.csv"))))
+    data=pd.concat(map(pd.read_csv, glob.glob(os.path.join('', data_path))))
 
     # Select metropoles
     data_top = zone_top(data,10)
@@ -23,7 +31,7 @@ def preprocess(filename):
     dvf = filtre_dur(dvf, 200, 6, 'Appartement')
 
     #
-    func = fonction_final_prix(dvf,trimestre_actu='2022-T2',actulisation=False)
+    func = fonction_final_prix(dvf,trimestre_actu=trimestre_actu,actulisation=False)
 
     # Observe year by year to choose the split date 
     find_pourcentage=(func['trimestre_vente'].value_counts(normalize=True)).sort_index().cumsum()
@@ -32,7 +40,7 @@ def preprocess(filename):
     find_pourcentage[find_pourcentage>0.8]
 
     #
-    dvf = fonction_final_prix(dvf,trimestre_actu='2021-T2')
+    dvf = fonction_final_prix(dvf,trimestre_actu=trimestre_actu)
 
     # Train test split 
     dvf_train = dvf[~dvf['trimestre_vente'].isin(test_trimestre)]
@@ -49,10 +57,17 @@ def preprocess(filename):
 
     # Create the variable "prix moyen au m2 des 10 biens les plus proches"
     dvf_geo = my_choose_closest(dvf = dvf_geo, table_info = dvf_geo[~dvf_geo['trimestre_vente'].isin(test_trimestre)],
-                k_neighbors = 10,
-                metric_interest = 'prix_m2_actualise',
-                name_new_metric = 'prix_m2_zone')
+            k_neighbors = 10,
+            metric_interest = 'prix_m2_actualise',
+            name_new_metric = 'prix_m2_zone')
 
     dvf_geo = dvf_geo.reset_index(drop=True)
 
-    return data
+    # Save the processed data
+    output_dir = "data/processed"
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    output_file = os.path.join(output_dir, "processed_data.csv")
+    dvf_geo.to_csv(output_file, index=False)
+
+    return True
