@@ -2,10 +2,25 @@ import numpy as np
 import pandas as pd
 from sklearn.neighbors import BallTree
 from sklearn.linear_model import LinearRegression
+import glob
+import os
+
 
 # Import the table which defines the metrpole (EPCI)
-path=#enter path
-metropoles = pd.read_csv(path, delimiter=';', header=5)
+
+#enter path
+#metropoles = pd.read_csv(path, delimiter=';', header=5)
+
+def read_dvfs(data_paths):
+    print('Reading data...')
+
+    # Use glob to find all csv files matching the data paths
+    data_paths = [path for pattern in data_paths for path in glob.glob(pattern)]
+    
+    # Print the list of file paths for debugging purposes
+    data = pd.concat(map(pd.read_csv, data_paths))
+    return data
+
 
 def get_top_zones(df, nb_top_zones):
 

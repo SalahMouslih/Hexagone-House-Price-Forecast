@@ -1,6 +1,8 @@
 import pandas as pd
 
 def clean_type(clean_data, type_bien):
+    print(f"Cleaning data for '{type_bien}'")
+
     mask = clean_data['type_local'] == type_bien
     clean_data = clean_data[mask]
     df = clean_data.groupby('index_group')['numero_disposition'].nunique()
@@ -16,6 +18,9 @@ def clean_multivente(data):
     If there are multiple rows with the same mutation ID, filter by property type (Appartement ou Maison) and keep only one row for each type. 
 
     '''
+
+    print("Cleaning multivente data...")
+
     data = data.drop_duplicates()
     data = data[data['nature_mutation'] == 'Vente']
     data['index_group'] = data['id_mutation'].astype(str) + data['date_mutation'].astype(str)

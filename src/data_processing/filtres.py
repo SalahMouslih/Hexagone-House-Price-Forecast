@@ -25,11 +25,14 @@ def filtre_dur(df, bati, piece, local, metropole_name=None):
     local (str): Type of property ('Maison' or 'Appartement').
     metropole_name (str, optional): Name of the metropolitan area to be filtered.
     """
-    
+
     if metropole_name:
+        print(f"Filtereing data for {metropole_name}...")
+
         df_metropole = df[(df['type_local'] == local) & (df['LIBEPCI'] == metropole_name)]
         df_other_metropoles = df[(df['LIBEPCI'] != metropole_name) | ((df['LIBEPCI'] == metropole_name) & (df['type_local'] != local))]
     else:
+        print(f"Filtereing data...")
         df_metropole = df[df['type_local'] == local]
         df_other_metropoles = df[df['type_local'] != local]
     

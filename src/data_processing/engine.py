@@ -1,10 +1,10 @@
-from clean import *
-from filtres import *
-from discount import *
-from utilities import *
+from data_processing.clean import *
+from data_processing.filtres import *
+from data_processing.discount import *
+from data_processing.utilities import *
 
 
-def preprocess_dvf_data(data_path, trimestre_actu='2022-T2', test_trimestre=['2021-T3','2021-T4','2022-T1','2022-T2']):
+def preprocess_dvf_data(data_paths, trimestre_actu='2022-T2', test_trimestre=['2021-T3','2021-T4','2022-T1','2022-T2']):
     """
     Preprocesses DVF data and returns a geopandas dataframe.
 
@@ -17,10 +17,10 @@ def preprocess_dvf_data(data_path, trimestre_actu='2022-T2', test_trimestre=['20
         dvf_geo (geopandas.DataFrame): Preprocessed DVF data as a geopandas dataframe.
     """
     # Import DVFs
-    data=pd.concat(map(pd.read_csv, glob.glob(os.path.join('', data_path))))
+    data = read_dvfs(data_paths)
 
     # Select metropoles
-    data_top = zone_top(data,10)
+    data_top = get_top_zones(data,10)
 
     # Keep multiventes
     clean_data = clean_multivente(data_top)
