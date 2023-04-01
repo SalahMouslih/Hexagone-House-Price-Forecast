@@ -2,6 +2,8 @@ import argparse
 from data_processing.engine import preprocess_dvf_data
 import logging
 import os
+import warnings
+warnings.filterwarnings('ignore')
 #from machine_learning.engine import machine_learning_engine
 #from eda.engine import eda_engine
 
@@ -32,7 +34,7 @@ def main():
 
     if args.preprocess:
         file_paths = [path for pattern in args.preprocess for path in parse_file_path(pattern)]
-        logging.info(f'Running the pre-processing engine on files: {file_paths}')
+        logging.info(f"Running the pre-processing engine on files: {', '.join(file_paths)}")
         preprocess_dvf_data(file_paths)
     #elif args.ml:
      #   logging.info('Running the machine learning engine')

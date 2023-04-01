@@ -30,30 +30,21 @@ def preprocess_dvf_data(data_paths, trimestre_actu='2022-T2', test_trimestre=['2
     dvf = filtre_dur(dvf, 360, 10, 'Maison')
     dvf = filtre_dur(dvf, 200, 6, 'Appartement')
 
-    #
-    func = fonction_final_prix(dvf,trimestre_actu=trimestre_actu,actulisation=False)
-
-    # Observe year by year to choose the split date 
-    find_pourcentage=(func['trimestre_vente'].value_counts(normalize=True)).sort_index().cumsum()
-    find_pourcentage
-
-    find_pourcentage[find_pourcentage>0.8]
-
-    #
-    dvf = fonction_final_prix(dvf,trimestre_actu=trimestre_actu)
+    # Filtering price
+    dvf = fonction_final_prix(dvf, trimestre_actu=trimestre_actu)
 
     # Train test split 
-    dvf_train = dvf[~dvf['trimestre_vente'].isin(test_trimestre)]
-    dvf_test = dvf[dvf['trimestre_vente'].isin(test_trimestre)]
-    
-    dvf_train = filtre_prix(dvf_train,'prix_m2_actualise', 0.99)
-    dvf_test = filtre_prix(dvf_test,'prix_m2', 0.99)
+    dvf_train = dvf.loc[~dvf['trimestre_vente'].isin(test_trimestre)]
+    dvf_test = dvf.loc[dvf['trimestre_vente'].isin(test_trimestre)]
+
+    dvf_train = filtre_prix(dvf_train,'prix_m2_actualise')
+    #dvf_test = filtre_prix(dvf_test,'prix_m2')
     
     # Concatenate
-    dvf = pd.concat([dvf_train, dvf_test])
+    #dvf = pd.concat([dvf_train, dvf_test])
 
     # Convert to geopandas
-    dvf_geo = convert_gpd(dvf)
+    dvf_geo = convert_gpd(dvf_train)
 
     # Create the variable "prix moyen au m2 des 10 biens les plus proches"
     dvf_geo = my_choose_closest(dvf = dvf_geo, table_info = dvf_geo[~dvf_geo['trimestre_vente'].isin(test_trimestre)],
@@ -68,6 +59,6 @@ def preprocess_dvf_data(data_paths, trimestre_actu='2022-T2', test_trimestre=['2
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     output_file = os.path.join(output_dir, "processed_data.csv")
-    dvf_geo.to_csv(output_file, index=False)
+    pd.DataFrame(dvf_geo).to_csv(output_file, index=False)
 
     return True

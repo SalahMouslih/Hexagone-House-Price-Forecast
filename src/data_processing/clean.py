@@ -1,10 +1,12 @@
 import pandas as pd
 
-def clean_type(clean_data, type_bien):
+def clean_type(data, type_bien):
+
+
     print(f"Cleaning data for '{type_bien}'")
 
-    mask = clean_data['type_local'] == type_bien
-    clean_data = clean_data[mask]
+    mask = data['type_local'] == type_bien
+    clean_data = data[mask]
     df = clean_data.groupby('index_group')['numero_disposition'].nunique()
     df = clean_data[clean_data.index_group.isin(df[df==1].index)].groupby('index_group').size()
     to_drop = df[df>1].index

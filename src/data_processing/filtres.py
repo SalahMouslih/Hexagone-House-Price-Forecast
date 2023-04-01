@@ -1,17 +1,19 @@
 import pandas as pd
-
+import numpy as np
 
 def select_bien(df):
+    
+    print("Filtereing property types...")
 
-  # Keep 'Ventes' transactions
-  df = df[df['nature_mutation'] == 'Vente']
-  # Keep the 'Maison' and 'Appartement' properties
-  df = df.loc[df['type_local'].isin(['Maison', 'Appartement'])]
-  # Keep only properties with known locations
-  # our analysis heavily relies on property location
-  df = df[(df['latitude'].notna()) & (df['longitude'].notna())]
+    # Keep 'Ventes' transactions
+    df = df[df['nature_mutation'] == 'Vente']
+    # Keep the 'Maison' and 'Appartement' properties
+    df = df.loc[df['type_local'].isin(['Maison', 'Appartement'])]
+    # Keep only properties with known locations
+    # our analysis heavily relies on property location
+    df = df[(df['latitude'].notna()) & (df['longitude'].notna())]
 
-  return df
+    return df
 
 
 def filtre_dur(df, bati, piece, local, metropole_name=None):
@@ -27,12 +29,12 @@ def filtre_dur(df, bati, piece, local, metropole_name=None):
     """
 
     if metropole_name:
-        print(f"Filtereing data for {metropole_name}...")
+        print(f"Filtereing data for '{local}' in ' {metropole_name}'...")
 
         df_metropole = df[(df['type_local'] == local) & (df['LIBEPCI'] == metropole_name)]
         df_other_metropoles = df[(df['LIBEPCI'] != metropole_name) | ((df['LIBEPCI'] == metropole_name) & (df['type_local'] != local))]
     else:
-        print(f"Filtereing data...")
+        print(f"Filtereing data for '{local}'")
         df_metropole = df[df['type_local'] == local]
         df_other_metropoles = df[df['type_local'] != local]
     
@@ -45,27 +47,26 @@ def filtre_dur(df, bati, piece, local, metropole_name=None):
     return df_filtered
 
 def filtre_prix(df, metric_prix, quantile_nv = 0.99):
+
     """ 
     Compute the 99th percentile for each city (more precise than EPCI) and property type (Appartement, Maison)
     Filter properties based on their price per square meter being below the 99th percentile
 
-    Parameters:
-    df (pd.DataFrame): Input dataset.
-    metric_prix (str): Column name for price metric.
-    quantile_nv (float, optional): Quantile value. Default is 0.99.
-
-    ++++++ Be careful to use the actualised price ++++++
+    ++++++ Be careful to use the discounted price ++++++
 
     """
+
+    print('Filtering prices...')
+
+    quantile_per_city_type = None
     df = df[(df[metric_prix] >= 1000) & (df[metric_prix] <= 20000)]
 
     quantile_per_city_type = (
             df.groupby(['nom_commune', 'type_local'])
             .agg({metric_prix: lambda x: np.quantile(x, quantile_nv)})
-            .rename(columns={metric_prix: 'quantile_prix'})
             .reset_index()
+            .rename(columns={metric_prix: 'quantile_prix'})
         )
-
     df = df.merge(quantile_per_city_type, on=['nom_commune', 'type_local'], how='left')
     df = df[df[metric_prix] < df['quantile_prix']]
 

@@ -1,9 +1,15 @@
 import pandas as pd
+import numpy as np
+import swifter
+from datetime import datetime
+from tqdm import tqdm
 
-path_valeur_indice="/Challenge/GROUP4/TEDONZE/valeurs_trimestrielles.csv"
-path_zonage_immo="/Challenge/GROUP4/TEDONZE/Zonage_abc_communes_2022.xlsx"
+# Define paths
+path_valeurs_trimestrielles = "data/open_data/valeurs_trimestrielles.csv"
+path_zonage_immo = "data/open_data/Zonage_abc_communes_2022.xlsx"
 
-iste_grande_ville=['Indice des prix des logements anciens - Agglomération de Marseille - Appartements - Base 100 en moyenne annuelle 2015 - Série CVS',
+# Define lists
+liste_grande_ville=['Indice des prix des logements anciens - Agglomération de Marseille - Appartements - Base 100 en moyenne annuelle 2015 - Série CVS',
                    'Indice des prix des logements anciens - Agglomération de Lille - Maisons - Base 100 en moyenne annuelle 2015 - Série CVS',
                    'Indice des prix des logements anciens - Agglomération de Lyon - Appartements - Base 100 en moyenne annuelle 2015 - Série CVS',
                    'Indice des prix des logements anciens - Paris - Appartements - Base 100 en moyenne annuelle 2015 - Série CVS',
@@ -43,30 +49,24 @@ liste_paris=['Paris 8e Arrondissement',
        'Paris 19e Arrondissement', 'Paris 2e Arrondissement',
        'Paris 4e Arrondissement']
 
-liste_complete=liste_paris+liste_lyon+liste_Marseille
+liste_complete = liste_paris + liste_lyon + liste_Marseille
 
 
 def create_columns(data):
     """Create columns 'Appartement' and 'Maison' and assign values based on 'coeff_appart_a_maison' 
     and 'coeff_maison_a_appart' columns.
-
-    Args:
-        data (pd.DataFrame): input data.
-
-    Returns:
-        pd.DataFrame: data with new columns.
     """
-    liste_var = data.columns
+    var_list = data.columns
 
-    for i in liste_var:
+    for i in var_list:
         if 'Appartement' in i:
             new_var = i.replace('Appartement', 'Maison')
-            if new_var not in liste_var:
+            if new_var not in var_list:
                 data[new_var] = data[i] * data['coeff_appart_a_maison']
                 
         if 'Maison' in i:
             new_var = i.replace('Maison', 'Appartement')
-            if new_var not in liste_var:
+            if new_var not in var_list:
                 data[new_var] = data[i] * data['coeff_maison_a_appart']
 
     return data
@@ -75,30 +75,30 @@ def create_columns(data):
 def commune(x):
     """Convert the input string into a valid commune code string."""
     commune = str(x)
-    commune_new = commune
+    new_commune = commune
 
     if len(commune) == 4:
-        commune_new = '0' + commune
+        new_commune = '0' + commune
 
-    return commune_new
+    return new_commune
 
 
-def fill_zone(data: pd.DataFrame) -> str:
+def fill_zone(data: pd.DataFrame):
     """Fill the missing values of 'Zone ABC' with the corresponding city or 'C' if the city is not in the list."""
-    liste_complete = liste_Marseille + liste_lyon + liste_paris
-    nom = data['nom_commune']
+    
+    commune_name = data['nom_commune']
     zone = ''
 
-    if nom in liste_Marseille:
+    if commune_name in liste_Marseille:
         zone = 'Marseille'
-    elif nom in liste_lyon:
+    elif commune_name in liste_lyon:
         zone = 'Lyon'
-    elif nom in liste_paris:
+    elif commune_name in liste_paris:
         zone = 'Paris'
-    elif nom == 'Lille':
+    elif commune_name == 'Lille':
         zone = 'Lille'
     elif pd.isna(data['Zone ABC']):
-        if nom not in liste_complete:
+        if commune_name not in liste_complete:
             zone = 'C'
     else:
         zone = data['Zone ABC']
@@ -110,6 +110,7 @@ def fill_zone(data: pd.DataFrame) -> str:
 
 def get_trimester(data):
     """Get the trimester based on the date"""
+    
     date = data['date_vente']
     month = int(date.month)
     year = date.year
@@ -128,10 +129,9 @@ def get_trimester(data):
 
     return trim_vente
 
-    
-
 
 def get_coeff_actu(data, base_indice_grand, trimestre_actu):
+
     """
     This function takes in data containing the zone, trimestre, and type of property,
     the base index data for the zone and type of property, and the current trimester. 
@@ -195,14 +195,14 @@ def get_coeff_actu(data, base_indice_grand, trimestre_actu):
     return coeff
 
 
-def fonction_final_prix(data,trimestre_actu,actulisation=True):
+def fonction_final_prix(data, trimestre_actu, actulisation=True):
 
     """
     Compute the updated real estate price per square meter using the actualisation coefficient.
     """
 
     # Process the real estate indices table
-    base_indice = pd.read_csv(path_valeur_indice,sep=';')
+    base_indice = pd.read_csv(path_valeurs_trimestrielles,sep=';')
     base_indice = base_indice[['Libellé','2016-T1', '2016-T2', '2016-T3', '2016-T4', '2017-T1', '2017-T2',
        '2017-T3', '2017-T4', '2018-T1', '2018-T2', '2018-T3', '2018-T4',
        '2019-T1', '2019-T2', '2019-T3', '2019-T4', '2020-T1', '2020-T2',
@@ -230,8 +230,8 @@ def fonction_final_prix(data,trimestre_actu,actulisation=True):
     base_indice_grand = base_indice_grand.reset_index()
 
     # Import of the real estate areas table
-    zone = pd.read_excel(path_zonage_immo)
-    zone = zone.rename({'Nom Commune': 'nom_commune'}, axis='columns')
+    zone = pd.read_excel(path_zonage_immo, engine='openpyxl')
+    zone = zone.rename(columns={'Nom Commune': 'nom_commune'})
 
     # Join dvf and area table, then replace missing values
     data['Code Commune'] = data['code_commune'].apply(lambda x: commune(x)).astype("str")
@@ -241,27 +241,32 @@ def fonction_final_prix(data,trimestre_actu,actulisation=True):
     
     # Get the sale trimesters
     joined_data['date_vente'] = joined_data['date_mutation'].apply(lambda x: datetime.strptime(x, '%Y-%m-%d'))
-    joined_data['trimestre_vente'] = joined_data.apply(lambda x: get_trimestre(x),axis=1)
+    joined_data['trimestre_vente'] = joined_data.apply(lambda x: get_trimester(x),axis=1)
     
     if actulisation:
+        
+        def my_tqdm_decorator(iterable):
+            progress_bar = tqdm(iterable, desc="Compute coefficient :")
+            for item in progress_bar:
+                yield item
+                # Refresh the progress bar after each iteration
+                sys.stdout.flush()
 
-        def your_func(row):
-
-          return get_coeff_actu(row,base_indice_grand,trimestre_actu)
-
+        print('Starting discount...')
+    
         # Compute the actualisation coefficient
-        joined_data['coeff_actu'] = joined_data.swifter.apply(lambda x: your_func(x),axis=1)
-        liste_drop_zone = ['Zone ABC','vrai_zone','date_vente']
-        joined_data = joined_data.drop(columns=liste_drop_zone)
+        joined_data['coeff_actu'] = list(tqdm(joined_data.swifter.apply(lambda x: get_coeff_actu(x,base_indice_grand,trimestre_actu),axis=1),
+                                    total=len(joined_data)))
+        drop_zone_list = ['Zone ABC','vrai_zone','date_vente']
+        joined_data = joined_data.drop(columns=drop_zone_list)
 
-
-        # Create the target variable : 'prix_actualise'
+        # Add columns
+        
+        # Create the target variables
         joined_data['prix_actualise'] = joined_data['valeur_fonciere'] * joined_data['coeff_actu']
-
-        # Create the  target variable : 'prix_m2'
         joined_data['prix_m2_actualise'] = joined_data['prix_actualise'] / joined_data['surface_reelle_bati']
         joined_data['prix_m2'] = joined_data['valeur_fonciere'] / joined_data['surface_reelle_bati']
-    
+        
     return joined_data
 
 

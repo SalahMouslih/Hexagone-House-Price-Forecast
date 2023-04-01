@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import geopandas as gpd
 from sklearn.neighbors import BallTree
 from sklearn.linear_model import LinearRegression
 import glob
@@ -8,42 +9,63 @@ import os
 
 # Import the table which defines the metrpole (EPCI)
 
-#enter path
-#metropoles = pd.read_csv(path, delimiter=';', header=5)
+path_to_metropole = 'data/open_data/metropoles_communes.csv'
+metropoles = pd.read_csv(path_to_metropole, delimiter=';', header=5)
 
 def read_dvfs(data_paths):
-    print('Reading data...')
+    try:
+        print('Reading data...')
 
-    # Use glob to find all csv files matching the data paths
-    data_paths = [path for pattern in data_paths for path in glob.glob(pattern)]
+        # Use glob to find all csv files matching the data paths
+        data_paths = [path for pattern in data_paths for path in glob.glob(pattern)]
+        
+        # Print the list of file paths for debugging purposes
+        data = pd.concat(map(pd.read_csv, data_paths))
+
+        print('Ready to start preprocessing')
+        print('*****')
+
+        return data
     
-    # Print the list of file paths for debugging purposes
-    data = pd.concat(map(pd.read_csv, data_paths))
-    return data
+    except Exception as e:
+        print(f"Error occurred while reading data: {e}")
+        return None
 
 
 def get_top_zones(df, nb_top_zones):
 
     """Select zones where the highest number mutations"""
 
-    # Correct the spelling of regions
-    df.loc[df.nom_commune.str.startswith('Marseille '), 'nom_commune'] = 'Marseille'
-    df.loc[df.nom_commune.str.startswith('Lyon '), 'nom_commune'] = 'Lyon'
-    df.loc[df.nom_commune.str.startswith('Paris '), 'nom_commune'] = 'Paris'
+    try:
+        print('Selecting top 10 metropoles...')
 
-    # Merge dvf and metropole
-    df = df.merge(metropoles, how='left', left_on='nom_commune', right_on='LIBGEO')
+        # Correct the spelling of regions
+        df.loc[df.nom_commune.str.startswith('Marseille '), 'nom_commune'] = 'Marseille'
+        df.loc[df.nom_commune.str.startswith('Lyon '), 'nom_commune'] = 'Lyon'
+        df.loc[df.nom_commune.str.startswith('Paris '), 'nom_commune'] = 'Paris'
 
-    # Pick the areas with the highest number of transactions
-    most_frequent = df['LIBEPCI'].value_counts().head(nb_top_zones).index.to_list()
-    df = df.loc[df['LIBEPCI'].isin(most_frequent)]
+        # Merge dvf and metropole
+        df = df.merge(metropoles, how='left', left_on='nom_commune', right_on='LIBGEO')
 
-    return df
+        # Pick the areas with the highest number of transactions
+        most_frequent = df['LIBEPCI'].value_counts().head(nb_top_zones).index.to_list()
+        df = df.loc[df['LIBEPCI'].isin(most_frequent)]
+
+        return df
+
+    except Exception as e:
+        print(f"An error occurred while selecting the top {nb_top_zones} zones: {str(e)}")
+        return None
 
 
 def convert_gpd(df):
+    """
+    Function convert_gpd converts a pandas DataFrame to a GeoDataFrame using the geometry attribute 
+    which is created from the longitude and latitude columns of the input DataFrame
+    """
     return gpd.GeoDataFrame(
-        df, geometry = gpd.points_from_xy(df.longitude, df.latitude))
+        df, geometry = gpd.points_from_xy(df.longitude, df.latitude)
+        )
 
 
 def get_k_nearest_neighbors(source_points, candidate_points, k_neighbors):
