@@ -8,11 +8,13 @@ import os
 
 
 # Import the table which defines the metrpole (EPCI)
-
 path_to_metropole = 'data/open_data/metropoles_communes.csv'
 metropoles = pd.read_csv(path_to_metropole, delimiter=';', header=5)
 
 def read_dvfs(data_paths):
+    """
+    Read multiple DVF data from the given paths and return a single concatenated dataframe.
+    """
     try:
         print('Reading data...')
 
@@ -32,7 +34,7 @@ def read_dvfs(data_paths):
         return None
 
 
-def return_dfs(*data_paths):
+def read_tables(*data_paths):
     """
     Read multiple csv files from the given paths and return a list of dataframes.
     """
@@ -46,6 +48,7 @@ def return_dfs(*data_paths):
 
     # return the list of dataframes
     return dfs 
+
 
 def get_top_zones(df, nb_top_zones):
 
@@ -119,27 +122,34 @@ def get_nearest_neighbors(left_gdf, right_gdf, k_neighbors, return_distances=Fal
         return indices
 
 
+def apply_linear_regression(row, metric_of_interest):
+
+    """Apply linear regression to calculate the intercept of a row with the given metric of interest."""
+    indices = row['indices']
+    X = table_info.loc[indices, ['surface_reelle_bati', 'nombre_pieces_principales']].values
+    y = table_info.loc[indices, metric_of_interest].values
+
+    lr = LinearRegression()
+    lr.fit(X, y)
+
+    return lr.intercept_
+
+
 def calculate_closest_metric(dvf, table_info, k_neighbors, metric_of_interest, new_metric_name, apply_regression=False):
     """Compute the new metric based on the k-nearest neighbors in table_info dataframe."""
+    try:
+        print(f"Computing {new_metric_name}...")
+        dvf[new_metric_name] = np.nan
+        closest_indices = get_nearest_neighbors(left_gdf=dvf, right_gdf=table_info, k_neighbors=k_neighbors)
+        dvf['indices'] = list(closest_indices)
 
-    print(f"Computing {new_metric_name}...")
-    dvf[new_metric_name] = np.nan
-    closest_indices = get_nearest_neighbors(left_gdf=dvf, right_gdf=table_info, k_neighbors=k_neighbors)
-    dvf['indices'] = list(closest_indices)
+        if apply_regression: 
+            dvf[new_metric_name] = dvf.swifter.apply(lambda row: apply_linear_regression(row, metric_of_interest), axis=1)
+        else:
+            dvf[new_metric_name] = dvf['indices'].apply(lambda indices: table_info[metric_of_interest].iloc[indices].mean())
 
-    if apply_regression:
-        def apply_linear_regression(row, metric_of_interest):
-            indices = row['indices']
-            X = table_info.loc[indices, ['surface_reelle_bati', 'nombre_pieces_principales']].values
-            y = table_info.loc[indices, metric_of_interest].values
+        return dvf
 
-            lr = LinearRegression()
-            lr.fit(X, y)
-    
-            return lr.intercept_
-        dvf[new_metric_name] = dvf.swifter.apply(lambda row: apply_linear_regression(row, metric_of_interest), axis=1)
-    else:
-        dvf[new_metric_name] = dvf['indices'].apply(lambda indices: table_info[metric_of_interest].iloc[indices].mean())
-
-    return dvf
-
+    except ValueError:
+        print("Error: could not calculate closest metric")
+        return None

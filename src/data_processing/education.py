@@ -7,31 +7,27 @@ def read_data():
     # get results at brevet for each collège
     brevet = pd.read_csv('data/open_data/resultats_brevet.csv', delimiter = ';')
     # get results at 'baccalauréat' for each lycée
-    lyc =  pd.read_csv('data/open_data/resultats_lycées.csv', sep = ';')
+    lycees =  pd.read_csv('data/open_data/resultats_lycées.csv', sep = ';')
     
-    return geo_etab, brevet, lyc
+    return geo_etab, brevet, lycees
 
 def prep_lyc(data: pd.DataFrame, geo_etab: pd.DataFrame) -> gpd.GeoDataFrame:
-    '''
+    """
     Filters the given lycée data to only include lycées généraux, as they are more likely to
     influence housing prices than other types of schools. Calculates the taux de mention for
     each lycée and converts the result to a geopandas dataframe, which is then merged with
     the dvf data.
 
-
-    Parameters:
-    -----------
-    data: pd.DataFrame
-        Dataframe containing information about the schools
-    geo_etab: pd.DataFrame
-        Dataframe containing geospatial information about the schools
+    Args:
+    data (pd.DataFrame): a pandas DataFrame containing data on lycées
+    geo_etab (pd.DataFrame): a pandas DataFrame containing geographical data on the lycées
 
     Returns:
-    --------
-    gpd.GeoDataFrame
-        Geospatial dataframe containing lycée data
-    '''
+    A geopandas GeoDataFrame with the filtered and processed lycée data
+    """
+    
     try:
+        # Start by filtering out the data for years other than 2020 and keeping only lycées généraux
         lyc = data[data['Annee'] == 2020]
         lyc_gen = lyc[['Etablissement', 'UAI', 'Code commune',
                     'Presents - L', 'Presents - ES', 'Presents - S',
@@ -42,23 +38,24 @@ def prep_lyc(data: pd.DataFrame, geo_etab: pd.DataFrame) -> gpd.GeoDataFrame:
             (lyc_gen['Presents - ES']>0)|
             (lyc_gen['Presents - S']>0)]
         lyc_gen = lyc_gen.fillna(0)
+        # Calculate the taux de mention for each lycée
         lyc_gen['taux_mention'] = (lyc_gen['Presents - L'] * lyc_gen['Taux de mentions - L'] + lyc_gen['Presents - ES'] * lyc_gen['Taux de mentions - ES'] + lyc_gen['Presents - S'] * lyc_gen['Taux de mentions - S']) / (lyc_gen['Presents - S'] + lyc_gen['Presents - L'] + lyc_gen['Presents - ES'])
+        # Merge the lycée data with the geographical data
         lyc_gen = lyc_gen.merge(geo_etab, how = 'left', left_on = 'UAI', right_on = 'numero_uai')
+        # Select only the relevant columns and rename them for clarity
         lyc_gen = lyc_gen[['Etablissement', 'UAI', 'Code commune', 'code_departement',
                 'Taux de mentions - L', 'Taux de mentions - ES', 'Taux de mentions - S', 'taux_mention',
                 'latitude', 'longitude']]
         lyc_gen.rename(columns = {'Taux de mentions - L':'taux_mention_L', 'Taux de mentions - ES':'taux_mention_ES', 'Taux de mentions - S':'taux_mention_S'}, inplace=True)
+        # Convert the resulting DataFrame to a geopandas GeoDataFrame, and filter out any rows with missing geographic data
         lyc_gen_geo = gpd.GeoDataFrame(
             lyc_gen, geometry = gpd.points_from_xy(lyc_gen.longitude, lyc_gen.latitude))
         lyc_gen_geo = lyc_gen_geo[(lyc_gen_geo['latitude'].notna()) & (lyc_gen_geo['longitude'].notna())]
 
         return lyc_gen_geo
 
-    except KeyError as e:
-        print(f"KeyError: {str(e)}. Please check that the column names are correct.")
-
-    except Exception as e:
-        print(f"Error: {str(e)}")
+    except:
+        print("An error occurred while processing the lycée data.")
 
 
 def prep_brevet(data, geo_etab):

@@ -12,12 +12,19 @@ warnings.filterwarnings('ignore')
 logging.basicConfig(level=logging.INFO)
 
 def parse_file_path(path):
-    if os.path.isdir(path):
+    if not os.path.exists(path):
+        # raise an error if the path does not exist
+        raise FileNotFoundError(f"No such file or directory: '{path}'")
+    elif os.path.isdir(path):
         # if the path is a directory, return all CSV files in the directory
         return [os.path.join(path, f) for f in os.listdir(path) if f.endswith('.csv')]
-    else:
+    elif os.path.isfile(path):
         # if the path is a file, return the file path as a list
         return [path]
+    else:
+        # raise an error if the path is neither a file nor a directory
+        raise ValueError(f"Invalid input: '{path}' is not a file or directory")
+
 
 
 def main():

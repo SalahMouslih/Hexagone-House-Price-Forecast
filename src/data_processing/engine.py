@@ -1,16 +1,18 @@
-from data_processing.clean import *
-from data_processing.discount import *
-from data_processing.education import *
-from data_processing.filters import *
-from data_processing.utilities import *
+from data_processing.clean import clean_multivente
+from data_processing.discount import fonction_final_prix
+from data_processing.education import prep_brevet, prep_lyc
+from data_processing.filters import select_bien, filtre_dur, filtre_prix
+from data_processing.utilities import calculate_closest_metric, get_top_zones,convert_gpd, read_dvfs, read_tables
 
 
-def preprocess_dvf_data(data_paths, trimestre_actu='2022-T2', test_trimestre=['2021-T3','2021-T4','2022-T1','2022-T2']):
-    """
-    Main engine of preprocessing. Preprocesses DVF data in an end-to-end fashion.
-    """
-    # Import DVFs
-    data = read_dvfs(data_paths)
+def preprocessing_engine(data_paths, trimestre_actu='2022-T2', test_trimestre=['2021-T3','2021-T4','2022-T1','2022-T2']):
+    """Main engine of preprocessing. Preprocesses DVF data in an end-to-end fashion."""
+    try:
+        # Read tables
+        geo_etab, brevet, lyc = read_data()
+    except FileNotFoundError:
+        print("Error: data file not found")
+        return None
 
     # Select metropoles
     data_top = get_top_zones(data,10)
@@ -69,15 +71,22 @@ def preprocess_dvf_data(data_paths, trimestre_actu='2022-T2', test_trimestre=['2
                     new_metric_name = 'moyenne_brevet')
 
     
-    # Save the processed data
-    output_dir = "data/processed"
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    output_file = os.path.join(output_dir, "processed_data.csv")
-    pd.DataFrame(dvf_geo).to_csv(output_file, index=False)
-    
-    print('Finished pre-processing')
-    print('************************')
-    print('Processed data saved to', output_dir)
+    if dvf_geo is None:
+        print("Error: data preprocessing failed")
+    else:
+        try:
+            # Save the processed data
+            output_dir = "data/processed"
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
+            output_file = os.path.join(output_dir, "processed_data.csv")
+            pd.DataFrame(dvf_geo).to_csv(output_file, index=False)
+            print('Finished pre-processing')
+            print('************************')
+            print('Processed data saved to', output_dir)
+
+        except IOError:
+            print("Error: could not write processed data to file")
+            return None
 
     return True

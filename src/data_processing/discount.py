@@ -136,133 +136,141 @@ def get_coeff_actu(data, base_indice_grand, trimestre_actu):
     It returns the coefficient of price evolution between the current trimester and the trimester in the data.
 
     """
+    try:
+        # Get the zone, trimester, and type of property from the data
+        zone = data['vrai_zone']
+        trimestre = data['trimestre_vente']
+        type_bien = data['type_local']
 
-    # Get the zone, trimester, and type of property from the data
-    zone = data['vrai_zone']
-    trimestre = data['trimestre_vente']
-    type_bien = data['type_local']
+        ligne = ''
 
-    ligne = ''
-
-    # Determine the correct line in the base index based on the zone and type of property
-    if zone == 'Paris':
-        if type_bien == 'Appartement':
-            ligne = 'Indice des prix des logements anciens - Paris - Appartements - Base 100 en moyenne annuelle 2015 - Série CVS'
+        # Determine the correct line in the base index based on the zone and type of property
+        if zone == 'Paris':
+            if type_bien == 'Appartement':
+                ligne = 'Indice des prix des logements anciens - Paris - Appartements - Base 100 en moyenne annuelle 2015 - Série CVS'
+            else:
+                ligne = 'Indice des prix des logements anciens - Paris - Maisons - Base 100 en moyenne annuelle 2015 - Série CVS'
+        elif zone == 'Marseille':
+            if type_bien == 'Appartement':
+                ligne = 'Indice des prix des logements anciens - Agglomération de Marseille - Appartements - Base 100 en moyenne annuelle 2015 - Série CVS'
+            else:
+                ligne = 'Indice des prix des logements anciens - Agglomération de Marseille - Maisons - Base 100 en moyenne annuelle 2015 - Série CVS'
+        elif zone == 'Lyon':
+            if type_bien == 'Appartement':
+                ligne = 'Indice des prix des logements anciens - Agglomération de Lyon - Appartements - Base 100 en moyenne annuelle 2015 - Série CVS'
+            else:
+                ligne = 'Indice des prix des logements anciens - Agglomération de Lyon - Maisons - Base 100 en moyenne annuelle 2015 - Série CVS'
+        elif zone == 'Lille':
+            if type_bien == 'Appartement':
+                ligne = 'Indice des prix des logements anciens - Agglomération de Lille - Appartements - Base 100 en moyenne annuelle 2015 - Série CVS'
+            else:
+                ligne = 'Indice des prix des logements anciens - Agglomération de Lille - Maisons - Base 100 en moyenne annuelle 2015 - Série CVS'
+        elif zone == 'A':
+            ligne = "Indice des prix des logements anciens - Zone A du Zonage A, B, C - Base 100 en moyenne annuelle 2015 - Série CVS"
+        elif zone == 'Abis':
+            ligne = "Indice des prix des logements anciens - Zone A bis du Zonage A, B, C - Base 100 en moyenne annuelle 2015 - Série CVS"
+        elif zone == 'B1':
+            ligne = "Indice des prix des logements anciens - Zone B1 du Zonage A, B, C - Base 100 en moyenne annuelle 2015 - Série CVS"
+        elif zone == 'B2':
+            ligne="Indice des prix des logements anciens - Zone B2 du Zonage A, B, C - Base 100 en moyenne annuelle 2015 - Série CVS"
+        elif zone=='C':
+            ligne="Indice des prix des logements anciens - Zone C du Zonage A, B, C - Base 100 en moyenne annuelle 2015 - Série CVS"
         else:
-            ligne = 'Indice des prix des logements anciens - Paris - Maisons - Base 100 en moyenne annuelle 2015 - Série CVS'
-    elif zone == 'Marseille':
-        if type_bien == 'Appartement':
-            ligne = 'Indice des prix des logements anciens - Agglomération de Marseille - Appartements - Base 100 en moyenne annuelle 2015 - Série CVS'
-        else:
-            ligne = 'Indice des prix des logements anciens - Agglomération de Marseille - Maisons - Base 100 en moyenne annuelle 2015 - Série CVS'
-    elif zone == 'Lyon':
-        if type_bien == 'Appartement':
-            ligne = 'Indice des prix des logements anciens - Agglomération de Lyon - Appartements - Base 100 en moyenne annuelle 2015 - Série CVS'
-        else:
-            ligne = 'Indice des prix des logements anciens - Agglomération de Lyon - Maisons - Base 100 en moyenne annuelle 2015 - Série CVS'
-    elif zone == 'Lille':
-        if type_bien == 'Appartement':
-            ligne = 'Indice des prix des logements anciens - Agglomération de Lille - Appartements - Base 100 en moyenne annuelle 2015 - Série CVS'
-        else:
-            ligne = 'Indice des prix des logements anciens - Agglomération de Lille - Maisons - Base 100 en moyenne annuelle 2015 - Série CVS'
-    elif zone == 'A':
-        ligne = "Indice des prix des logements anciens - Zone A du Zonage A, B, C - Base 100 en moyenne annuelle 2015 - Série CVS"
-    elif zone == 'Abis':
-        ligne = "Indice des prix des logements anciens - Zone A bis du Zonage A, B, C - Base 100 en moyenne annuelle 2015 - Série CVS"
-    elif zone == 'B1':
-        ligne = "Indice des prix des logements anciens - Zone B1 du Zonage A, B, C - Base 100 en moyenne annuelle 2015 - Série CVS"
-    elif zone == 'B2':
-        ligne="Indice des prix des logements anciens - Zone B2 du Zonage A, B, C - Base 100 en moyenne annuelle 2015 - Série CVS"
-    elif zone=='C':
-        ligne="Indice des prix des logements anciens - Zone C du Zonage A, B, C - Base 100 en moyenne annuelle 2015 - Série CVS"
+            raise ValueError('Invalid zone:', zone)
 
-    # Select the row of interest from the dataframe
-    # The row is identified by the 'Libellé' column matching the 'ligne' string
-    données = base_indice_grand[base_indice_grand['Libellé'].isin([ligne])]
+        # Select the row of interest from the dataframe
+        # The row is identified by the 'Libellé' column matching the 'ligne' string
+        données = base_indice_grand[base_indice_grand['Libellé'].isin([ligne])]
 
-    # Extract the index values for the current and base quarters
-    # Convert the values to floats
-    indice_ancien = données[trimestre].apply(lambda x: float(x))
-    indice_actu = données[trimestre_actu].apply(lambda x: float(x))
+        # Extract the index values for the current and base quarters
+        # Convert the values to floats
+        indice_ancien = données[trimestre].apply(lambda x: float(x))
+        indice_actu = données[trimestre_actu].apply(lambda x: float(x))
 
-    # The coefficient represents the ratio of the current index to the base index
-    # It is calculated as (current index - base index) / base index + 1
-    coeff = float(((indice_actu - indice_ancien) / indice_ancien) + 1)
+        # The coefficient represents the ratio of the current index to the base index
+        # It is calculated as (current index - base index) / base index + 1
+        coeff = float(((indice_actu - indice_ancien) / indice_ancien) + 1)
 
-    # Return the coefficient
-    return coeff
-
+        # Return the coefficient
+        return coeff
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
 
 def fonction_final_prix(data, trimestre_actu, actulisation=True):
 
     """
     Compute the updated real estate price per square meter using the actualisation coefficient.
     """
+    try:
+        # Process the real estate indices table
+        base_indice = pd.read_csv(path_valeurs_trimestrielles,sep=';')
+        base_indice = base_indice[['Libellé','2016-T1', '2016-T2', '2016-T3', '2016-T4', '2017-T1', '2017-T2',
+        '2017-T3', '2017-T4', '2018-T1', '2018-T2', '2018-T3', '2018-T4',
+        '2019-T1', '2019-T2', '2019-T3', '2019-T4', '2020-T1', '2020-T2',
+        '2020-T3', '2020-T4', '2021-T1', '2021-T2', '2021-T3', '2021-T4',
+        '2022-T1', '2022-T2', '2022-T3']]
 
-    # Process the real estate indices table
-    base_indice = pd.read_csv(path_valeurs_trimestrielles,sep=';')
-    base_indice = base_indice[['Libellé','2016-T1', '2016-T2', '2016-T3', '2016-T4', '2017-T1', '2017-T2',
-       '2017-T3', '2017-T4', '2018-T1', '2018-T2', '2018-T3', '2018-T4',
-       '2019-T1', '2019-T2', '2019-T3', '2019-T4', '2020-T1', '2020-T2',
-       '2020-T3', '2020-T4', '2021-T1', '2021-T2', '2021-T3', '2021-T4',
-       '2022-T1', '2022-T2', '2022-T3']]
+        base_indice_grand=base_indice[base_indice['Libellé'].isin(liste_grande_ville)]
+        base_indice_grand.set_index('Libellé',inplace=True)
+        base_indice_grand=base_indice_grand.transpose()
 
-    base_indice_grand=base_indice[base_indice['Libellé'].isin(liste_grande_ville)]
-    base_indice_grand.set_index('Libellé',inplace=True)
-    base_indice_grand=base_indice_grand.transpose()
+        base_indice_grand = base_indice_grand.replace('(s)', np.nan)
+        base_indice_grand = base_indice_grand.fillna( method='ffill',)
+        base_indice_grand = base_indice_grand.astype('float')
 
-    base_indice_grand = base_indice_grand.replace('(s)', np.nan)
-    base_indice_grand = base_indice_grand.fillna( method='ffill',)
-    base_indice_grand = base_indice_grand.astype('float')
+        # Create the coefficient variables
+        base_indice_grand['coeff_maison_a_appart'] = base_indice_grand['Indice des prix des logements anciens - France métropolitaine - Appartements - Base 100 en moyenne annuelle 2015 - série CVS']/base_indice_grand['Indice des prix des logements anciens - France métropolitaine - Maisons - Base 100 en moyenne annuelle 2015 - Série CVS']
+        base_indice_grand['coeff_appart_a_maison'] = base_indice_grand['Indice des prix des logements anciens - France métropolitaine - Maisons - Base 100 en moyenne annuelle 2015 - Série CVS']/base_indice_grand['Indice des prix des logements anciens - France métropolitaine - Appartements - Base 100 en moyenne annuelle 2015 - série CVS']
 
-    # Create the coefficient variables
-    base_indice_grand['coeff_maison_a_appart'] = base_indice_grand['Indice des prix des logements anciens - France métropolitaine - Appartements - Base 100 en moyenne annuelle 2015 - série CVS']/base_indice_grand['Indice des prix des logements anciens - France métropolitaine - Maisons - Base 100 en moyenne annuelle 2015 - Série CVS']
-    base_indice_grand['coeff_appart_a_maison'] = base_indice_grand['Indice des prix des logements anciens - France métropolitaine - Maisons - Base 100 en moyenne annuelle 2015 - Série CVS']/base_indice_grand['Indice des prix des logements anciens - France métropolitaine - Appartements - Base 100 en moyenne annuelle 2015 - série CVS']
+        base_indice_grand=create_columns(base_indice_grand)
 
-    base_indice_grand=create_columns(base_indice_grand)
+        liste_drop=['coeff_maison_a_appart', 'coeff_appart_a_maison','Indice des prix des logements anciens - France métropolitaine - Maisons - Base 100 en moyenne annuelle 2015 - série CVS',
+        'Indice des prix des logements anciens - France métropolitaine - Appartements - Base 100 en moyenne annuelle 2015 - Série CVS']
+        base_indice_grand = base_indice_grand.drop(columns=liste_drop)
+        base_indice_grand=base_indice_grand.transpose()
+        base_indice_grand = base_indice_grand.reset_index()
 
-    liste_drop=['coeff_maison_a_appart', 'coeff_appart_a_maison','Indice des prix des logements anciens - France métropolitaine - Maisons - Base 100 en moyenne annuelle 2015 - série CVS',
-       'Indice des prix des logements anciens - France métropolitaine - Appartements - Base 100 en moyenne annuelle 2015 - Série CVS']
-    base_indice_grand = base_indice_grand.drop(columns=liste_drop)
-    base_indice_grand=base_indice_grand.transpose()
-    base_indice_grand = base_indice_grand.reset_index()
+        # Import of the real estate areas table
+        zone = pd.read_excel(path_zonage_immo, engine='openpyxl')
+        zone = zone.rename(columns={'Nom Commune': 'nom_commune'})
 
-    # Import of the real estate areas table
-    zone = pd.read_excel(path_zonage_immo, engine='openpyxl')
-    zone = zone.rename(columns={'Nom Commune': 'nom_commune'})
-
-    # Join dvf and area table, then replace missing values
-    data['Code Commune'] = data['code_commune'].apply(lambda x: commune(x)).astype("str")
-    joined_data = pd.merge(data, zone,how="left", on='Code Commune')
-    
-    joined_data['vrai_zone'] = joined_data.apply(lambda x: fill_zone(x),axis=1)
-    
-    # Get the sale trimesters
-    joined_data['date_vente'] = joined_data['date_mutation'].apply(lambda x: datetime.strptime(x, '%Y-%m-%d'))
-    joined_data['trimestre_vente'] = joined_data.apply(lambda x: get_trimester(x),axis=1)
-    
-    if actulisation:
+        # Join dvf and area table, then replace missing values
+        data['Code Commune'] = data['code_commune'].apply(lambda x: commune(x)).astype("str")
+        joined_data = pd.merge(data, zone,how="left", on='Code Commune')
         
-        def my_tqdm_decorator(iterable):
-            progress_bar = tqdm(iterable, desc="Compute coefficient :")
-            for item in progress_bar:
-                yield item
-                # Refresh the progress bar after each iteration
-                sys.stdout.flush()
-
-        print('Starting discount...')
-    
-        # Compute the actualisation coefficient
-        joined_data['coeff_actu'] = list(tqdm(joined_data.swifter.apply(lambda x: get_coeff_actu(x,base_indice_grand,trimestre_actu),axis=1),
-                                    total=len(joined_data)))
-        drop_zone_list = ['Zone ABC','vrai_zone','date_vente']
-        joined_data = joined_data.drop(columns=drop_zone_list)
-
-        # Add columns
+        joined_data['vrai_zone'] = joined_data.apply(lambda x: fill_zone(x),axis=1)
         
-        # Create the target variables
-        joined_data['prix_actualise'] = joined_data['valeur_fonciere'] * joined_data['coeff_actu']
-        joined_data['prix_m2_actualise'] = joined_data['prix_actualise'] / joined_data['surface_reelle_bati']
-        joined_data['prix_m2'] = joined_data['valeur_fonciere'] / joined_data['surface_reelle_bati']
+        # Get the sale trimesters
+        joined_data['date_vente'] = joined_data['date_mutation'].apply(lambda x: datetime.strptime(x, '%Y-%m-%d'))
+        joined_data['trimestre_vente'] = joined_data.apply(lambda x: get_trimester(x),axis=1)
         
-    return joined_data
+        if actulisation:
+            
+            def my_tqdm_decorator(iterable):
+                progress_bar = tqdm(iterable, desc="Compute coefficient :")
+                for item in progress_bar:
+                    yield item
+                    # Refresh the progress bar after each iteration
+                    sys.stdout.flush()
+
+            print('Starting discount...')
+        
+            # Compute the actualisation coefficient
+            joined_data['coeff_actu'] = list(tqdm(joined_data.swifter.apply(lambda x: get_coeff_actu(x,base_indice_grand,trimestre_actu),axis=1),
+                                        total=len(joined_data)))
+            drop_zone_list = ['Zone ABC','vrai_zone','date_vente']
+            joined_data = joined_data.drop(columns=drop_zone_list)
+
+            # Add columns
+            
+            # Create the target variables
+            joined_data['prix_actualise'] = joined_data['valeur_fonciere'] * joined_data['coeff_actu']
+            joined_data['prix_m2_actualise'] = joined_data['prix_actualise'] / joined_data['surface_reelle_bati']
+            joined_data['prix_m2'] = joined_data['valeur_fonciere'] / joined_data['surface_reelle_bati']
+            
+        return joined_data
+        
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
