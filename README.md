@@ -1,4 +1,4 @@
-## House Prices Predictions
+## House Price Predictions
 
 This project includes a command-line interface to run engines for exploratory data analysis and machine learning on real estate data.
 
