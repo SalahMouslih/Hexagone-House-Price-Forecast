@@ -106,8 +106,6 @@ def fill_zone(data: pd.DataFrame):
     return zone
 
 
-
-
 def get_trimester(data):
     """Get the trimester based on the date"""
     
@@ -268,5 +266,3 @@ def fonction_final_prix(data, trimestre_actu, actulisation=True):
         joined_data['prix_m2'] = joined_data['valeur_fonciere'] / joined_data['surface_reelle_bati']
         
     return joined_data
-
-

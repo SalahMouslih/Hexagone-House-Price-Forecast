@@ -1,20 +1,13 @@
 from data_processing.clean import *
-from data_processing.filtres import *
 from data_processing.discount import *
+from data_processing.education import *
+from data_processing.filters import *
 from data_processing.utilities import *
 
 
 def preprocess_dvf_data(data_paths, trimestre_actu='2022-T2', test_trimestre=['2021-T3','2021-T4','2022-T1','2022-T2']):
     """
-    Preprocesses DVF data and returns a geopandas dataframe.
-
-    Args:
-        data_path (str): Path to input DVF data.
-        trimestre_actu (str): The trimester to use for the final price calculation.
-        test_trimestre (list): List of trimesters to use for testing data split. Default is ['2021-T3','2021-T4','2022-T1','2022-T2'].
-
-    Returns:
-        dvf_geo (geopandas.DataFrame): Preprocessed DVF data as a geopandas dataframe.
+    Main engine of preprocessing. Preprocesses DVF data in an end-to-end fashion.
     """
     # Import DVFs
     data = read_dvfs(data_paths)
@@ -54,25 +47,28 @@ def preprocess_dvf_data(data_paths, trimestre_actu='2022-T2', test_trimestre=['2
 
     dvf_geo = dvf_geo.reset_index(drop=True)
 
-    ##..
-    #lyc_gen_geo = prep_lyc(lyc, geo_etab)
-    #dvf_geo = calculate_closest_metric(dvf = dvf_geo,
-     #          table_info = lyc_gen_geo,
-     #          k_neighbors = 3,
-     #          metric_interest = 'taux_mention',
-     #          name_new_metric = 'moyenne')
+    
+    ##
+    # Read tables
+    geo_etab, brevet, lyc = read_data()
 
-    ## Ecoles
-    # Get the taux de mention for each collège + geographical coordinates of schools
-    #brevet_geo = prep_brevet(brevet, geo_etab)
+    # Get the taux de mention for each lycée and collège as well as their geographical coordinates
+    lyc_gen_geo = prep_lyc(lyc, geo_etab)
+    brevet_geo = prep_brevet(brevet, geo_etab)
 
-    # We get for each good the average taux de mention of the 3 closest collèges
-    #dvf_geo = calculate_closest_metric(dvf = dvf_geo,
-    #                table_info = brevet_geo,
-    #                k_neighbors = 3,
-    #                metric_interest = 'taux_mention',
-     #               name_new_metric = 'moyenne_brevet')
+    # Get for each property the average 'taux de mention' of the 3 closest 'lycées'
+    dvf_geo = calculate_closest_metric(dvf = dvf_geo, table_info = lyc_gen_geo,
+              k_neighbors = 3,
+              metric_of_interest = 'taux_mention',
+              new_metric_name = 'moyenne')
 
+    # Get for each property the average 'taux de mention' of the 3 closest 'collèges'
+    dvf_geo = calculate_closest_metric(dvf = dvf_geo, table_info = brevet_geo,
+                    k_neighbors = 3,
+                    metric_of_interest = 'taux_mention',
+                    new_metric_name = 'moyenne_brevet')
+
+    
     # Save the processed data
     output_dir = "data/processed"
     if not os.path.exists(output_dir):

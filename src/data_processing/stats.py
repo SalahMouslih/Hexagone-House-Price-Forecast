@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
+
 def stat_sur_filtre(data):
     """
     Compute and print the shape of the input dataframe, group the data by metropole and print the resulting sizes,
@@ -10,6 +11,7 @@ def stat_sur_filtre(data):
     print("Group sizes by LIBEPCI:")
     print(data.groupby(['LIBEPCI']).size())
     return data.groupby(['LIBEPCI', 'type_local']).size()
+
 
 def stat_before_after(data,clean_data):
     """

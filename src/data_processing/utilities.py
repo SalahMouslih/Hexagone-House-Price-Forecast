@@ -32,6 +32,21 @@ def read_dvfs(data_paths):
         return None
 
 
+def return_dfs(*data_paths):
+    """
+    Read multiple csv files from the given paths and return a list of dataframes.
+    """
+    dfs = [] 
+
+    # iterate over each path in the input arguments
+    for path in data_paths: 
+        df = pd.read_csv(path) 
+        # add the resulting dataframe to the list
+        dfs.append(df) 
+
+    # return the list of dataframes
+    return dfs 
+
 def get_top_zones(df, nb_top_zones):
 
     """Select zones where the highest number mutations"""
