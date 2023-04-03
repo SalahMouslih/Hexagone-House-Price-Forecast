@@ -1,9 +1,12 @@
+import os
+import pandas as pd
 from data_processing.amenities import equipements_prep
 from data_processing.clean import clean_multivente
 from data_processing.discount import fonction_final_prix
 from data_processing.education import prep_brevet, prep_lyc
 from data_processing.filters import select_bien, filtre_dur, filtre_prix
-from data_processing.utilities import calculate_closest_metric, chose_metric_names, get_top_zones,convert_gpd, read_dvfs, read_tables
+from data_processing.utilities import calculate_closest_metric, chose_metric_names, get_top_zones,convert_gpd, read_dvfs, read_tables,iris_prep
+from src.data_processing.utilities import select_variables
 
 
 def preprocessing_engine(data_paths, trimestre_actu='2022-T2', test_trimestre=['2021-T3','2021-T4','2022-T1','2022-T2']):
@@ -73,7 +76,7 @@ def preprocessing_engine(data_paths, trimestre_actu='2022-T2', test_trimestre=['
     dvf_geo = dvf_geo.sjoin(iris, how = 'left', predicate = 'within')
 
     ##
-    dvf_geo = chose_metric_name(dvf_geo,'income')
+    dvf_geo = chose_metric_names(dvf_geo,'income')
 
 
     ##equippement
@@ -82,7 +85,7 @@ def preprocessing_engine(data_paths, trimestre_actu='2022-T2', test_trimestre=['
     equipements = equipements_prep(bpe)
 
     dvf_geo = dvf_geo.merge(equipements, how = 'left', left_on = 'DCOMIRIS', right_on = 'DCIRIS')
-    dvf_geo = chose_metric_name(dvf_geo,'equi')
+    dvf_geo = chose_metric_names(dvf_geo,'equi')
 
     #
     dvf_geo = select_variables(dvf_geo)

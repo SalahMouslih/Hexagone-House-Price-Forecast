@@ -126,17 +126,17 @@ def get_nearest_neighbors(left_gdf, right_gdf, k_neighbors, return_distances=Fal
         return indices
 
 
-def apply_linear_regression(row, metric_of_interest):
+# def apply_linear_regression(row, metric_of_interest):
 
-    """Apply linear regression to calculate the intercept of a row with the given metric of interest."""
-    indices = row['indices']
-    X = table_info.loc[indices, ['surface_reelle_bati', 'nombre_pieces_principales']].values
-    y = table_info.loc[indices, metric_of_interest].values
+#     """Apply linear regression to calculate the intercept of a row with the given metric of interest."""
+#     indices = row['indices']
+#     X = table_info.loc[indices, ['surface_reelle_bati', 'nombre_pieces_principales']].values
+#     y = table_info.loc[indices, metric_of_interest].values
 
-    lr = LinearRegression()
-    lr.fit(X, y)
+#     lr = LinearRegression()
+#     lr.fit(X, y)
 
-    return lr.intercept_
+#     return lr.intercept_
 
 
 def calculate_closest_metric(dvf, table_info, k_neighbors, metric_of_interest, new_metric_name, apply_regression=False):
@@ -227,11 +227,11 @@ def alter_metric_name(df,input_variable_names,output_variable_names):
     """
     # Define a helper function to calculate a single new metric using my_choose_closest() function
     def calculate_single_metric(input_var, output_var):
-        return calculate_closest_metric(dvf=dvf_geo,
-                                        table_info=dvf_geo[dvf_geo[input_metric].notnull()], 
+        return calculate_closest_metric(dvf=df,
+                                        table_info=df[df[input_var].notnull()], 
                                         k_neighbors=1,
-                                        metric_of_interest=input_metric, 
-                                        new_metric_name=new_metric_name)[new_metric_name]
+                                        metric_of_interest=input_var, 
+                                        new_metric_name=output_var)[output_var]
     
     # Calculate the new metrics using parallel processing
     results = Parallel(n_jobs=-1, verbose=1)(

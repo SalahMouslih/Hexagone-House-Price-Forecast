@@ -67,7 +67,16 @@ def train_test_split(df, metropole=None, type_local=None, random_state=42, split
         test_df['prix_m2_actualise'] = test_df['prix_m2']
         return pd.concat([shuffled_df, test_df], axis=0)
 
-def pre_process(data, type_local):
+def preprocess_ml(data, type_local):
+    '''
+    Here we will drop unnecessary columns and corraled feature
+
+    Args:
+        data : the pandas dataframe to process
+        type: the type of local to process
+    Return:
+        Clean dataframe for pipeline
+    '''
     
     # Drop unnecessary columns
     drop_clean=list(set(data.columns)&set(to_drop))

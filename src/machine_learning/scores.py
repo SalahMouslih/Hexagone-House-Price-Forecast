@@ -3,6 +3,8 @@ import numpy as np
 from machine_learning.preprocess import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.pipeline import Pipeline
+from machine_learning.preprocess import preprocess_ml
+from machine_learning.engine import build_pipeline
 from joblib import dump
 
 QUARTILE = 0.05
@@ -28,7 +30,7 @@ def train_score_save(model, data, metropole, type_local):
     
     try:
         data = train_test_split(data, metropole, type_local, split=False)
-        data = preprocessing(data, type_local)
+        data = preprocess_ml(data, type_local)
         shape = data.shape
         
         clf = build_pipeline(model, data)
@@ -51,9 +53,11 @@ def train_score_save(model, data, metropole, type_local):
         
         shape = data.shape
         estimator = clf.best_estimator_
+        ### save to model to disk
         dump(estimator, f"results/{metropole.strip().replace(' ', '-')}-{type_local}-{model}.joblib")
         
         result = f"{metropole}-{type_local}-{model}-best_score: {best_score}, best_param: {best_params}, rmse: {rmse}, score: {score}, median: {median}, mean: {mean}"
+        print(result)
         dataframe = pd.DataFrame([[metropole, type_local, model, best_score, best_params, rmse, score, median, mean, shape]],
                                  columns=['metropole', 'type_local', 'model', 'best_score_cv_search', 'best_params', 'rmse', 'score_r2_test', 'error_prix_actualise_median', 'error_prix_actualise_mean', 'shape'])
         with open("results_log/results.txt", "a+") as f:
