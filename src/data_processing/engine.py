@@ -1,15 +1,17 @@
+from data_processing.amenities import equipements_prep
 from data_processing.clean import clean_multivente
 from data_processing.discount import fonction_final_prix
 from data_processing.education import prep_brevet, prep_lyc
 from data_processing.filters import select_bien, filtre_dur, filtre_prix
-from data_processing.utilities import calculate_closest_metric, get_top_zones,convert_gpd, read_dvfs, read_tables
+from data_processing.utilities import calculate_closest_metric, chose_metric_names, get_top_zones,convert_gpd, read_dvfs, read_tables
 
 
 def preprocessing_engine(data_paths, trimestre_actu='2022-T2', test_trimestre=['2021-T3','2021-T4','2022-T1','2022-T2']):
     """Main engine of preprocessing. Preprocesses DVF data in an end-to-end fashion."""
     try:
         # Read tables
-        geo_etab, brevet, lyc = read_data()
+        data = read_dvfs()
+        geo_etab, brevet, lyc = read_tables()
     except FileNotFoundError:
         print("Error: data file not found")
         return None
@@ -49,10 +51,6 @@ def preprocessing_engine(data_paths, trimestre_actu='2022-T2', test_trimestre=['
 
     dvf_geo = dvf_geo.reset_index(drop=True)
 
-    
-    ##
-    # Read tables
-    geo_etab, brevet, lyc = read_data()
 
     # Get the taux de mention for each lycée and collège as well as their geographical coordinates
     lyc_gen_geo = prep_lyc(lyc, geo_etab)
@@ -70,7 +68,25 @@ def preprocessing_engine(data_paths, trimestre_actu='2022-T2', test_trimestre=['
                     metric_of_interest = 'taux_mention',
                     new_metric_name = 'moyenne_brevet')
 
-    
+    ##Iris
+    iris = iris_prep()
+    dvf_geo = dvf_geo.sjoin(iris, how = 'left', predicate = 'within')
+
+    ##
+    dvf_geo = chose_metric_name(dvf_geo,'income')
+
+
+    ##equippement
+
+    bpe = read_equi()
+    equipements = equipements_prep(bpe)
+
+    dvf_geo = dvf_geo.merge(equipements, how = 'left', left_on = 'DCOMIRIS', right_on = 'DCIRIS')
+    dvf_geo = chose_metric_name(dvf_geo,'equi')
+
+    #
+    dvf_geo = select_variables(dvf_geo)
+
     if dvf_geo is None:
         print("Error: data preprocessing failed")
     else:
