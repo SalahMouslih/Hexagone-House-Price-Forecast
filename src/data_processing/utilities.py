@@ -6,13 +6,12 @@ from sklearn.linear_model import LinearRegression
 import glob
 import os
 from joblib import Parallel, delayed
-
+import warnings
+warnings.filterwarnings('ignore')
 
 # Import tables 
 path_to_metropole = 'data/open_data/metropoles_communes.csv'
 metropoles = pd.read_csv(path_to_metropole, delimiter=';', header=5)
-iris_value = pd.read_csv('data/open_data/IRIS_donnees.csv', delimiter = ';')
-iris_shape = gpd.read_file('data/open_data/IRIS_contours.shp')
 
 
 def read_dvfs(data_paths):
@@ -29,7 +28,7 @@ def read_dvfs(data_paths):
         data = pd.concat(map(pd.read_csv, data_paths))
 
         print('Ready to start preprocessing')
-        print('************************')
+        print('****************************')
 
         return data
     
@@ -52,6 +51,31 @@ def read_tables(*data_paths):
 
     # return the list of dataframes
     return dfs 
+
+
+def read_lyc():
+    """
+    Read lycees csv files.
+    """
+
+    print("Reading lycees tables...")
+    # get geographical coordinates of schools
+    geo_etab = pd.read_csv('data/open_data/geo_brevet.csv', delimiter = ';')
+    # get results at brevet for each collège
+    brevet = pd.read_csv('data/open_data/resultats_brevet.csv', delimiter = ';')
+    # get results at 'baccalauréat' for each lycée
+    lyc =  pd.read_csv('data/open_data/resultats_lycées.csv', sep = ';')
+
+    return geo_etab, brevet, lyc
+
+
+def read_iris():
+
+    print("Reading iris tables...This might take a while")
+    iris_value = pd.read_csv('data/open_data/IRIS_donnees.csv', delimiter = ';')
+    iris_shape = gpd.read_file('data/open_data/IRIS_contours.shp')
+
+    return iris_value, iris_shape
 
 
 def get_top_zones(df, nb_top_zones):
@@ -142,7 +166,7 @@ def apply_linear_regression(row, metric_of_interest):
 def calculate_closest_metric(dvf, table_info, k_neighbors, metric_of_interest, new_metric_name, apply_regression=False):
     """Compute the new metric based on the k-nearest neighbors in table_info dataframe."""
     try:
-        print(f"Computing {new_metric_name}...")
+        print(f"Computing `{new_metric_name}`...")
         dvf[new_metric_name] = np.nan
         closest_indices = get_nearest_neighbors(left_gdf=dvf, right_gdf=table_info, k_neighbors=k_neighbors)
         dvf['indices'] = list(closest_indices)
@@ -160,7 +184,7 @@ def calculate_closest_metric(dvf, table_info, k_neighbors, metric_of_interest, n
         return None
 
 
-def iris_prep():
+def iris_prep(iris_value, iris_shape):
     """
     Merge iris_shape and iris_value tables to obtain the polygons and the IRIS values in the same table.
 
@@ -203,14 +227,23 @@ equi_output_variable_names = ['Banques', 'Bureaux_de_Poste', 'Commerces', 'Ecole
                         'Bibliotheques', 'Espaces_remarquables_et_patrimoine']            
 
 
-def choose_metric_names(df, variable):
+def choose_metric_name(df, variable):
     """
     Calculates a new metric using the given input metric and name.
+    
+    Args:
+    - df: pandas DataFrame to modify
+    - variable: string indicating the type of metric to create. Should be either 'income' or 'equip'.
+
+    Returns:
+    - A pandas DataFrame with a new column for the selected metric.
     """
     if variable == 'income':
-        return alter_metric_name(df,income_input_variable_names, income_output_variable_names) 
+        return alter_metric_name(df, income_input_variable_names, income_output_variable_names) 
     elif variable == 'equip':
-        return alter_metric_name(df,equi_input_variable_names, equi_output_variable_names) 
+        return alter_metric_name(df,equi_input_variable_names, equi_output_variable_names)
+    else :
+        raise ValueError("Invalid variable input. Choose either 'income' or 'equip'.")
 
 
 def alter_metric_name(df,input_variable_names,output_variable_names):
@@ -226,16 +259,18 @@ def alter_metric_name(df,input_variable_names,output_variable_names):
     df (pandas dataframe): updated dataframe with input variables dropped and new metrics added.
     """
     # Define a helper function to calculate a single new metric using my_choose_closest() function
-    def calculate_single_metric(input_var, output_var):
-        return calculate_closest_metric(dvf=dvf_geo,
-                                        table_info=dvf_geo[dvf_geo[input_metric].notnull()], 
+    def calculate_single_metric(params):
+        input_var = params[0]
+        output_var = params[1]
+        return calculate_closest_metric(dvf=df,
+                                        table_info=df[df[input_var].notnull()], 
                                         k_neighbors=1,
-                                        metric_of_interest=input_metric, 
-                                        new_metric_name=new_metric_name)[new_metric_name]
+                                        metric_of_interest=input_var, 
+                                        new_metric_name=output_var)[output_var]
     
     # Calculate the new metrics using parallel processing
     results = Parallel(n_jobs=-1, verbose=1)(
-        delayed(calculate_single_metric)(input_var, output_var) for input_var, output_var in zip(input_variable_names, output_variable_names))
+        delayed(calculate_single_metric)(vars) for vars in zip(input_variable_names, output_variable_names))
     
     # Create a dictionary of new metric names and values
     new_metrics_dict = {output_var: result for output_var, result in zip(output_variable_names, results)}

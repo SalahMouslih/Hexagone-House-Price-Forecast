@@ -1,5 +1,6 @@
 import pandas as pd
 
+trimestres=['2021-T3', '2021-T4', '2022-T1', '2022-T2']
 to_drop=['adresse_numero', 'adresse_suffixe','numero_disposition',
        'adresse_code_voie', 'code_postal', 'code_commune',
        'ancien_code_commune','ancien_nom_commune' , 'ancien_id_parcelle',
@@ -12,8 +13,7 @@ to_drop=['adresse_numero', 'adresse_suffixe','numero_disposition',
        'id_parcelle','nature_mutation','date_mutation','LIBEPCI','prix_actualise','DCOMIRIS','DCIRIS','prix_m2',
        'type_local','geometry','indices','quantile_prix','coeff_actu']
 
-
-def train_test_split(df, metropole=None, type_local=None, random_state=42, split=True, trimestres=['2021-T3', '2021-T4', '2022-T1', '2022-T2'], quartile=None):
+def train_test_split(df, metropole=None, type_local=None, random_state=42, split=True, trimestres=trimestres, quartile=None):
     """
     Splits a given dataframe into training and testing sets based on the given parameters.
 

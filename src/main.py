@@ -1,5 +1,5 @@
 import argparse
-from data_processing.engine import preprocess_dvf_data
+from data_processing.engine import preprocessing_engine
 import logging
 import os
 import warnings
@@ -42,7 +42,7 @@ def main():
     if args.preprocess:
         file_paths = [path for pattern in args.preprocess for path in parse_file_path(pattern)]
         logging.info(f"Running the pre-processing engine on files: {', '.join(file_paths)}")
-        preprocess_dvf_data(file_paths)
+        preprocessing_engine(file_paths)
         logging.info("Pre-processing complete. You can find the processed files in the 'processed' directory.")
 
     #elif args.ml:
