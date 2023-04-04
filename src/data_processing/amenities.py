@@ -20,6 +20,7 @@ def read_equi():
     """
     try:
         print("Reading Equipements table...")
+        # Read 'base permanente des equipements' file
         amenities = pd.read_csv(bpe_data_path, delimiter=';')
         return amenities
     except IOError:
@@ -54,24 +55,24 @@ def equipements_prep(liste_iris):
 
     for equipement in liste_equipements:
         # Filter the amenities dataframe to only include the current equipment category
-        amenities = amenities[amenities['TYPEQU'].isin(equipement)]
+        amenities_temp = amenities[amenities['TYPEQU'].isin(equipement)]
 
         # Group the amenities dataframe by DCIRIS and TYPEQU, count the number of occurrences and store the result in a dataframe
-        amenities = amenities.groupby('DCIRIS')['TYPEQU'].value_counts().to_frame()
+        amenities_temp = amenities_temp.groupby('DCIRIS')['TYPEQU'].value_counts().to_frame()
 
         # Group the amenities dataframe by DCIRIS, sum the number of equipment and rename the column to the first equipment name in the list
-        amenities = amenities.groupby('DCIRIS').sum()
-        amenities = amenities.rename(columns={"TYPEQU": equipement[0]})
+        amenities_temp = amenities_temp.groupby('DCIRIS').sum()
+        amenities_temp = amenities_temp.rename(columns={"TYPEQU": equipement[0]})
 
         # Append the amenities dataframe to the amenities list
-        amenities_df.append(amenities_df)
+        amenities_df.append(amenities_temp)
 
     # Concatenate the amenities dataframes in the amenities list, fill the missing values with 0, and reset the ind
     amenities_df = pd.concat(amenities_df).fillna(0)
     amenities_df['DCIRIS'] = amenities_df.index
     amenities_df = amenities_df.reset_index(drop=True)
     
-    #
+    # drop duplicates and group by IRIS
     amenities_df = amenities_df.drop_duplicates()
     amenities_df = amenities_df.groupby(["DCIRIS"], as_index=False).sum()
 

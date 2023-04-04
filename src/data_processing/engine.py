@@ -3,8 +3,9 @@ from data_processing.clean import clean_multivente
 from data_processing.discount import fonction_final_prix
 from data_processing.education import prep_brevet, prep_lyc
 from data_processing.filters import select_bien, filtre_dur, filtre_prix
-from data_processing.utilities import calculate_closest_metric, choose_metric_name, iris_prep, get_top_zones,convert_gpd, read_dvfs, read_iris, read_lyc
-
+from data_processing.utilities import calculate_closest_metric, choose_metric_name, iris_prep, get_top_zones,convert_gpd, read_dvfs, read_iris, read_lyc, select_variables
+import pandas as pd
+import os
 
 trimestre_actu = '2022-T2'
 test_trimestre=['2021-T3','2021-T4','2022-T1','2022-T2']
@@ -42,10 +43,10 @@ def preprocessing_engine(data_paths, trimestre_actu=trimestre_actu, test_trimest
 
     # Filter the prices of the datasets
     dvf_train = filtre_prix(dvf_train,'prix_m2_actualise')
-    #dvf_test = filtre_prix(dvf_test,'prix_m2')
+    dvf_test = filtre_prix(dvf_test,'prix_m2')
     
     # Concatenate train and test data
-    #dvf = pd.concat([dvf_train, dvf_test])
+    dvf = pd.concat([dvf_train, dvf_test])
 
     # Convert data to geopandas
     dvf_geo = convert_gpd(dvf_train)
@@ -95,7 +96,7 @@ def preprocessing_engine(data_paths, trimestre_actu=trimestre_actu, test_trimest
     equipements = equipements_prep(liste_iris)
 
     dvf_geo = dvf_geo.merge(equipements, how = 'left', left_on = 'DCOMIRIS', right_on = 'DCIRIS')
-    dvf_geo = choose_metric_name(dvf_geo,'equi')
+    dvf_geo = choose_metric_name(dvf_geo,'amenity')
 
     # Select the relevant variables
     dvf_geo = select_variables(dvf_geo)

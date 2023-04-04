@@ -30,7 +30,7 @@ def read_dvfs(data_paths):
         print('Ready to start preprocessing')
         print('****************************')
 
-        return data
+        return data[:1000]
     
     except Exception as e:
         print(f"Error occurred while reading data: {e}")
@@ -210,42 +210,6 @@ def iris_prep(iris_value, iris_shape):
         print(f"Error: {str(e)}")
 
 
-income_input_variable_names = ['DISP_TP6019', 'DISP_Q119', 'DISP_MED19', 'DISP_Q319', 'DISP_EQ19', 'DISP_D119', 'DISP_D219',
-                        'DISP_D319', 'DISP_D419', 'DISP_D619', 'DISP_D719', 'DISP_D819', 'DISP_D919', 'DISP_RD19',
-                        'DISP_S80S2019', 'DISP_GI19', 'DISP_PACT19', 'DISP_PTSA19', 'DISP_PCHO19', 'DISP_PBEN19',
-                        'DISP_PPEN19', 'DISP_PPAT19', 'DISP_PPSOC19', 'DISP_PPFAM19', 'DISP_PPMINI19', 'DISP_PPLOGT19',
-                        'DISP_PIMPOT19', 'DISP_NOTE19']
-income_output_variable_names = ['Taux_pauvreté_seuil_60', 'Q1', 'Mediane', 'Q3', 'Ecart_inter_Q_rapporte_a_la_mediane', 'D1',
-                         'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'Rapport_interdécile_D9/D1', 'S80/S20', 'Gini',
-                         'Part_revenus_activite', 'Part_salaire', 'Part_revenus_chomage', 'Part_revenus_non_salariées',
-                         'Part_retraites', 'Part_revenus_patrimoine', 'Part_prestations_sociales',
-                         'Part_prestations_familiales', 'Part_minima_sociaux', 'Part_prestations_logement', 'Part_impôts']
-
-equi_input_variable_names=['A203', 'A206', 'B101', 'C101', 'C201', 'D201', 'E107', 'F303', 'F307', 'F313']
-
-equi_output_variable_names = ['Banques', 'Bureaux_de_Poste', 'Commerces', 'Ecoles','Collèges_Lycées', 'Medecins','Gares', 'Cinema',
-                        'Bibliotheques', 'Espaces_remarquables_et_patrimoine']            
-
-
-def choose_metric_name(df, variable):
-    """
-    Calculates a new metric using the given input metric and name.
-    
-    Args:
-    - df: pandas DataFrame to modify
-    - variable: string indicating the type of metric to create. Should be either 'income' or 'equip'.
-
-    Returns:
-    - A pandas DataFrame with a new column for the selected metric.
-    """
-    if variable == 'income':
-        return alter_metric_name(df, income_input_variable_names, income_output_variable_names) 
-    elif variable == 'equip':
-        return alter_metric_name(df,equi_input_variable_names, equi_output_variable_names)
-    else :
-        raise ValueError("Invalid variable input. Choose either 'income' or 'equip'.")
-
-
 def alter_metric_name(df,input_variable_names,output_variable_names):
     """
     Calculate new metrics using my_choose_closest() function and return updated dataframe.
@@ -283,6 +247,42 @@ def alter_metric_name(df,input_variable_names,output_variable_names):
     
     return df
 
+income_input_variable_names = ['DISP_TP6019', 'DISP_Q119', 'DISP_MED19', 'DISP_Q319', 'DISP_EQ19', 'DISP_D119', 'DISP_D219',
+                        'DISP_D319', 'DISP_D419', 'DISP_D619', 'DISP_D719', 'DISP_D819', 'DISP_D919', 'DISP_RD19',
+                        'DISP_S80S2019', 'DISP_GI19', 'DISP_PACT19', 'DISP_PTSA19', 'DISP_PCHO19', 'DISP_PBEN19',
+                        'DISP_PPEN19', 'DISP_PPAT19', 'DISP_PPSOC19', 'DISP_PPFAM19', 'DISP_PPMINI19', 'DISP_PPLOGT19',
+                        'DISP_PIMPOT19', 'DISP_NOTE19']
+income_output_variable_names = ['Taux_pauvreté_seuil_60', 'Q1', 'Mediane', 'Q3', 'Ecart_inter_Q_rapporte_a_la_mediane', 'D1',
+                         'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'Rapport_interdécile_D9/D1', 'S80/S20', 'Gini',
+                         'Part_revenus_activite', 'Part_salaire', 'Part_revenus_chomage', 'Part_revenus_non_salariées',
+                         'Part_retraites', 'Part_revenus_patrimoine', 'Part_prestations_sociales',
+                         'Part_prestations_familiales', 'Part_minima_sociaux', 'Part_prestations_logement', 'Part_impôts']
+
+equi_input_variable_names=['A203', 'A206', 'B101', 'C101', 'C201', 'D201', 'E107', 'F303', 'F307', 'F313']
+
+equi_output_variable_names = ['Banques', 'Bureaux_de_Poste', 'Commerces', 'Ecoles','Collèges_Lycées', 'Medecins','Gares', 'Cinema',
+                        'Bibliotheques', 'Espaces_remarquables_et_patrimoine']            
+
+
+def choose_metric_name(df, variable):
+    """
+    Calculates a new metric using the given input metric and name.
+    
+    Args:
+    - df: pandas DataFrame to modify
+    - variable: string indicating the type of metric to create. Should be either 'income' or 'equip'.
+
+    Returns:
+    - A pandas DataFrame with a new column for the selected metric.
+    """
+    if variable == 'income':
+        return alter_metric_name(df, income_input_variable_names, income_output_variable_names) 
+    elif variable == 'amenity':
+        return alter_metric_name(df,equi_input_variable_names, equi_output_variable_names)
+    else :
+        raise ValueError("Invalid variable input. Choose either 'income' or 'amenity'.")
+
+
 liste_var_garder=['id_mutation', 'date_mutation', 'numero_disposition', 'valeur_fonciere',
        'adresse_numero', 'adresse_nom_voie', 'adresse_code_voie',
        'code_commune', 'nom_commune', 'code_departement', 'LIBEPCI',
@@ -299,6 +299,7 @@ liste_var_garder=['id_mutation', 'date_mutation', 'numero_disposition', 'valeur_
        'Part_salaire', 'Part_revenus_chomage', 'Part_revenus_non_salariées', 'Part_retraites', 'Part_revenus_patrimoine',
        'Part_prestations_sociales', 'Part_prestations_familiales', 'Part_minima_sociaux', 'Part_prestations_logement','Part_impôts']
 
+
 def select_variables(dvf_geo, keep_columns = liste_var_garder):
     """
     Select variables from dvf_geo dataframe and return updated dataframe.
@@ -310,6 +311,13 @@ def select_variables(dvf_geo, keep_columns = liste_var_garder):
     Returns:
     dvf_geo_final (pandas dataframe): updated dataframe with selected variables.
     """
-    dvf_geo_final = dvf_geo[keep_columns]
-    
-    return dvf_geo_final
+    try:
+        
+        print("Keeping variables of interest...")
+        # Keep columns of interest 
+        dvf_geo_final = dvf_geo[keep_columns]
+        return dvf_geo_final
+
+    except Exception as e:
+        print(f"Error occurred while filtering data: {e}")
+        return None
