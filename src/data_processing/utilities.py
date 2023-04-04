@@ -1,17 +1,21 @@
-import numpy as np
-import pandas as pd
-import geopandas as gpd
-from sklearn.neighbors import BallTree
-from sklearn.linear_model import LinearRegression
-import glob
+""" 
+
+"""
 import os
-from joblib import Parallel, delayed
+import glob
 import warnings
 warnings.filterwarnings('ignore')
 
-# Import tables 
-path_to_metropole = 'data/open_data/metropoles_communes.csv'
-metropoles = pd.read_csv(path_to_metropole, delimiter=';', header=5)
+from joblib import Parallel, delayed
+import geopandas as gpd
+from sklearn.neighbors import BallTree
+from sklearn.linear_model import LinearRegression
+import pandas as pd
+import numpy as np
+
+# Import tables import numpy as np
+PATH_TO_METROPOLES = 'data/open_data/metropoles_communes.csv'
+metropoles = pd.read_csv(PATH_TO_METROPOLES, delimiter=';', header=5)
 
 
 def read_dvfs(data_paths):
@@ -30,53 +34,60 @@ def read_dvfs(data_paths):
         print('Ready to start preprocessing')
         print('****************************')
 
-        return data[:1000]
-    
+        return data[:1000]    
     except Exception as e:
         print(f"Error occurred while reading data: {e}")
         return None
-
 
 def read_tables(*data_paths):
     """
     Read multiple csv files from the given paths and return a list of dataframes.
     """
-    dfs = [] 
+    dataframes = [] 
 
     # iterate over each path in the input arguments
     for path in data_paths: 
-        df = pd.read_csv(path) 
+        dataframe = pd.read_csv(path) 
         # add the resulting dataframe to the list
-        dfs.append(df) 
+        dataframes.append(dataframe) 
 
     # return the list of dataframes
-    return dfs 
+    return dataframes 
 
-
-def read_lyc():
+def read_lycees():
     """
-    Read lycees csv files.
+    Read lycees and colleges csv files.
     """
+    try:
+        print("Reading lycees tables...")
+        # get geographical coordinates of schools
+        geo_etab_df = pd.read_csv('data/open_data/geo_brevet.csv', delimiter=';')
+        # get results at brevet for each college
+        brevet_df = pd.read_csv('data/open_data/resultats_brevet.csv', delimiter=';')
+        # get results at 'baccalaureat' for each lycee
+        lyc_df = pd.read_csv('data/open_data/resultats_lycées.csv', sep=';')
 
-    print("Reading lycees tables...")
-    # get geographical coordinates of schools
-    geo_etab = pd.read_csv('data/open_data/geo_brevet.csv', delimiter = ';')
-    # get results at brevet for each collège
-    brevet = pd.read_csv('data/open_data/resultats_brevet.csv', delimiter = ';')
-    # get results at 'baccalauréat' for each lycée
-    lyc =  pd.read_csv('data/open_data/resultats_lycées.csv', sep = ';')
+        return geo_etab_df, brevet_df, lyc_df
 
-    return geo_etab, brevet, lyc
-
+    except FileNotFoundError as fnfe:
+        print(f"Error reading lycees tables: {fnfe}")
+        return None
+    except Exception as e:
+        print(f"An error occurred while reading lycees tables: {e}")
+        return None
 
 def read_iris():
-
-    print("Reading iris tables...This might take a while")
-    iris_value = pd.read_csv('data/open_data/IRIS_donnees.csv', delimiter = ';')
-    iris_shape = gpd.read_file('data/open_data/IRIS_contours.shp')
-
-    return iris_value, iris_shape
-
+    """
+    Read IRIS tables and return iris_value and iris_shape.
+    """
+    try:
+        print("Reading iris tables...this might take a while")
+        iris_value = pd.read_csv('data/open_data/IRIS_donnees.csv', delimiter=';')
+        iris_shape = gpd.read_file('data/open_data/IRIS_contours.shp')
+        return iris_value, iris_shape
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
 
 def get_top_zones(df, nb_top_zones):
 
@@ -103,22 +114,44 @@ def get_top_zones(df, nb_top_zones):
         print(f"An error occurred while selecting the top {nb_top_zones} zones: {str(e)}")
         return None
 
-
 def convert_gpd(df):
     """
-    Function convert_gpd converts a pandas DataFrame to a GeoDataFrame using the geometry attribute 
-    which is created from the longitude and latitude columns of the input DataFrame
+    Function convert_gpd converts a pandas DataFrame to a GeoDataFrame using the geometry
+    attribute which is created from the longitude and latitude columns of the input DataFrame
     """
-    return gpd.GeoDataFrame(
-        df, geometry = gpd.points_from_xy(df.longitude, df.latitude)
+    try:
+        return gpd.GeoDataFrame(
+            df, geometry = gpd.points_from_xy(df.longitude, df.latitude)
         )
+    except ValueError as e:
+        print(f"Error converting to GeoDataFrame: {e}")
+        return None
 
+
+
+from sklearn.neighbors import BallTree
 
 def get_k_nearest_neighbors(source_points, candidate_points, k_neighbors):
-    """Find the k nearest neighbors for all source points from a set of candidate points"""
-    tree = BallTree(candidate_points, leaf_size=15, metric='haversine')
-    distances, indices = tree.query(source_points, k=k_neighbors)
-    return indices, distances
+    """
+    Find the k nearest neighbors for all source points from a set of candidate points.
+    
+    Args:
+    source_points: numpy array or list of arrays containing the coordinates of the source points
+    candidate_points: numpy array or list of arrays containing the coordinates of the candidate points
+    k_neighbors: integer specifying the number of nearest neighbors to return
+    
+    Returns:
+    A tuple containing two numpy arrays:
+    - indices: the indices of the k nearest neighbors in the candidate_points array for each source point
+    - distances: the distances between each source point and its k nearest neighbors
+    """
+    try:
+        tree = BallTree(candidate_points, leaf_size=15, metric='haversine')
+        distances, indices = tree.query(source_points, k=k_neighbors)
+        return indices, distances
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None, None
 
 
 def get_nearest_neighbors(left_gdf, right_gdf, k_neighbors, return_distances=False):
@@ -150,7 +183,7 @@ def get_nearest_neighbors(left_gdf, right_gdf, k_neighbors, return_distances=Fal
         return indices
 
 
-def apply_linear_regression(row, metric_of_interest):
+def apply_linear_regression(row,table_info, metric_of_interest):
 
     """Apply linear regression to calculate the intercept of a row with the given metric of interest."""
     indices = row['indices']
@@ -237,7 +270,7 @@ def alter_metric_name(df,input_variable_names,output_variable_names):
         delayed(calculate_single_metric)(vars) for vars in zip(input_variable_names, output_variable_names))
     
     # Create a dictionary of new metric names and values
-    new_metrics_dict = {output_var: result for output_var, result in zip(output_variable_names, results)}
+    new_metrics_dict = dict(zip(output_variable_names, results))
     
     # Add the new metrics to the df dataframe
     df = df.assign(**new_metrics_dict)
@@ -312,12 +345,22 @@ def select_variables(dvf_geo, keep_columns = liste_var_garder):
     dvf_geo_final (pandas dataframe): updated dataframe with selected variables.
     """
     try:
+        if not isinstance(dvf_geo, pd.DataFrame):
+            raise TypeError("dvf_geo must be a pandas DataFrame.")
         
         print("Keeping variables of interest...")
         # Keep columns of interest 
         dvf_geo_final = dvf_geo[keep_columns]
         return dvf_geo_final
 
-    except Exception as e:
+    except KeyError as e:
+        print(f"Error occurred while selecting variables: {e}")
+        return None
+
+    except TypeError as e:
         print(f"Error occurred while filtering data: {e}")
+        return None
+    
+    except Exception as e:
+        print(f"An error occurred: {e}")
         return None

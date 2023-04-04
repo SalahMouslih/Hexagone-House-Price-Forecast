@@ -1,15 +1,21 @@
+"""
+This module provides functions to preprocess data on schools and merge it with DVF data.
+
+Functions:
+- prep_lyc(data: pd.DataFrame, geo_etab: pd.DataFrame) -> gpd.GeoDataFrame
+    Filters the given lycée data to only include lycées généraux, calculates the taux de mention for
+    each lycée and converts the result to a geopandas dataframe, which is then merged with
+    the dvf data.
+
+- prep_brevet(data, geo_etab)
+    Preprocesses brevet data by computing the taux de mention for each college,
+    converting it to a geopandas dataframe, and merging it with the DVF dataframe.
+
+"""
+
 import pandas as pd
 import geopandas as gpd
 
-def read_data():
-    # get geographical coordinates of schools
-    geo_etab = pd.read_csv('data/open_data/geo_brevet.csv', delimiter = ';')
-    # get results at brevet for each collège
-    brevet = pd.read_csv('data/open_data/resultats_brevet.csv', delimiter = ';')
-    # get results at 'baccalauréat' for each lycée
-    lycees =  pd.read_csv('data/open_data/resultats_lycées.csv', sep = ';')
-    
-    return geo_etab, brevet, lycees
 
 def prep_lyc(data: pd.DataFrame, geo_etab: pd.DataFrame) -> gpd.GeoDataFrame:
     """
@@ -24,8 +30,7 @@ def prep_lyc(data: pd.DataFrame, geo_etab: pd.DataFrame) -> gpd.GeoDataFrame:
 
     Returns:
     A geopandas GeoDataFrame with the filtered and processed lycée data
-    """
-    
+    """    
     try:
         # Start by filtering out the data for years other than 2020 and keeping only lycées généraux
         lyc = data[data['Annee'] == 2020]
@@ -53,9 +58,9 @@ def prep_lyc(data: pd.DataFrame, geo_etab: pd.DataFrame) -> gpd.GeoDataFrame:
         lyc_gen_geo = lyc_gen_geo[(lyc_gen_geo['latitude'].notna()) & (lyc_gen_geo['longitude'].notna())]
 
         return lyc_gen_geo
-
-    except:
-        print("An error occurred while processing the lycée data.")
+    except Exception as e:
+        print(f"An error occurred while preprocessing lycees data: {e}")
+        return None
 
 
 def prep_brevet(data, geo_etab):
@@ -63,7 +68,6 @@ def prep_brevet(data, geo_etab):
     Preprocesses brevet data by computing the taux de mention for each college,
     converting it to a geopandas dataframe, and merging it with the DVF dataframe.
     """
-
     try:
         brevet = data[data['session'] == 2021]
         brevet_geo = brevet.merge(geo_etab, how = 'left', left_on = 'numero_d_etablissement', right_on = 'numero_uai')
@@ -78,6 +82,11 @@ def prep_brevet(data, geo_etab):
 
         return brevet_geo
 
-    except Exception as e:
-        print(f"An error occurred while preprocessing brevet data: {e}")
+    except TypeError as e:
+        print(f"TypeError occurred while preprocessing brevet data: {e}")
         return None
+    
+    except KeyError as e:
+        print(f"KeyError occurred while preprocessing brevet data: {e}")
+        return None
+
