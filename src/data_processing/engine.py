@@ -14,6 +14,7 @@ dvf_geo (GeoDataFrame): A GeoDataFrame containing the preprocessed data that is 
 """
 import os
 import pandas as pd
+from utils.common import convert_gpd
 from data_processing.amenities import equipements_prep
 from data_processing.clean import clean_multivente
 from data_processing.discount import fonction_final_prix
@@ -21,7 +22,7 @@ from data_processing.education import prep_brevet, prep_lyc
 from data_processing.filters import select_bien, filtre_dur, filtre_prix
 from data_processing.utilities import (
     calculate_closest_metric, choose_metric_name, 
-    iris_prep, get_top_zones,convert_gpd, read_dvfs, 
+    iris_prep, get_top_zones, read_dvfs, 
     read_iris, read_lycees, select_variables
     )
 

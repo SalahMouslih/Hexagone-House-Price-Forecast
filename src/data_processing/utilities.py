@@ -114,23 +114,6 @@ def get_top_zones(df, nb_top_zones):
         print(f"An error occurred while selecting the top {nb_top_zones} zones: {str(e)}")
         return None
 
-def convert_gpd(df):
-    """
-    Function convert_gpd converts a pandas DataFrame to a GeoDataFrame using the geometry
-    attribute which is created from the longitude and latitude columns of the input DataFrame
-    """
-    try:
-        return gpd.GeoDataFrame(
-            df, geometry = gpd.points_from_xy(df.longitude, df.latitude)
-        )
-    except ValueError as e:
-        print(f"Error converting to GeoDataFrame: {e}")
-        return None
-
-
-
-from sklearn.neighbors import BallTree
-
 def get_k_nearest_neighbors(source_points, candidate_points, k_neighbors):
     """
     Find the k nearest neighbors for all source points from a set of candidate points.
@@ -339,7 +322,7 @@ def select_variables(dvf_geo, keep_columns = liste_var_garder):
 
     Parameters:
     dvf_geo (pandas dataframe): dataframe to select variables from.
-    liste_var_garder (list): list of variables to keep in the updated dataframe.
+    keep_columns (list): list of variables to keep in the updated dataframe.
 
     Returns:
     dvf_geo_final (pandas dataframe): updated dataframe with selected variables.
