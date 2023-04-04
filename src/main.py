@@ -33,9 +33,8 @@ def parse_file_path(path):
     raise ValueError(f"Invalid input: '{path}' is not a file or directory")
 
 
-
 def main():
-    """ efsv """
+    """ main function """
     parser = argparse.ArgumentParser(description='Run the machine learning project engines.')
 
     parser.add_argument('--preprocess', metavar='data_path', nargs='+', type=str,
