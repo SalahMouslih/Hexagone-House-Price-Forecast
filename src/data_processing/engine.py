@@ -10,7 +10,7 @@ trimestre_actu (str): A string representing the current quarter in the format
 
 Outputs:
 
-dvf_geo (GeoDataFrame): A GeoDataFrame containing the preprocessed data that is ready for machine learning
+dvf_geo (GeoDataFrame): A GeoDataFrame containing the preprocessed data that is ready for modeling
 """
 import os
 import pandas as pd
@@ -104,6 +104,7 @@ def preprocessing_engine(data_paths, trimestre_actu='2022-T2'):
     # Add information about the IRIS area
     iris_value, iris_shape = read_iris()
     iris = iris_prep(iris_value, iris_shape)
+    ##save_iris(iris)
     dvf_geo = dvf_geo.sjoin(iris, how = 'left', predicate = 'within')
 
     #Choose the metric name for income
