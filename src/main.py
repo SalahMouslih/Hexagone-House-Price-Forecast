@@ -7,13 +7,14 @@ The machine learnibg engine..
 
 import argparse
 import logging
+import traceback
 import os
 import warnings
 warnings.filterwarnings('ignore')
 
 from data_processing.engine import preprocessing_engine
 #from machine_learning.engine import machine_learning_engine
-#from eda.engine import eda_engine
+from eda.eda_engine import eda_engine
 
 
 # Set up logging
@@ -42,7 +43,7 @@ def main():
                         You can use wildcards such as * to specify multiple files.')
     parser.add_argument('--ml', dest='ml', action='store_true',
                         help='run the machine learning engine')
-    parser.add_argument('--eda', action='store_true',
+    parser.add_argument('--eda', metavar='data_path', type=str,
                         help='run the exploratory data analysis engine')
 
     args = parser.parse_args()
@@ -57,13 +58,19 @@ def main():
         except Exception as e:
             logging.error("An error occurred while pre-processing the files: %s", e)
 
-
     #elif args.ml:
      #   logging.info('Running the machine learning engine')
       #  machine_learning_engine()
-    #elif args.eda:
-     #   logging.info('Running the exploratory data analysis engine')
-      #  eda_engine()
+    elif args.eda:
+        try:
+            logging.info('Running the exploratory data analysis engine')
+            eda_engine(args.eda)
+            logging.info("EDA complete. You can find the output plots \
+                         in the 'plots' directory.")
+        except Exception as e:
+            logging.error("An error occurred while performing EDA : %s", e)
+            print(traceback.format_exc())
+
     else:
         parser.print_help()
 
