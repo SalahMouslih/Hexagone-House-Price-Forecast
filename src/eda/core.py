@@ -4,14 +4,8 @@ EDA Core functions
 This module contains core functions for visualizing and analyzing processed data.
 """
 
-import geopandas as gpd
-import pandas as pd
 import numpy as np
-from numpy import mean
-import glob
 import os
-from datetime import datetime
-import math
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -111,7 +105,6 @@ def distribution_target_type_and_metropoles(data, output_dir=None):
         for i, met in enumerate(data.LIBEPCI.unique()):
             fig = sns.displot(data=data[data.LIBEPCI == met], x="prix_m2_actualise", hue="type_local", kde=True)
             fig.set(title='Distribution of prix_m2_actualise for flats and houses, {}'.format(met))
-
             if output_dir:
               # Save the resulting plot to the specified directory
               filename = os.path.join(output_dir, f"prix_m2_distribution_{met}.png")

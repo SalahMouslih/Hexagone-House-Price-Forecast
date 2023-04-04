@@ -39,28 +39,33 @@ def read_processed_data(data_path):
         data = pd.read_csv(data_path)
         print('Ready to start EDA')
         print('****************************')
-        return data[:1000]
+        return data
     except Exception as e:
         print(f"Error occurred while reading data: {e}")
         return None
 
 
 def create_output_dir():
-     """
+    """
     Creates then returns a directory named "data/plots" if it does not exist already.
 
     Returns:
         str: Path of the output directory.
     """
-    # Define the path of the output directory
-    output_dir = "data/plots/"
-    
-    # Create the output directory if it does not exist already
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    try:
+        # Define the path of the output directory
+        output_dir = "data/output_plots/"
         
-    # Return the path of the output directory
-    return output_dir
+        # Create the output directory if it does not exist already
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        
+        # Return the path of the output directory
+        return output_dir
+    
+    except Exception as e:
+        print(f"Error creating output directory: {str(e)}")
+        return None
 
 def get_metropoles(data):
     """
