@@ -1,8 +1,7 @@
 """
 This module provides utility functions for performing exploratory data analysis (EDA)
-on processed data from a single CSV file. It includes functions for reading the
-processed data, creating an output directory, selecting variables from a
-dataframe, and getting unique values for metropoles.
+on processed data from a single CSV file. It includes functions for creating an output directory, 
+selecting variables from a dataframes.
 """
 import pandas as pd
 import os
@@ -21,28 +20,6 @@ liste=['prix_m2_actualise',
        'Rapport_interdécile_D9/D1', 'S80/S20', 'Gini',
        'Part_revenus_activite', 'Part_salaire', 'Part_revenus_chomage', 'Part_revenus_non_salariées', 'Part_retraites', 'Part_revenus_patrimoine',
        'Part_prestations_sociales', 'Part_prestations_familiales', 'Part_minima_sociaux', 'Part_prestations_logement', 'Part_impôts']
-
-
-def read_processed_data(data_path):
-    """
-    Read processed data from a single CSV file and return the dataframe.
-
-    Args:
-        data_path (str): Path to the processed CSV file.
-
-    Returns:
-        pd.DataFrame: Dataframe containing the processed data.
-            Returns None if an error occurs while reading the data.
-    """
-    try:
-        print('Reading processed data...')
-        data = pd.read_csv(data_path)
-        print('Ready to start EDA')
-        print('****************************')
-        return data
-    except Exception as e:
-        print(f"Error occurred while reading data: {e}")
-        return None
 
 
 def create_output_dir():
@@ -67,40 +44,6 @@ def create_output_dir():
         print(f"Error creating output directory: {str(e)}")
         return None
 
-def get_metropoles(data):
-    """
-    Returns a list of metropoles of the given dataframe.
-
-    Args:
-        data (pd.DataFrame): The input dataframe.
-
-    Returns:
-        list: A list of metropoles.
-
-    Raises:
-        TypeError: If 'data' is not a pandas DataFrame.
-        KeyError: If the 'LIBEPCI' column is not present in the dataframe.
-        Exception: For any other errors that may occur.
-    """
-    try:
-        if not isinstance(data, pd.DataFrame):
-            raise TypeError("'data' must be a pandas DataFrame.")
-
-        # Extract unique 'LIBEPCI' values
-        metropoles = data['LIBEPCI'].unique()
-        return metropoles
-
-    except KeyError as e:
-        print(f"Error occurred while extracting 'LIBEPCI' values: {e}")
-        return None
-
-    except TypeError as e:
-        print(f"Error occurred while processing data: {e}")
-        return None
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None
 
 def select_variables(df, keep_columns = liste):
     """

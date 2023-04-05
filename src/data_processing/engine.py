@@ -14,7 +14,7 @@ dvf_geo (GeoDataFrame): A GeoDataFrame containing the preprocessed data that is 
 """
 import os
 import pandas as pd
-from utils.common import convert_gpd
+from utils.common import convert_gpd, read_data, read_iris, iris_prep
 from data_processing.amenities import equipements_prep
 from data_processing.clean import clean_multivente
 from data_processing.discount import fonction_final_prix
@@ -22,8 +22,8 @@ from data_processing.education import prep_brevet, prep_lyc
 from data_processing.filters import select_bien, filtre_dur, filtre_prix
 from data_processing.utilities import (
     calculate_closest_metric, choose_metric_name, 
-    iris_prep, get_top_zones, read_dvfs, 
-    read_iris, read_lycees, select_variables
+    get_top_zones, read_lycees, 
+    select_variables
     )
 
 def preprocessing_engine(data_paths, trimestre_actu='2022-T2'):
@@ -37,7 +37,9 @@ def preprocessing_engine(data_paths, trimestre_actu='2022-T2'):
 
     try:
         # Read data
-        data = read_dvfs(data_paths)
+        data = read_data(data_paths)
+        print('Ready to start preprocessing')
+        print('****************************')
     except FileNotFoundError:
         print("Error: data file not found")
         return None
@@ -105,7 +107,6 @@ def preprocessing_engine(data_paths, trimestre_actu='2022-T2'):
     # Add information about the IRIS area
     iris_value, iris_shape = read_iris()
     iris = iris_prep(iris_value, iris_shape)
-    ##save_iris(iris)
     dvf_geo = dvf_geo.sjoin(iris, how = 'left', predicate = 'within')
 
     #Choose the metric name for income

@@ -1,8 +1,9 @@
 """
 This module provides an engine that utilizes functions for performing exploratory data analysis (EDA) on processed data.
 """
+from utils.common import read_data, read_iris, iris_prep
 from eda.core import *
-from eda.utilities import create_output_dir, read_processed_data, select_variables
+from eda.utilities import create_output_dir, select_variables
 
 
 def eda_engine(data_path):
@@ -17,7 +18,9 @@ def eda_engine(data_path):
     """
     try:
         # Read processed data
-        data = read_processed_data(data_path)
+        data = read_data(data_path)
+        print('Ready to start EDA')
+        print('****************************')
     except FileNotFoundError:
         print("Error: data file not found")
 

@@ -18,42 +18,6 @@ PATH_TO_METROPOLES = 'data/open_data/metropoles_communes.csv'
 metropoles = pd.read_csv(PATH_TO_METROPOLES, delimiter=';', header=5)
 
 
-def read_dvfs(data_paths):
-    """
-    Read multiple DVF data from the given paths and return a single concatenated dataframe.
-    """
-    try:
-        print('Reading data...')
-
-        # Use glob to find all csv files matching the data paths
-        data_paths = [path for pattern in data_paths for path in glob.glob(pattern)]
-        
-        # Print the list of file paths for debugging purposes
-        data = pd.concat(map(pd.read_csv, data_paths))
-
-        print('Ready to start preprocessing')
-        print('****************************')
-
-        return data[:1000]    
-    except Exception as e:
-        print(f"Error occurred while reading data: {e}")
-        return None
-
-def read_tables(*data_paths):
-    """
-    Read multiple csv files from the given paths and return a list of dataframes.
-    """
-    dataframes = [] 
-
-    # iterate over each path in the input arguments
-    for path in data_paths: 
-        dataframe = pd.read_csv(path) 
-        # add the resulting dataframe to the list
-        dataframes.append(dataframe) 
-
-    # return the list of dataframes
-    return dataframes 
-
 def read_lycees():
     """
     Read lycees and colleges csv files.
@@ -75,19 +39,7 @@ def read_lycees():
     except Exception as e:
         print(f"An error occurred while reading lycees tables: {e}")
         return None
-
-def read_iris():
-    """
-    Read IRIS tables and return iris_value and iris_shape.
-    """
-    try:
-        print("Reading iris tables...this might take a while")
-        iris_value = pd.read_csv('data/open_data/IRIS_donnees.csv', delimiter=';')
-        iris_shape = gpd.read_file('data/open_data/IRIS_contours.shp')
-        return iris_value, iris_shape
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None
+        
 
 def get_top_zones(df, nb_top_zones):
 
@@ -198,32 +150,6 @@ def calculate_closest_metric(dvf, table_info, k_neighbors, metric_of_interest, n
         print("Error: could not calculate closest metric")
         print(str(e))
         return None
-
-
-def iris_prep(iris_value, iris_shape):
-    """
-    Merge iris_shape and iris_value tables to obtain the polygons and the IRIS values in the same table.
-
-    Parameters: None
-    Returns: A pandas dataframe containing the merged iris data with no duplicate entries based on 'DCOMIRIS' column.
-    """
-    try:
-        # Remove duplicates from iris_shape and iris_value tables
-        iris_shape = iris_shape.drop_duplicates(subset=['DCOMIRIS'], keep='first')
-        iris_value = iris_value.drop_duplicates(subset=['IRIS'], keep='first')
-
-        # Convert 'IRIS' column to a string of 9 characters with leading zeros if necessary
-        iris_value['IRIS'] = iris_value['IRIS'].astype(str).str.rjust(9, '0')
-
-        # Merge iris_shape and iris_value tables and remove duplicates based on 'DCOMIRIS' column
-        iris = iris_shape.merge(iris_value, how='left', right_on='IRIS', left_on='DCOMIRIS')
-        iris = iris.drop_duplicates(subset=['DCOMIRIS'], keep='first')
-
-        return iris
-    except KeyError as e:
-        print(f"Error: {str(e)} column not found in input data")
-    except Exception as e:
-        print(f"Error: {str(e)}")
 
 
 def alter_metric_name(df,input_variable_names,output_variable_names):
