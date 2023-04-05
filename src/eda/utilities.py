@@ -31,7 +31,7 @@ def create_output_dir():
     """
     try:
         # Define the path of the output directory
-        output_dir = "data/output/plots/"
+        output_dir = "output/plots"
         
         # Create the output directory if it does not exist already
         if not os.path.exists(output_dir):
