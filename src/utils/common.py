@@ -24,7 +24,7 @@ def read_data(data_paths):
             data = pd.read_csv(data_paths)
         else:
             data = pd.concat(map(pd.read_csv, data_paths))
-        return data
+        return data[:1000]
     except FileNotFoundError as e:
         print(f"Error occurred while reading data: {e}")
         return None

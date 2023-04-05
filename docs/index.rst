@@ -4,12 +4,18 @@
    contain the root `toctree` directive.
 
 Welcome to House prices Prediction's documentation!
-===================================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+=======
+My Project
+==========
+
+.. toctree::
+   :maxdepth: 2
+   
    modules
 
 Indices and tables
