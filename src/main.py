@@ -66,9 +66,9 @@ def main():
              "in the 'plots' directory.")
         else:
             logging.error("An error occurred while performing EDA")
-     #elif args.ml:
-     #   logging.info('Running the machine learning engine')
-      #  machine_learning_engine()
+    elif args.ml:
+        logging.info('Running the machine learning engine')
+        machine_learning_engine()
     else:
         parser.print_help()
 
