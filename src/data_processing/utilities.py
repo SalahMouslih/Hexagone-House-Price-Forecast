@@ -1,4 +1,17 @@
 """ 
+Module for processing data related to real estate transactions.
+
+This module provides utility functions for reading and processing geographical data on 
+schools and property transactions. It relies on several libraries, including pandas, geopandas, and scikit-learn.
+
+Functions:
+- read_lycees(): Read lycees and colleges CSV files and return them as pandas dataframes.
+- get_top_zones(df, nb_top_zones): Returns a new DataFrame containing only the top 'nb_top_zones' 
+metropoles with the highest number of real estate transactions.
+- get_k_nearest_neighbors(source_points, candidate_points, k_neighbors): Find the k nearest neighbors 
+for all source points from a set of candidate points.
+- get_nearest_neighbors(left_gdf, right_gdf, k_neighbors, return_distances=False): For each point in left_gdf, 
+find the k-nearest neighbors in right_gdf and return their indices.
 
 """
 import os
@@ -20,15 +33,20 @@ metropoles = pd.read_csv(PATH_TO_METROPOLES, delimiter=';', header=5)
 
 def read_lycees():
     """
-    Read lycees and colleges csv files.
+    Read lycees and colleges CSV files and return them as pandas dataframes.
+
+    Returns:
+        geo_etab_df (pandas.DataFrame): DataFrame containing the geographical coordinates of schools.
+        brevet_df (pandas.DataFrame): DataFrame containing the results at brevet for each college.
+        lyc_df (pandas.DataFrame): DataFrame containing the results at 'baccalaureat' for each lycee.
     """
     try:
         print("Reading lycees tables...")
-        # get geographical coordinates of schools
+        # read geographical coordinates of schools
         geo_etab_df = pd.read_csv('data/open_data/geo_brevet.csv', delimiter=';')
-        # get results at brevet for each college
+        # read results at brevet for each college
         brevet_df = pd.read_csv('data/open_data/resultats_brevet.csv', delimiter=';')
-        # get results at 'baccalaureat' for each lycee
+        # read results at 'baccalaureat' for each lycee
         lyc_df = pd.read_csv('data/open_data/resultats_lycées.csv', sep=';')
 
         return geo_etab_df, brevet_df, lyc_df
@@ -38,13 +56,22 @@ def read_lycees():
         return None
     except Exception as e:
         print(f"An error occurred while reading lycees tables: {e}")
-        return None
-        
+        return None        
 
 def get_top_zones(df, nb_top_zones):
 
-    """Select zones where the highest number mutations"""
+    """
+    Returns a new DataFrame containing only the top 'nb_top_zones' metropoles 
+    with the highest number of real estate transactions.
 
+    Args:
+        df (pandas.DataFrame): The input DataFrame.
+        nb_top_zones (int): The number of top metropoles to select.
+
+    Returns:
+        pandas.DataFrame: A new DataFrame containing only the top 'nb_top_zones' metropoles 
+        with the highest number of real estate transactions.
+    """
     try:
         print('Selecting top 10 metropoles...')
 
@@ -71,14 +98,14 @@ def get_k_nearest_neighbors(source_points, candidate_points, k_neighbors):
     Find the k nearest neighbors for all source points from a set of candidate points.
     
     Args:
-    source_points: numpy array or list of arrays containing the coordinates of the source points
-    candidate_points: numpy array or list of arrays containing the coordinates of the candidate points
-    k_neighbors: integer specifying the number of nearest neighbors to return
+        source_points: numpy array or list of arrays containing the coordinates of the source points
+        candidate_points: numpy array or list of arrays containing the coordinates of the candidate points
+        k_neighbors: integer specifying the number of nearest neighbors to return
     
     Returns:
-    A tuple containing two numpy arrays:
-    - indices: the indices of the k nearest neighbors in the candidate_points array for each source point
-    - distances: the distances between each source point and its k nearest neighbors
+        tuple containing two numpy arrays:
+        - indices: the indices of the k nearest neighbors in the candidate_points array for each source point
+        - distances: the distances between each source point and its k nearest neighbors
     """
     try:
         tree = BallTree(candidate_points, leaf_size=15, metric='haversine')
@@ -156,13 +183,13 @@ def alter_metric_name(df,input_variable_names,output_variable_names):
     """
     Calculate new metrics using my_choose_closest() function and return updated dataframe.
 
-    Parameters:
-    df (pandas dataframe): dataframe to calculate new metrics on.
-    input_variable_names (list): names of variables to calculate new metrics from.
-    output_variable_names (list): names to give new metrics.
+    Args:
+        df (pandas dataframe): dataframe to calculate new metrics on.
+        input_variable_names (list): names of variables to calculate new metrics from.
+        output_variable_names (list): names to give new metrics.
 
     Returns:
-    df (pandas dataframe): updated dataframe with input variables dropped and new metrics added.
+        df (pandas dataframe): updated dataframe with input variables dropped and new metrics added.
     """
     # Define a helper function to calculate a single new metric using my_choose_closest() function
     def calculate_single_metric(params):
@@ -211,11 +238,11 @@ def choose_metric_name(df, variable):
     Calculates a new metric using the given input metric and name.
     
     Args:
-    - df: pandas DataFrame to modify
-    - variable: string indicating the type of metric to create. Should be either 'income' or 'equip'.
+        df: pandas DataFrame to modify
+        variable: string indicating the type of metric to create. Should be either 'income' or 'equip'.
 
     Returns:
-    - A pandas DataFrame with a new column for the selected metric.
+        A pandas DataFrame with a new column for the selected metric.
     """
     if variable == 'income':
         return alter_metric_name(df, income_input_variable_names, income_output_variable_names) 
@@ -246,12 +273,12 @@ def select_variables(dvf_geo, keep_columns = liste_var_garder):
     """
     Select variables from dvf_geo dataframe and return updated dataframe.
 
-    Parameters:
-    dvf_geo (pandas dataframe): dataframe to select variables from.
-    keep_columns (list): list of variables to keep in the updated dataframe.
+    Args:
+        dvf_geo (pandas dataframe): dataframe to select variables from.
+        keep_columns (list): list of variables to keep in the updated dataframe.
 
     Returns:
-    dvf_geo_final (pandas dataframe): updated dataframe with selected variables.
+        dvf_geo_final (pandas dataframe): updated dataframe with selected variables.
     """
     try:
         if not isinstance(dvf_geo, pd.DataFrame):
