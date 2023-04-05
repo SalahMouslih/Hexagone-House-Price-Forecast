@@ -30,7 +30,7 @@ pip install -r requirements.txt
 Before running the preprocessing engine, you need to make sure that the required data is available in the correct directory. 
 
 Specifically, you need to download and unzip the raw data file(s) available at [raw_data](https://drive.google.com/file/d/1DvGKiCj-ywh_SthmYUayIZ7W5onqwJF-/view?usp=share_link) then place the extracted files in the `data/raw` directory.
-Similarily, download and unzip public data available at [public_data]([https://drive.google.com/file/d/1DvGKiCj-ywh_SthmYUayIZ7W5onqwJF-/view?usp=share_link](https://drive.google.com/file/d/1HQUMVZtvtxghBXzWahRg8CDM5oh1vJIB/view?usp=share_link) then place the extracted files in the `data/open_data` directory. 
+Similarily, download and unzip public data available at [public_data](https://drive.google.com/file/d/1HQUMVZtvtxghBXzWahRg8CDM5oh1vJIB/view?usp=share_link) then place the extracted files in the `data/open_data` directory. 
 
 Once the data is in the correct directory, you can proceed with running the main.py script with the desired command line arguments. The available options are:
 
