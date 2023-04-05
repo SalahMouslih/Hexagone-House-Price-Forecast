@@ -5,7 +5,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.pipeline import Pipeline
 from machine_learning.preprocess import preprocess_ml
 from machine_learning.preprocess import build_pipeline
-from machine_learning.utils import generate_feature_importance, save_result
+from machine_learning.utilities import generate_feature_importance, save_result
 
 
 QUARTILE = 0.05
