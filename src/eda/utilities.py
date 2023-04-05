@@ -22,7 +22,6 @@ liste=['prix_m2_actualise',
        'Part_revenus_activite', 'Part_salaire', 'Part_revenus_chomage', 'Part_revenus_non_salariées', 'Part_retraites', 'Part_revenus_patrimoine',
        'Part_prestations_sociales', 'Part_prestations_familiales', 'Part_minima_sociaux', 'Part_prestations_logement', 'Part_impôts']
 
-
 def create_output_dir():
     """
     Creates then returns a directory named "data/plots" if it does not exist already.
@@ -32,7 +31,7 @@ def create_output_dir():
     """
     try:
         # Define the path of the output directory
-        output_dir = "data/output_plots/"
+        output_dir = "data/plots/"
         
         # Create the output directory if it does not exist already
         if not os.path.exists(output_dir):
@@ -78,6 +77,55 @@ def select_variables(df, keep_columns = liste):
         print(f"An error occurred: {e}")
         return None
 
+liste_equipements = ['A203', 'A206', 'B101', 'C101',  'C201', 'D201', 'E107', 'F303', 'F307',  'F313']
+
+def select_equi(equipements, liste_equi = liste_equipements):
+    '''
+    Filters the equipements dataframe to select rows whose TYPEQU column is in the given list.
+
+    Args:
+    - equipements (pandas.DataFrame): a dataframe containing information about equipements in different IRIS
+    - liste_equi (list): a list of strings containing the names of the equipements to select
+
+    Returns:
+    - equipements (pandas.DataFrame): the filtered dataframe
+    '''
+
+    try:
+        equipements = equipements[equipements['TYPEQU'].isin(liste_equi)]
+        equipements = equipements.replace({'A203': 'Banque', 'A206': 'Poste', 'B101': 'Alimentation', 'C101': 'Ecoles',  'C201': 'College-Lycee',
+                         'D201': 'Medecin', 'E107': 'Gare',  'F303': 'Cinema', 'F307': 'Bibliotheque',  'F313': 'Patrimoine'})
+        return equipements
+
+    except Exception as e:
+        print(f"Error occurred while selecting equipements: {e}")
+        return None
+
+
+def transform_equi(equipements, crs):
+    '''
+    Transforms the equipements dataframe to match the given crs.
+
+    Args:
+    - equipements (pandas.DataFrame): a dataframe containing information about equipements in different IRIS
+    - crs (str): the coordinate reference system to transform the dataframe to
+
+    Returns:
+    - equipements_crs (geopandas.GeoDataFrame): the transformed dataframe
+    '''
+
+    try:
+        if equipements.crs is None:
+            equipements = equipements.set_crs(epsg=2154) # sets the initial crs of the dataframe
+        equipements_crs = equipements.to_crs(crs) # transforms the dataframe to the given crs
+        return equipements_crs
+
+    except Exception as e:
+        print(f"Error occurred while transforming equipements: {e}")
+        return None
+
+
+    
 def read_communes():
     """
     Read communes tables and return communes.
@@ -114,6 +162,7 @@ def modify_geo_data(data, iris, commune):
         print('Modify geodataframes')
        
         # Alter data columns
+        data = data.set_crs(4171)
         data['nom_commune'] = data['nom_commune'].str.upper()
         data.loc[data.NOM_COM.str.startswith('PARIS ').fillna(False), 'NOM_COM'] = 'Paris'
         data.loc[data.NOM_COM.str.startswith('MARSEILLE ').fillna(False), 'NOM_COM'] = 'Marseille'

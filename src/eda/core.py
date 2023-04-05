@@ -10,6 +10,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import geopandas as gpd
+from tqdm import tqdm
 
 def plot_heatmap(data, output_dir=None):
   """
@@ -384,7 +385,7 @@ def iris_bien(data, iris, area, output_dir=None):
   """
 
   try:
-    print(f"Generating revenus médian et au prix_m2 for {area}...")
+    print(f"Generating `revenus médian` et `prix_m2` for {area}...")
 
     cmap = plt.get_cmap("jet")
     data.to_crs(iris.crs)
@@ -416,32 +417,35 @@ def iris_bien_moyen(data, iris, area, metrique, var_iris, name_var_iris, output_
   variable for each IRIS, on the map of the area. The colors on the map correspond to the average metric values
   (per IRIS) and the variable values (per IRIS).
 
-  Parameters:
-  data (geopandas.GeoDataFrame): The GeoDataFrame containing property information.
-  iris (geopandas.GeoDataFrame): The GeoDataFrame containing IRIS information.
-  area (str): the name of the area to plot (e.g. "Paris", "Marseille", "Lyon")
-  metrique (str): the name of the metric to use for the color scale on the map
-  var_iris (str): the name of the variable to use for the color scale on the map
-  name_var_iris (str): a display name for the variable, to use in the color scale label on the map
-  output_dir (str): optional, the path to a directory where the resulting plot will be saved
+  Args:
+    data (geopandas.GeoDataFrame): The GeoDataFrame containing property information.
+    iris (geopandas.GeoDataFrame): The GeoDataFrame containing IRIS information.
+    area (str): the name of the area to plot (e.g. "Paris", "Marseille", "Lyon")
+    metrique (str): the name of the metric to use for the color scale on the map
+    var_iris (str): the name of the variable to use for the color scale on the map
+    name_var_iris (str): a display name for the variable, to use in the color scale label on the map
+    output_dir (str): optional, the path to a directory where the resulting plot will be saved
 
   Returns:
-  None
+    None
   """
 
   try:
-    print(f"Generating {var_iris} et au prix_m2 for {area}...")
+    print(f"Generating `{var_iris}` et `prix_m2` for {area}...")
 
     cmap = plt.get_cmap("jet")
 
     inter = data.groupby(['DCOMIRIS_right'])[[metrique]].mean()
-    inter.reset_index(inplace=True)
+    inter = inter.reset_index()
     iris_moyenne = inter.merge(iris, how='right', left_on='DCOMIRIS_right', right_on='DCOMIRIS')
     iris_moyenne = gpd.GeoDataFrame(iris_moyenne[[metrique, 'DCOMIRIS', 'NOM_COM']], geometry=iris_moyenne['geometry'])
-    iris_moyenne = iris_moyenne.to_crs(iris.crs)
-    
+
     iris_moyenne['center'] = iris_moyenne.centroid
-    iris_moyenne = iris_moyenne.set_geometry('center').to_crs(iris.crs)
+    
+    if iris_moyenne.crs is None:
+      iris_moyenne = iris_moyenne.set_crs(epsg=2154) # sets the initial crs of the dataframe
+      iris_moyenne = iris_moyenne.to_crs(str(iris.crs))
+      iris_moyenne = iris_moyenne.set_geometry('center').to_crs(str(iris.crs))
 
     base = iris.loc[iris.NOM_COM == area].plot(column=var_iris,
                                                 figsize=(20,10),
@@ -462,3 +466,178 @@ def iris_bien_moyen(data, iris, area, metrique, var_iris, name_var_iris, output_
       plt.show()
   except Exception as e:
     print(f"Error occurred while plotting data: {e}")
+
+def plot_equi_commune(equipements, communes, area, num_com, output_dir=None):
+  """
+  Plot the equipements in a given commune using geopandas.
+
+  Parameters:
+  area (str): Name of the commune to plot.
+  num_com (str): Departmental code of the commune.
+  size (tuple): Figure size (width, height).
+  output_file (str): Path to output file to save the plot. Defaults to None.
+
+  Returns:
+  None
+  """
+
+  try:
+    print(f"Generating 'equipements' distribution in {area}_{num_com}...")
+
+    # Create a base map of the commune
+    base = communes[communes.nom == area].plot(figsize=(20,10), alpha=0.1)
+
+    # Plot the equipements on the base map
+    figure = equipements[equipements['DEPCOM'] == num_com].plot(ax=base,
+                                                            column='TYPEQU',
+                                                            figsize=(20,10),
+                                                            legend=True,
+                                                            cmap=plt.get_cmap("jet")
+                                                            # legend_kwds={'label': "Type d'équipement"}
+                                                            )
+    # Hide axis
+    figure.set_axis_off()
+
+    # Save plot to output file if path is provided
+    if output_dir:
+      output_file = os.path.join(output_dir, f"distribution equipements_{area}_{num_com}.png")
+      plt.savefig(output_file)
+    else:
+      plt.show()
+
+  except KeyError:
+    print(f"Commune '{area}' not found in shapefile")
+  except Exception as e:
+    print(f"Error occurred while plotting data: {e}")
+
+
+def plot_equi_iris(equipements, iris, num_iris, output_dir=None):
+  '''
+  Plots a choropleth map showing the distribution of different types of amenities in a given IRIS.
+
+  Args:
+  - num_iris (str): the code of the IRIS to plot the amenities distribution for
+  - size (tuple): the size of the plot
+  - output_dir (str): the directory to save the plot image to (default is None)
+
+  Returns:
+  None
+  '''
+  print(f"Generating 'equipements' distribution in {num_iris}...")
+
+  try:
+      # plot the IRIS base map
+    base = iris[iris.DCOMIRIS == num_iris].plot(figsize=(20,10), alpha=0.1)
+
+    # plot the choropleth map
+    figure = equipements[equipements['DCIRIS'] == num_iris].plot(ax=base,
+                                                                        column='TYPEQU',
+                                                                        figsize=(20,10),
+                                                                        legend=True,
+                                                                        cmap=plt.get_cmap("jet"))
+
+    figure.set_axis_off()
+
+    # save the plot to output directory if given
+    if output_dir:
+      plt.savefig(os.path.join(output_dir, f"distribution equipements_{num_iris}.png"))
+    else:
+      plt.show()
+
+  except ValueError as e:
+    print(f"Error occurred while plotting the map: {e}")
+  except Exception as e:
+    print(f"Error occurred: {e}")
+
+import scipy.stats
+
+
+def corr_iris(data:gpd.GeoDataFrame, method:str, iris:list, col_1:str, col_2:str) -> float:
+    """
+    Computes the correlation between two columns of a dataset for a given IRIS region.
+
+    Args:
+    - data (gpd.GeoDataFrame): input GeoDataFrame
+    - method (str): the correlation method to use (pearson, spearman, kendall)
+    - iris (list): the IRIS region to consider
+    - col_1 (str): the name of the first column
+    - col_2 (str): the name of the second column
+
+    Returns:
+    - corr (float): the computed correlation
+
+    Raises:
+    - ValueError: if the provided method is not supported
+    - ValueError: if the provided columns are not found in the dataset
+    """
+
+    # Select data for the given IRIS region
+    points_iris = data[(data['IRIS_x']==iris[0]) & (data['IRIS_y']==iris[1])]
+  
+    # Select the two columns to compute correlation for
+    try:
+        x, y = [points_iris[col_1],points_iris[col_2]]
+    except KeyError:
+        raise ValueError(f"The provided columns '{col_1}' and '{col_2}' are not found in the dataset.")
+  
+    # Compute correlation if conditions are met
+    if (len(x)>2) & (np.min(x)!= np.max(x)) & (np.min(y)!= np.max(y)):
+        if method == 'pearson':
+            corr = scipy.stats.pearsonr(x, y)[0]
+        elif method == 'spearman':
+            corr = scipy.stats.spearmanr(x, y)[0]
+        elif method == 'kendall':
+            corr = scipy.stats.kendalltau(x, y)[0]
+        else:
+            raise ValueError(f"The correlation method '{method}' is not supported.")
+    else:
+        corr = np.nan
+  
+    return corr
+
+
+def plot_corr_spatiale(data, iris, communes, area, col_1='prix_m2_actualise', col_2='prix_m2_zone', method='spearman', output_dir=None):
+    """
+    Plot the spatial correlation of two columns of a specific area.
+
+    Args:
+    - data (gpd.GeoDataFrame): input GeoDataFrame
+    - iris (geopandas.GeoDataFrame): The GeoDataFrame containing IRIS information.
+    - area (str): name of the area to plot the correlation
+    - col_1 (str): the name of the first column to calculate the correlation
+    - col_2 (str): the name of the second column to calculate the correlation
+    - method (str): the method to use for calculating the correlation, defaults to 'spearman'
+    - output_dir(str, optional: the directory to save the plot image to (default is None)
+
+    Returns:
+    - None
+
+    """
+
+    try:
+      # Calculate the spatial correlation for each iris in the area
+      base_area = iris.loc[iris.NOM_COM == area].reset_index(drop=True)
+      column_corr = []
+      for index_iris in tqdm(base_area.index):
+        data_iris = base_area.iloc[index_iris]
+        column_corr.append(corr_iris(data, method, [data_iris['IRIS_x'], data_iris['IRIS_y']], col_1, col_2))
+      base_area['corr_spatiale'] = column_corr
+
+      # Plot the spatial correlation on the map
+      base = communes[communes.nom == area].plot(figsize=(20, 10), alpha=0.1)
+      figure = base_area.plot(ax=base,
+                            column='corr_spatiale',
+                            figsize=(20, 10),
+                            legend=True,
+                            cmap=plt.get_cmap("jet"),
+                            legend_kwds={'label': "Corrélation spatiale dans l'IRIS ({}) dans la ville de {}".format(method, area)})
+      figure.set_axis_off()
+      # save the plot to output directory if given
+      if output_dir:
+        plt.savefig(os.path.join(output_dir, f"correlation_spatiale_{area}.png"))
+      else:
+        plt.show()
+    except KeyError:
+      print(f"The area '{area}' is not available.")
+    except Exception as e:
+      print(f"An error occurred while plotting the spatial correlation: {e}")
