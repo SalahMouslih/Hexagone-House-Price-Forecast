@@ -39,8 +39,8 @@ def main():
     parser = argparse.ArgumentParser(description='Run the machine learning project engines.')
 
     parser.add_argument('--preprocess', metavar='data_path', nargs='+', type=str,
-                        help='path(s) of the raw data file(s) to be preprocessed. \
-                        You can use wildcards such as * to specify multiple files.')
+                        help='path(s) of the raw data file(s) to be preprocessed.'
+                        'You can use wildcards such as * to specify multiple files.')
     parser.add_argument('--ml', dest='ml', action='store_true',
                         help='run the machine learning engine')
     parser.add_argument('--eda', metavar='data_path', type=str,
@@ -52,25 +52,23 @@ def main():
         try:
             file_paths = [path for pattern in args.preprocess for path in parse_file_path(pattern)]
             logging.info("Running the pre-processing engine on files: %s", ', '.join(file_paths))
-            preprocessing_engine(file_paths)
-            logging.info("Pre-processing complete. You can find the processed \
-                        files in the 'processed' directory.")
+            if preprocessing_engine(file_paths):
+                logging.info("Pre-processing completed successfully!")
+            else:
+                logging.error("Error occurred during pre-processing!")
         except Exception as e:
-            logging.error("An error occurred while pre-processing the files: %s", e)
-
-    #elif args.ml:
+            logging.error("An error occurred while running the pre-processing engine: %s", e)
+            print(traceback.format_exc())
+    elif args.eda:
+        logging.info('Running the exploratory data analysis engine')
+        if eda_engine(args.eda):
+            logging.info("EDA complete. You can find the output plots "
+             "in the 'plots' directory.")
+        else:
+            logging.error("An error occurred while performing EDA")
+     #elif args.ml:
      #   logging.info('Running the machine learning engine')
       #  machine_learning_engine()
-    elif args.eda:
-        try:
-            logging.info('Running the exploratory data analysis engine')
-            eda_engine(args.eda)
-            logging.info("EDA complete. You can find the output plots \
-                         in the 'plots' directory.")
-        except Exception as e:
-            logging.error("An error occurred while performing EDA : %s", e)
-            print(traceback.format_exc())
-
     else:
         parser.print_help()
 
