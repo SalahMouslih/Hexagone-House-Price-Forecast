@@ -72,7 +72,7 @@ To see the available command-line arguments, run the following command:
 ``` python src/main.py --help``` 
 
 ## Documentation
-The project documentation can be found at `docs/index.html`.
+The project documentation can be found at `docs/_build/index.html`.
 
 ## General structure
 
@@ -80,10 +80,9 @@ The project documentation can be found at `docs/index.html`.
 ├── README.md
 ├── data
 │   ├── open_data
-│   │   └── open_data.zip
 │   ├── processed  
 │   └── raw
-│         └──  dvf_data.zip
+├── docs
 ├── models
 ├── notebooks
 │   ├── processing_notebook.py
