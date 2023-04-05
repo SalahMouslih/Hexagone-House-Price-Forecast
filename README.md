@@ -25,11 +25,12 @@ pip install -r requirements.txt
 
 ### Usage
 
-#### Unzip data
+#### Download data
 
 Before running the preprocessing engine, you need to make sure that the required data is available in the correct directory. 
 
-Specifically, you need to unzip the raw data file(s) and place the extracted files in the `data/raw` directory, and also unzip the open data file(s) and place the extracted files in the `data/open_data` directory. 
+Specifically, you need to download and unzip the raw data file(s) available at [raw_data](https://drive.google.com/file/d/1DvGKiCj-ywh_SthmYUayIZ7W5onqwJF-/view?usp=share_link) then place the extracted files in the `data/raw` directory.
+Similarily, download and unzip public data available at [public_data]([https://drive.google.com/file/d/1DvGKiCj-ywh_SthmYUayIZ7W5onqwJF-/view?usp=share_link](https://drive.google.com/file/d/1HQUMVZtvtxghBXzWahRg8CDM5oh1vJIB/view?usp=share_link) then place the extracted files in the `data/open_data` directory. 
 
 Once the data is in the correct directory, you can proceed with running the main.py script with the desired command line arguments. The available options are:
 
@@ -49,11 +50,12 @@ You can also preprocess multiple files at once using wildcards:
 The preprocessed files will be stored in the `processed` directory.
 
 #### Machine Learning Engine
-To run the machine learning engine, use the following command:
+To run the machine learning engine on the processed data, use the following command:
 
 ``` python src/main.py --ml ```
 
 This engine trains machine learning models on the preprocessed data and saves the evaluation metrics in the `output/models` directory.
+Note that you need to run the preprocessing engine first.
 
 #### Exploratory Data Analysis Engine
 
