@@ -1,9 +1,11 @@
 import argparse
-from data_processing.engine import preprocessing_engine
 import logging
 import os
 import warnings
+from data_processing.engine import preprocessing_engine
+from  machine_learning.engine import ml_processing
 warnings.filterwarnings('ignore')
+
 #from machine_learning.engine import machine_learning_engine
 #from eda.engine import eda_engine
 
@@ -44,10 +46,11 @@ def main():
         logging.info(f"Running the pre-processing engine on files: {', '.join(file_paths)}")
         preprocessing_engine(file_paths)
         logging.info("Pre-processing complete. You can find the processed files in the 'processed' directory.")
+    
 
-    #elif args.ml:
-     #   logging.info('Running the machine learning engine')
-      #  machine_learning_engine()
+    elif args.ml:
+       logging.info('Running the machine learning engine')
+       ml_processing()
     #elif args.eda:
      #   logging.info('Running the exploratory data analysis engine')
       #  eda_engine()

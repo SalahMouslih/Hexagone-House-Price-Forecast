@@ -1,9 +1,13 @@
 import pandas as pd
 import numpy as np
+import traceback
 from machine_learning.preprocess import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.pipeline import Pipeline
-from joblib import dump
+from machine_learning.preprocess import preprocess_ml
+from machine_learning.preprocess import build_pipeline
+from machine_learning.utils import generate_feature_importance, save_result
+
 
 QUARTILE = 0.05
 
@@ -28,7 +32,7 @@ def train_score_save(model, data, metropole, type_local):
     
     try:
         data = train_test_split(data, metropole, type_local, split=False)
-        data = preprocessing(data, type_local)
+        data = preprocess_ml(data, type_local)
         shape = data.shape
         
         clf = build_pipeline(model, data)
@@ -51,15 +55,20 @@ def train_score_save(model, data, metropole, type_local):
         
         shape = data.shape
         estimator = clf.best_estimator_
-        dump(estimator, f"results/{metropole.strip().replace(' ', '-')}-{type_local}-{model}.joblib")
-        
-        result = f"{metropole}-{type_local}-{model}-best_score: {best_score}, best_param: {best_params}, rmse: {rmse}, score: {score}, median: {median}, mean: {mean}"
-        dataframe = pd.DataFrame([[metropole, type_local, model, best_score, best_params, rmse, score, median, mean, shape]],
-                                 columns=['metropole', 'type_local', 'model', 'best_score_cv_search', 'best_params', 'rmse', 'score_r2_test', 'error_prix_actualise_median', 'error_prix_actualise_mean', 'shape'])
-        with open("results_log/results.txt", "a+") as f:
-            f.write(result + '\n')
+        numerical_columns = list(data.select_dtypes(exclude=["object","string"]).columns)
+        target='prix_m2_actualise'
+        numerical_columns=[col for col in numerical_columns if col!=target]
+        new_cat_cols = estimator.named_steps['preprocessor'].named_transformers_["cat"].named_steps["encoder"].get_feature_names_out(['code_departement'])
+        ### Generate feature importance
+        if model in ['xgboost','random_forest']:
+            model_ = estimator[-1]
+            generate_feature_importance(model_,model,metropole,type_local,numerical_columns,new_cat_cols)
+        ### save to model to disk and print rsult in console
+
+        result=save_result(estimator,type_local,model,metropole,best_score,best_params,rmse,score,median,mean,shape)
     except Exception as e:
         print(f"An error occurred: {e}")
-        dataframe = pd.DataFrame()
+        traceback.print_exc()
+        result=pd.DataFrame()
+    return result      
     
-    return dataframe

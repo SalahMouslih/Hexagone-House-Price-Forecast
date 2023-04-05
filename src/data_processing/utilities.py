@@ -29,7 +29,7 @@ def read_dvfs(data_paths):
 
         print('Ready to start preprocessing')
         print('****************************')
-
+        
         return data[:1000]
     
     except Exception as e:

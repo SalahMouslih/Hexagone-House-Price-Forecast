@@ -25,7 +25,6 @@ def preprocessing_engine(data_paths, trimestre_actu=trimestre_actu, test_trimest
 
     # Select the top 10 metropoles
     data_top = get_top_zones(data,10)
-
     #Clean the data to keep only multiventes
     clean_data = clean_multivente(data_top)
     
@@ -33,13 +32,13 @@ def preprocessing_engine(data_paths, trimestre_actu=trimestre_actu, test_trimest
     dvf = select_bien(clean_data)
     dvf = filtre_dur(dvf, surface_max_maison, nombre_pieces_max_maison, 'Maison')
     dvf = filtre_dur(dvf, surface_max_appartement, nombre_max_appartement, 'Appartement')
-
     # Discounting price
     dvf = fonction_final_prix(dvf, trimestre_actu=trimestre_actu)
 
     # TSplit the data into training and testing datasets
     dvf_train = dvf.loc[~dvf['trimestre_vente'].isin(test_trimestre)]
     dvf_test = dvf.loc[dvf['trimestre_vente'].isin(test_trimestre)]
+  
 
     # Filter the prices of the datasets
     dvf_train = filtre_prix(dvf_train,'prix_m2_actualise')

@@ -1,0 +1,5 @@
+Métropole du Grand Paris-Appartement-linear-best_score: 0.7714339215774003, best_param: {'poly_features__degree': 1}, rmse: 1517.0310568521784, score: 0.6778204188859992, median: 11.0083344179692, mean: 15.472795754958454
+Métropole du Grand Paris-Appartement-xgboost-best_score: 0.585898740374199, best_param: {}, rmse: 2084.4793635093347, score: 0.11841407703194362, median: 21.204975183913156, mean: 21.951150272562515
+Métropole du Grand Paris-Appartement-xgboost-best_score: 0.585898740374199, best_param: {}, rmse: 2084.4793635093347, score: 0.11841407703194362, median: 21.204975183913156, mean: 21.951150272562515
+Métropole du Grand Paris-Appartement-xgboost-best_score: 0.585898740374199, best_param: {}, rmse: 2084.4793635093347, score: 0.11841407703194362, median: 21.204975183913156, mean: 21.951150272562515
+Métropole du Grand Paris-Appartement-xgboost-best_score: 0.585898740374199, best_param: {}, rmse: 2084.4793635093347, score: 0.11841407703194362, median: 21.204975183913156, mean: 21.951150272562515

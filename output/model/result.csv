@@ -1,0 +1,2 @@
+metropole,type_local,model,best_score_cv_search,best_params,rmse,score_r2_test,error_prix_actualise_median,error_prix_actualise_mean,shape
+Métropole du Grand Paris,Appartement,xgboost,0.585898740374199,{},2084.4793635093347,0.11841407703194362,21.204975183913156,21.951150272562515,"(715998, 38)"
