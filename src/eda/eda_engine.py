@@ -1,9 +1,10 @@
 """
 This module provides an engine that utilizes functions for performing exploratory data analysis (EDA) on processed data.
 """
-from utils.common import read_data, read_iris, iris_prep
+from utils.common import convert_gpd, read_data, read_iris, iris_prep
+from eda.utilities import create_output_dir, modify_geo_data, read_communes, select_variables
 from eda.core import *
-from eda.utilities import create_output_dir, select_variables
+import geopandas as gpd
 
 
 def eda_engine(data_path):
@@ -16,6 +17,8 @@ def eda_engine(data_path):
     Returns:
         bool: True if the EDA is completed successfully, False otherwise.
     """
+
+    example_area = 'PARIS' #Change to prefered Area
     try:
         # Read processed data
         data = read_data(data_path)
@@ -42,6 +45,47 @@ def eda_engine(data_path):
     boxen_flats_houses(data, output_dir)
 
     box_flats_houses_metropoles(data, output_dir)
+
+    # Convert data to geopandas
+    geo_data = convert_gpd(data)
+
+    # Read communes and iris
+    try:
+        iris_value, iris_shape = read_iris()
+        commune = read_communes()
+    except Exception:
+        print("Error: data file not found")
+
+    # Add information about the IRIS area
+    iris = iris_prep(iris_value, iris_shape)
+    iris['iris_geometry'] = iris.geometry 
+    # Join data
+    joined_geo_data = gpd.sjoin(geo_data, iris, how = 'left', op = 'within')
+    filtered_data = joined_geo_data.drop(columns = ['iris_geometry'])
+    filtered_data = filtered_data.set_crs(4171)
+
+    # Modify tables
+    data, iris, commune = modify_geo_data(filtered_data, iris, commune)
+
+    ## Plot income and mean price maps
+    # Give example with 'Paris' and 'DISP_RD19' variable
+    plot_var_iris(iris, example_area, 'DISP_RD19',output_dir)
+
+    #
+    bien_prix_m2(commune, data, 'NICE',output_dir)
+
+    #
+    iris_bien(data, iris, example_area,output_dir)
+
+    #Iris + bien moyen, you can specify metropole and background variable
+    # Give example Give example with 'Paris' and 'DISP_RD19' variable
+    iris_bien_moyen(data, iris, example_area , metrique = 'prix_m2_actualise', var_iris = 'DISP_EQ19',
+                     name_var_iris = 'IQR divided by the mean of incomes', output_dir = output_dir)
+    # Give example with 'Nice' and 'DISP_EQ19' variable                
+    iris_bien_moyen(data, iris, 'NICE', metrique = 'prix_m2_actualise', var_iris = 'DISP_EQ19',
+                     name_var_iris = 'IQR divided by the mean of incomes', output_dir = output_dir)
+
+    # Plot amenities maps
     print('****************************')
 
     return True

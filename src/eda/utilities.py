@@ -4,6 +4,7 @@ on processed data from a single CSV file. It includes functions for creating an 
 selecting variables from a dataframes.
 """
 import pandas as pd
+import geopandas as gpd
 import os
 
 
@@ -75,4 +76,59 @@ def select_variables(df, keep_columns = liste):
     
     except Exception as e:
         print(f"An error occurred: {e}")
+        return None
+
+def read_communes():
+    """
+    Read communes tables and return communes.
+    """
+    communes_shape_path = 'data/open_data/communes-20220101.shp'
+    try:
+        print("Reading 'communes' tables...")
+        communes = gpd.read_file(communes_shape_path)
+        return communes
+    except FileNotFoundError as e:
+        print(f"Error occurred while reading data: {e}")
+        return None
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+
+def modify_geo_data(data, iris, commune):
+    """
+    Modify columns of communes, data, and iris dataframes.
+
+    Parameters:
+    iris (geoPandas): iris dataset.
+    data (geoPandas): data dataset.
+    commune (geoPandas): commune dataset.
+
+    Returns:
+    tuple: A tuple containing preprocessed iris, data and communes dataframes.
+
+
+    Raises:
+    FileNotFoundError: If commune the input file paths is incorrect.
+    """
+    try:
+        print('Modify geodataframes')
+       
+        # Alter data columns
+        data['nom_commune'] = data['nom_commune'].str.upper()
+        data.loc[data.NOM_COM.str.startswith('PARIS ').fillna(False), 'NOM_COM'] = 'Paris'
+        data.loc[data.NOM_COM.str.startswith('MARSEILLE ').fillna(False), 'NOM_COM'] = 'Marseille'
+        data.loc[data.NOM_COM.str.startswith('LYON ').fillna(False), 'NOM_COM'] = 'Lyon'
+        data['NOM_COM'] = data['NOM_COM'].str.upper()
+        # Alter iris columns
+        iris.loc[iris.NOM_COM.str.startswith('PARIS ').fillna(False), 'NOM_COM'] = 'Paris'
+        iris.loc[iris.NOM_COM.str.startswith('MARSEILLE ').fillna(False), 'NOM_COM'] = 'Marseille'
+        iris.loc[iris.NOM_COM.str.startswith('LYON ').fillna(False), 'NOM_COM'] = 'Lyon'
+        iris['NOM_COM'] = iris['NOM_COM'].str.upper()
+        
+        # Process communes file
+        commune.nom = commune.nom.str.upper()
+
+        return data, iris, commune
+    except Exception as e:
+        print(f"Error occurred while cleaning data: {e}")
         return None

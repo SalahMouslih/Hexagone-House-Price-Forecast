@@ -14,6 +14,9 @@ def read_data(data_paths):
         else:
             data = pd.concat(map(pd.read_csv, data_paths))
         return data
+    except FileNotFoundError as e:
+        print(f"Error occurred while reading data: {e}")
+        return None
     except Exception as e:
         print(f"Error occurred while reading data: {e}")
         return None
@@ -88,10 +91,13 @@ def read_iris():
     iris_value_path = 'data/open_data/IRIS_donnees.csv'
     iris_shape_path = 'data/open_data/IRIS_contours.shp'
     try:
-        print("Reading iris tables...this might take a while")
+        print("Reading 'iris' tables...this might take a while")
         iris_value = pd.read_csv(iris_value_path, delimiter=';')
         iris_shape = gpd.read_file(iris_shape_path)
         return iris_value, iris_shape
+    except FileNotFoundError as e:
+        print(f"Error occurred while reading data: {e}")
+        return None
     except Exception as e:
         print(f"An error occurred: {e}")
         return None
