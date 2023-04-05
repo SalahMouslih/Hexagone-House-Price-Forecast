@@ -1,4 +1,10 @@
-""" dsocstring"""
+"""
+This module contains functions for discounting real estate data.
+
+The main function in this module is 'create_columns', which computes 
+the discount'coeff_appart_a_maison' and 'coeff_maison_a_appart' and
+apply discounting.
+"""
 from datetime import datetime
 import numpy as np
 import pandas as pd
@@ -132,10 +138,15 @@ def get_trimester(data):
 
 def get_coeff_actu(data, base_indice_grand, trimestre_actu):
     """
-    This function takes in data containing the zone, trimestre, and type of property,
-    the base index data for the zone and type of property, and the current trimester. 
-    It returns the coefficient of price evolution between the current trimester and 
-    the trimester in the data.
+    Calculate the discount coefficient for a given zone and type of property.
+
+    Args:
+        data: A dictionary containing the zone, trimester, and type of property.
+        base_indice_grand: A pandas DataFrame of the base index data for the zone and type of property.
+        trimestre_actu: A string representing the trimester of discount.
+
+Returns:
+- coeff: A float representing the coefficient of price evolution.
     """
     try:
         # Get the zone, trimester, and type of property from the data
@@ -203,6 +214,14 @@ def fonction_final_prix(data, trimestre_actu, actulisation=True):
 
     """
     Compute the updated real estate price per square meter using the actualisation coefficient.
+
+    Args:
+        data (pd.DataFrame): The real estate data to be processed.
+        trimestre_actu (str): The discounted quarter.
+        actulisation (bool, optional): Whether to apply actualisation or not. Defaults to True.
+
+    Returns:
+        pd.DataFrame: The joined data with the updated real estate price per square meter.
     """
     try:
         # Process the real estate indices table
