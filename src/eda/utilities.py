@@ -49,12 +49,12 @@ def select_variables(df, keep_columns = liste):
     """
     Select variables from dataframe and return updated dataframe.
 
-    Parameters:
-    df (pandas dataframe): dataframe to select variables from.
-    keep_columns (list): list of variables to keep in the updated dataframe.
+    Args:
+        df (pandas dataframe): dataframe to select variables from.
+        keep_columns (list): list of variables to keep in the updated dataframe.
 
     Returns:
-    df_final (pandas dataframe): updated dataframe with selected variables.
+        df_final (pandas dataframe): updated dataframe with selected variables.
     """
     try:
         if not isinstance(df, pd.DataFrame):
@@ -84,11 +84,11 @@ def select_equi(equipements, liste_equi = liste_equipements):
     Filters the equipements dataframe to select rows whose TYPEQU column is in the given list.
 
     Args:
-    - equipements (pandas.DataFrame): a dataframe containing information about equipements in different IRIS
-    - liste_equi (list): a list of strings containing the names of the equipements to select
+        equipements (pandas.DataFrame): a dataframe containing information about equipements in different IRIS
+        liste_equi (list): a list of strings containing the names of the equipements to select
 
     Returns:
-    - equipements (pandas.DataFrame): the filtered dataframe
+        equipements (pandas.DataFrame): the filtered dataframe
     '''
 
     try:
@@ -107,11 +107,11 @@ def transform_equi(equipements, crs):
     Transforms the equipements dataframe to match the given crs.
 
     Args:
-    - equipements (pandas.DataFrame): a dataframe containing information about equipements in different IRIS
-    - crs (str): the coordinate reference system to transform the dataframe to
+        equipements (pandas.DataFrame): a dataframe containing information about equipements in different IRIS
+        crs (str): the coordinate reference system to transform the dataframe to
 
     Returns:
-    - equipements_crs (geopandas.GeoDataFrame): the transformed dataframe
+        equipements_crs (geopandas.GeoDataFrame): the transformed dataframe
     '''
 
     try:
@@ -128,35 +128,53 @@ def transform_equi(equipements, crs):
     
 def read_communes():
     """
-    Read communes tables and return communes.
+    Read the shapefile containing the commune data and return a GeoDataFrame.
+    
+    Returns:
+        communes (GeoDataFrame): A GeoDataFrame containing the commune data.
+
+    Raises:
+        FileNotFoundError: If the data file is not found.
+        Exception: If there is an error while reading the data file.
     """
+
+    # Set the path of the shapefile containing the commune data
     communes_shape_path = 'data/open_data/communes-20220101.shp'
+
     try:
+        # Read the data from the shapefile and create a GeoDataFrame
         print("Reading 'communes' tables...")
         communes = gpd.read_file(communes_shape_path)
+
+        # Return the GeoDataFrame
         return communes
+
     except FileNotFoundError as e:
+        # If the data file is not found, print an error message and return None
         print(f"Error occurred while reading data: {e}")
         return None
+
     except Exception as e:
+        # If there is an error while reading the data file, print an error message and return None
         print(f"An error occurred: {e}")
         return None
+
 
 def modify_geo_data(data, iris, commune):
     """
     Modify columns of communes, data, and iris dataframes.
 
-    Parameters:
-    iris (geoPandas): iris dataset.
-    data (geoPandas): data dataset.
-    commune (geoPandas): commune dataset.
+    Args:
+        iris (geoPandas): iris dataset.
+        data (geoPandas): data dataset.
+        commune (geoPandas): commune dataset.
 
     Returns:
-    tuple: A tuple containing preprocessed iris, data and communes dataframes.
+        tuple: A tuple containing preprocessed iris, data and communes dataframes.
 
 
     Raises:
-    FileNotFoundError: If commune the input file paths is incorrect.
+        FileNotFoundError: If commune the input file paths is incorrect.
     """
     try:
         print('Modify geodataframes')

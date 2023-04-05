@@ -1,11 +1,16 @@
 """
 This module provides an engine that utilizes functions for performing exploratory data analysis (EDA) on processed data.
 """
-from utils.common import convert_gpd, read_data, read_equi, read_iris, iris_prep
-from eda.utilities import create_output_dir, modify_geo_data, read_communes, select_equi, transform_equi, select_variables
-from eda.core import *
-import geopandas as gpd
+import logging
 import traceback
+import geopandas as gpd
+from utils.common import convert_gpd, read_data, read_equi, read_iris, iris_prep
+from eda.utilities import ( create_output_dir, modify_geo_data,
+    read_communes, select_equi,
+    transform_equi, select_variables
+    )
+from eda.core import *
+
 
 def eda_engine(data_path):
     """
@@ -26,6 +31,7 @@ def eda_engine(data_path):
         print('****************************')
     except FileNotFoundError:
         print("Error: data file not found")
+        return False
     try:
         # Create or return directory
         output_dir = create_output_dir()
@@ -40,7 +46,8 @@ def eda_engine(data_path):
         # Plot 'Maison' and 'Appartement' percentage per metropole
         #plot_flats_houses_shares(data, output_dir)
 
-        # Generate box and boxen plots for 'surface_reelle_bati' and 'nombre_pieces_principales' for each 'type_local'
+        # Generate box and boxen plots for 'surface_reelle_bati' 
+        #and 'nombre_pieces_principales' for each 'type_local'
         #box_flats_houses(data, output_dir)
         #boxen_flats_houses(data, output_dir)
 
@@ -77,11 +84,15 @@ def eda_engine(data_path):
 
         #Iris + bien moyen, you can specify metropole and background variable
         # Give example Give example with 'Paris' and 'DISP_RD19' variable
-        iris_bien_moyen(data, iris, example_area , metrique = 'prix_m2_actualise', var_iris = 'DISP_EQ19',
-                        name_var_iris = 'IQR divided by the mean of incomes', output_dir = output_dir)
+        iris_bien_moyen(data, iris, example_area , metrique = 'prix_m2_actualise',
+                         var_iris = 'DISP_EQ19',
+                        name_var_iris = 'IQR divided by the mean of incomes', 
+                        output_dir = output_dir)
         # Give example with 'Nice' and 'DISP_EQ19' variable                
-        iris_bien_moyen(data, iris, 'NICE', metrique = 'prix_m2_actualise', var_iris = 'DISP_EQ19',
-                        name_var_iris = 'IQR divided by the mean of incomes', output_dir = output_dir)
+        iris_bien_moyen(data, iris, 'NICE', metrique = 'prix_m2_actualise', 
+                        var_iris = 'DISP_EQ19',
+                        name_var_iris = 'IQR divided by the mean of incomes', 
+                        output_dir = output_dir)
 
         # Plot amenities maps
         geo_amenities = convert_gpd(amenities, equi=True)
@@ -93,13 +104,12 @@ def eda_engine(data_path):
 
         plot_equi_iris(amenities, iris, '751187022', output_dir)
 
-        plot_corr_spatiale(data, iris, commune, example_area, method = 'spearman', output_dir = output_dir )
-
+        plot_corr_spatiale(data, iris, commune, example_area, method = 'spearman',
+                         output_dir = output_dir )
         print('****************************') 
-        
-        return True
-
     except Exception as e:
         logging.error("An error occurred while performing EDA: %s", e)
         print(traceback.format_exc())
         return False  
+        
+    return True

@@ -1,11 +1,10 @@
 """
 EDA Core functions
-
 This module contains core functions for visualizing and analyzing processed data.
 """
-
-import numpy as np
 import os
+import scipy.stats
+import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -17,13 +16,13 @@ def plot_heatmap(data, output_dir=None):
   Plot a heatmap of the correlation matrix between features and "prix_m2_actualise" for a given dataset, 
   either for all metropoles or for a specific metropole, and save the resulting plot to a directory.
 
-  Parameters:
-  data (pandas.DataFrame): Input data containing the columns to be used for computing the correlation matrix.
-  output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. 
-  If not provided, the plots will only be displayed and not saved. Defaults to None.
+  Args:
+    data (pandas.DataFrame): Input data containing the columns to be used for computing the correlation matrix.
+    output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. 
+    If not provided, the plots will only be displayed and not saved. Defaults to None.
 
   Returns:
-  None
+    None
   """
 
   try:
@@ -49,13 +48,13 @@ def plot_correlation_matrix(data, output_dir=None):
   """
   Compute the correlation matrix and plot it as a heatmap.
 
-  Parameters:
-  data (pandas.DataFrame): Input data.
-  output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. 
-  If not provided, the plots will only be displayed and not saved. Defaults to None.
+  Args:
+    data (pandas.DataFrame): Input data.
+    output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. 
+    If not provided, the plots will only be displayed and not saved. Defaults to None.
 
   Returns:
-  None
+    None
   """
 
   print("Computing the correlation matrix...")
@@ -87,13 +86,13 @@ def plot_correlation_matrix(data, output_dir=None):
 
 def distribution_target_type_and_metropoles(data, output_dir=None):
   """
-  Plot the distribution of prix_m2_actualise for different types of properties (flats and houses) and metropoles, 
-  and save the resulting plot to a directory.
+    Plot the distribution of prix_m2_actualise for different types of properties (flats and houses) for all metropoles, 
+    and save the resulting plot to a directory.
 
-  Parameters:
-  data (pandas.DataFrame): Input data containing the column "prix_m2_actualise" and "type_local".
-  output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. 
-  If not provided, the plots will only be displayed and not saved. Defaults to None.
+  Args:
+    data (pandas.DataFrame): Input data containing the column "prix_m2_actualise" and "type_local".
+    output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. 
+    If not provided, the plots will only be displayed and not saved. Defaults to None.
 
   Returns:
   None
@@ -103,7 +102,7 @@ def distribution_target_type_and_metropoles(data, output_dir=None):
       print("Generating target variable distribution per metropole...")
       # Iterate over the unique values of "data.LIBEPCI" and plot the distribution of "prix_m2_actualise"
       # for each metropole on a separate subplot
-      for i, met in enumerate(data.LIBEPCI.unique()):
+      for _, met in enumerate(data.LIBEPCI.unique()):
           fig = sns.displot(data=data[data.LIBEPCI == met], x="prix_m2_actualise", hue="type_local", kde=True)
           fig.set(title='Distribution of prix_m2_actualise for flats and houses, {}'.format(met))
           if output_dir:
@@ -120,13 +119,13 @@ def plot_flats_houses_shares(data, output_dir=None):
   """
   Plot the percentage of flats and houses for each metropole, and save the resulting plot to a directory.
 
-  Parameters:
-  data (pandas.DataFrame): Input data containing the columns "LIBEPCI" and "type_local".
-  output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. 
-  If not provided, the plots will only be displayed and not saved. Defaults to None.
+  Args:
+    data (pandas.DataFrame): Input data containing the columns "LIBEPCI" and "type_local".
+    output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. 
+    If not provided, the plots will only be displayed and not saved. Defaults to None.
 
   Returns:
-  None
+    None
   """
 
   print("Generating percentage of flats and houses for each metropole...")
@@ -168,12 +167,12 @@ def box_flats_houses(data, output_dir=None):
   Create and display box plots for the features 'surface_reelle_bati' and 'nombre_pieces_principales'
   for different types of properties (flats and houses) using the given data.
 
-  Parameters:
-  data (pandas.DataFrame): Input data containing the columns 'type_local', 'surface_reelle_bati', and 'nombre_pieces_principales'.
-  output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. If not provided, the plots will only be displayed and not saved. Defaults to None.
+  Args:
+    data (pandas.DataFrame): Input data containing the columns 'type_local', 'surface_reelle_bati', and 'nombre_pieces_principales'.
+    output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. If not provided, the plots will only be displayed and not saved. Defaults to None.
 
   Returns:
-  None
+    None
   """
 
   try:
@@ -206,12 +205,12 @@ def boxen_flats_houses(data, output_dir=None):
   """
   Generate boxen plots for the surface_reelle_bati and nombre_pieces_principales columns, comparing flats and houses.
 
-  Parameters:
-  data (pandas.DataFrame): Input data containing the columns "type_local", "surface_reelle_bati", and "nombre_pieces_principales".
-  output_dir (str, optional): Path to the directory where the figure will be saved. If None, the figure will be displayed using plt.show(). Default is None.
+  Args:
+    data (pandas.DataFrame): Input data containing the columns "type_local", "surface_reelle_bati", and "nombre_pieces_principales".
+    output_dir (str, optional): Path to the directory where the figure will be saved. If None, the figure will be displayed using plt.show(). Default is None.
 
   Returns:
-  None
+    None
   """
 
   try:
@@ -250,12 +249,12 @@ def box_flats_houses_metropoles(data, output_dir=None):
   Plot boxenplots of surface_reelle_bati and nombre_pieces_principales for different types of properties (flats and houses) 
   and metropoles, and save the resulting plot to a directory.
 
-  Parameters:
-  data (pandas.DataFrame): Input data containing the columns "type_local", "surface_reelle_bati", "nombre_pieces_principales", and "LIBEPCI".
-  output_dir (str): Path to the directory where the plot will be saved.
+  Args:
+    data (pandas.DataFrame): Input data containing the columns "type_local", "surface_reelle_bati", "nombre_pieces_principales", and "LIBEPCI".
+    output_dir (str): Path to the directory where the plot will be saved.
 
   Returns:
-  None
+    None
   """
   try:
     print("Generating boxen plots of 'surface_reelle_bati' and 'nombre_pieces_principales' per metropole...")
@@ -285,26 +284,26 @@ def box_flats_houses_metropoles(data, output_dir=None):
     print("Error occurred while plotting boxenplots: ", e)
   
 def plot_var_iris(iris, area, var, output_dir=None):
-  print(f"Generating 'prix m2 moyen' for {area}...")
 
   """
   Plot a variable for a specific area using the IRIS dataset.
 
   Args:
-  - iris (geopandas.GeoDataFrame): The GeoDataFrame containing IRIS information.
-  - area (str): The name of the area to plot.
-  - var (str): The name of the variable to plot.
-  - output_dir (str, optional): The output directory to save the plot to.
+    iris (geopandas.GeoDataFrame): The GeoDataFrame containing IRIS information.
+    area (str): The name of the area to plot.
+    var (str): The name of the variable to plot.
+    output_dir (str, optional): The output directory to save the plot to.
 
   Returns:
-  - None
+    None
 
   Raises:
-  - ValueError: If the specified area is not found in the IRIS dataset.
-  - Exception: If an error occurs while plotting the variable.
-
+    ValueError: If the specified area is not found in the IRIS dataset.
+    Exception: If an error occurs while plotting the variable.
   """
   try:
+    print(f"Generating 'prix m2 moyen' for {area}...")
+
     cmap = plt.get_cmap("jet")
     data = iris[iris.NOM_COM == area]
     if data.empty:
@@ -325,20 +324,20 @@ def plot_var_iris(iris, area, var, output_dir=None):
 
 def bien_prix_m2(commune, data, area, output_dir=None):
   """
-  Plot all the properties of an area on top of the commune. Color corresponds to prix_m2.
+  Plot all the properties of an area on top of the 'commune'. 
+  Color corresponds to prix_m2.
 
   Args:
-  - commune (GeoDataFrame): GeoDataFrame representing the commune.
-  - data (geopandas.GeoDataFrame): The GeoDataFrame containing property information.
-  - area (str): the name of the area to plot (e.g. "Paris", "Marseille", "Lyon")  - area (str): name of the area of interest.
-  - output_dir (str, optional): output directory to save the plot.
+    commune (GeoDataFrame): GeoDataFrame representing the commune.
+    data (geopandas.GeoDataFrame): The GeoDataFrame containing property information.
+    area (str): the name of the area to plot (e.g. "Paris", "Marseille", "Lyon")  - area (str): name of the area of interest.
+    output_dir (str, optional): output directory to save the plot.
 
   Returns:
-  - None
+    None
 
   Raises:
-  - ValueError: If the area is not found in the data DataFrame.
-
+    ValueError: If the area is not found in the data DataFrame.
   """
   try:
     print(f"Generating 'prix m2' des biens for {area}...")
@@ -469,16 +468,18 @@ def iris_bien_moyen(data, iris, area, metrique, var_iris, name_var_iris, output_
 
 def plot_equi_commune(equipements, communes, area, num_com, output_dir=None):
   """
-  Plot the equipements in a given commune using geopandas.
+  Plot the equipements in a given 'commune'.
 
-  Parameters:
-  area (str): Name of the commune to plot.
-  num_com (str): Departmental code of the commune.
-  size (tuple): Figure size (width, height).
-  output_file (str): Path to output file to save the plot. Defaults to None.
+  Args:
+    equipements (geopandas.GeoDataFrame): The GeoDataFrame containing equipements information.
+    communes (geopandas.GeoDataFrame): The GeoDataFrame containing communes information.
+    area (str): Name of the commune to plot.
+    num_com (str): Departmental code of the commune.
+    size (tuple): Figure size (width, height).
+    output_file (str): Path to output file to save the plot. Defaults to None.
 
   Returns:
-  None
+    None
   """
 
   try:
@@ -512,17 +513,19 @@ def plot_equi_commune(equipements, communes, area, num_com, output_dir=None):
 
 
 def plot_equi_iris(equipements, iris, num_iris, output_dir=None):
-  '''
+  """
   Plots a choropleth map showing the distribution of different types of amenities in a given IRIS.
 
   Args:
-  - num_iris (str): the code of the IRIS to plot the amenities distribution for
-  - size (tuple): the size of the plot
-  - output_dir (str): the directory to save the plot image to (default is None)
+    equipements (geopandas.GeoDataFrame): The GeoDataFrame containing equipements information.
+    iris (geopandas.GeoDataFrame): The GeoDataFrame containing IRIS information.
+    num_iris (str): the code of the IRIS to plot the amenities distribution for
+    size (tuple): the size of the plot
+    output_dir (str): the directory to save the plot image to (default is None)
 
   Returns:
-  None
-  '''
+    None
+  """
   print(f"Generating 'equipements' distribution in {num_iris}...")
 
   try:
@@ -549,26 +552,24 @@ def plot_equi_iris(equipements, iris, num_iris, output_dir=None):
   except Exception as e:
     print(f"Error occurred: {e}")
 
-import scipy.stats
-
 
 def corr_iris(data:gpd.GeoDataFrame, method:str, iris:list, col_1:str, col_2:str) -> float:
     """
     Computes the correlation between two columns of a dataset for a given IRIS region.
 
     Args:
-    - data (gpd.GeoDataFrame): input GeoDataFrame
-    - method (str): the correlation method to use (pearson, spearman, kendall)
-    - iris (list): the IRIS region to consider
-    - col_1 (str): the name of the first column
-    - col_2 (str): the name of the second column
+      data (gpd.GeoDataFrame): input GeoDataFrame
+      method (str): the correlation method to use (pearson, spearman, kendall)
+      iris (list): the IRIS region to consider
+      col_1 (str): the name of the first column
+      col_2 (str): the name of the second column
 
     Returns:
-    - corr (float): the computed correlation
+      corr (float): the computed correlation
 
     Raises:
-    - ValueError: if the provided method is not supported
-    - ValueError: if the provided columns are not found in the dataset
+      ValueError: if the provided method is not supported
+      ValueError: if the provided columns are not found in the dataset
     """
 
     # Select data for the given IRIS region
@@ -596,21 +597,22 @@ def corr_iris(data:gpd.GeoDataFrame, method:str, iris:list, col_1:str, col_2:str
     return corr
 
 
-def plot_corr_spatiale(data, iris, communes, area, col_1='prix_m2_actualise', col_2='prix_m2_zone', method='spearman', output_dir=None):
+def plot_corr_spatiale(data, iris, communes, area, col_1='prix_m2_actualise', col_2='prix_m2_zone', 
+                      method='spearman', output_dir=None):
     """
     Plot the spatial correlation of two columns of a specific area.
 
     Args:
-    - data (gpd.GeoDataFrame): input GeoDataFrame
-    - iris (geopandas.GeoDataFrame): The GeoDataFrame containing IRIS information.
-    - area (str): name of the area to plot the correlation
-    - col_1 (str): the name of the first column to calculate the correlation
-    - col_2 (str): the name of the second column to calculate the correlation
-    - method (str): the method to use for calculating the correlation, defaults to 'spearman'
-    - output_dir(str, optional: the directory to save the plot image to (default is None)
+      data (gpd.GeoDataFrame): input GeoDataFrame
+      iris (geopandas.GeoDataFrame): The GeoDataFrame containing IRIS information.
+      area (str): name of the area to plot the correlation
+      col_1 (str): the name of the first column to calculate the correlation
+      col_2 (str): the name of the second column to calculate the correlation
+      method (str): the method to use for calculating the correlation, defaults to 'spearman'
+      output_dir(str, optional: the directory to save the plot image to (default is None)
 
     Returns:
-    - None
+      None
 
     """
 
