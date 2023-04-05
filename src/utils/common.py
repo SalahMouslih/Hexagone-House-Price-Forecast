@@ -71,15 +71,20 @@ def get_metropoles(data):
         print(f"An error occurred: {e}")
         return None
 
-def convert_gpd(df):
+def convert_gpd(df, equi=False):
     """
     Function convert_gpd converts a pandas DataFrame to a GeoDataFrame using the geometry
     attribute which is created from the longitude and latitude columns of the input DataFrame
     """
     try:
-        return gpd.GeoDataFrame(
-            df, geometry = gpd.points_from_xy(df.longitude, df.latitude)
-        )
+        if equi:
+            return gpd.GeoDataFrame(
+                df, geometry = gpd.points_from_xy(df.LAMBERT_X, df.LAMBERT_Y)
+            )
+        else :
+            return gpd.GeoDataFrame(
+                df, geometry = gpd.points_from_xy(df.longitude, df.latitude)
+            )
     except ValueError as e:
         print(f"Error converting to GeoDataFrame: {e}")
         return None
@@ -102,6 +107,24 @@ def read_iris():
         print(f"An error occurred: {e}")
         return None
 
+def read_equi():
+    """
+    Reads the amenities table from the open data directory and returns it as a DataFrame.
+    
+    Returns:
+        pd.DataFrame: DataFrame containing the amenities data.
+    Raises:
+        IOError: If the amenities file cannot be found or read.
+    """
+    bpe_data_path = "data/open_data/bpe21_ensemble_xy.csv"
+    try:
+        print("Reading 'equipements' table...")
+        # Read 'base permanente des equipements' file
+        amenities = pd.read_csv(bpe_data_path, delimiter=';')
+        return amenities
+    except IOError:
+        print("Error: could not read amenities file.")
+        return None
 
 def iris_prep(iris_value, iris_shape):
     """
