@@ -9,7 +9,6 @@ To use this project, fisst clone the repository
 ```
 git clone https://github.com/salahmouslih/data-challenge.git
 cd data-challenge
-
 ```
 
 Next, create and activate a virtual environment then install the required packages using pip:
@@ -68,7 +67,7 @@ This engine generates exploratory data analysis visualizations and saves them in
 
 To see the available command-line arguments, run the following command:
 
-``` python main.py --help``` 
+``` python src/main.py --help``` 
 
 ## Documentation
 The project documentation can be found at `docs/index.html`.
