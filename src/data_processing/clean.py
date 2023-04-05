@@ -3,19 +3,26 @@ This module provides functions for cleaning and preprocessing real estate and ed
 
 Functions:
 
-- clean_multivente(data): Cleans a given dataset by removing duplicates and mutations with multiple disposition 
-IDs, filtering for 'Vente' transactions, and keeping only one row for each property type if there
-are multiple rows with the same mutation ID.
-- clean_type(data, type_bien): Cleans data by removing all properties of a given type (Appartement, Maison, etc.) 
-where the same property has been counted multiple times.
+    - clean_type(data, type_bien): Cleans data by removing all properties of a given type (Appartement, Maison, etc.) 
+    where the same property has been counted multiple times.
+    - clean_multivente(data): Cleans a given dataset by removing duplicates and mutations with multiple disposition 
+    IDs, filtering for 'Vente' transactions, and keeping only one row for each property type if there
+    are multiple rows with the same mutation ID.
 """
 import pandas as pd
 
 
 def clean_type(data, type_bien):
     """
-    Cleans data by removing all properties of a given type (Appartement or Maison) 
+    Clean data by removing all properties of a given type (Appartement or Maison) 
     where the same property has been counted multiple times.
+
+    Args:
+        data: pandas DataFrame containing geographical data.
+        type_bien: string indicating the type of property to clean, either 'Appartement' or 'Maison'.
+
+    Returns:
+        A pandas DataFrame with cleaned data.
     """
     print(f"Cleaning data for '{type_bien}...'")
 
@@ -38,14 +45,20 @@ def clean_type(data, type_bien):
 
 
 def clean_multivente(data):
-    '''
+    """
     Clean the given dataset by performing the following operations:
-    1. Drop duplicates
-    2. Filter for 'Vente' transactions
-    3. Remove mutations with multiple disposition IDs, as they are more complex. 
-    4. If there are multiple rows with the same mutation ID, filter by property 
-    type (Appartement ou Maison) and keep only one row for each type.
-    '''
+        1. Drop duplicates
+        2. Filter for 'Vente' transactions
+        3. Remove mutations with multiple disposition IDs, as they are more complex. 
+        4. If there are multiple rows with the same mutation ID, filter by property 
+        type (Appartement ou Maison) and keep only one row for each type.
+        
+    Args:
+        data: pandas DataFrame containing geographical data.
+
+    Returns:
+        A pandas DataFrame with cleaned data.
+    """
     # Print message to indicate that the function has started
     print("Cleaning multivente data...")
 
