@@ -3,4 +3,6 @@ venv
 data/raw/*
 data/processed/*
 data/open_data/*
+docs/
+build/
 .DS_Store
