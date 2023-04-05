@@ -10,17 +10,28 @@ Functions:
 meter below the 99th percentile for each city and property type.
 
 """
-
 import pandas as pd
 import numpy as np
 
-def select_bien(df):    
+
+def select_bien(df):  
+    """
+    Filter and select specific property types from a given DataFrame.
+
+    Args:
+        df (pandas.DataFrame): DataFrame containing property transaction data.
+
+    Returns:
+        pandas.DataFrame: Filtered DataFrame containing only property transactions that are
+        of type 'Vente', are either 'Maison' or 'Appartement', and have known
+        latitude and longitude values.Returns None if KeyError or TypeError occurs.
+    """  
     try:
         print("Filtering property types...")
 
-        # Keep 'Ventes' transactions
+        # Filter by transacation type
         df = df[df['nature_mutation'] == 'Vente']
-        # Keep the 'Maison' and 'Appartement' properties
+        # Filter by property type. Keep only the 'Maison' and 'Appartement' properties
         df = df.loc[df['type_local'].isin(['Maison', 'Appartement'])]
         # Keep only properties with known locations
         # our analysis heavily relies on property location
@@ -39,30 +50,30 @@ def filtre_dur(df, bati, piece, local, metropole_name=None):
     """
     Filter out outlier values for a given metropolitan area and property type.
 
-    Parameters:
-    df (pd.DataFrame): Input dataset.
-    bati (int): Maximum allowed building surface.
-    piece (int): Maximum allowed number of rooms.
-    local (str): Type of property ('Maison' or 'Appartement').
-    metropole_name (str, optional): Name of the metropolitan area to be filtered.
+    Args:
+        df (pd.DataFrame): Input dataset.
+        bati (int): Maximum allowed building surface.
+        piece (int): Maximum allowed number of rooms.
+        local (str): Type of property ('Maison' or 'Appartement').
+        metropole_name (str, optional): Name of the metropolitan area to be filtered.
 
     Returns:
-    pd.DataFrame: The filtered dataset.    
+        pd.DataFrame: The filtered dataset.    
     """
     try:
-        # if a metropole name is given, filter data for the given local in that metropole
+        # Filter data for the given local in metropole
         if metropole_name:
             print(f"Filtering data for '{local}' in '{metropole_name}'...")
 
             df_metropole = df[(df['type_local'] == local) & (df['LIBEPCI'] == metropole_name)]
             df_other_metropoles = df[(df['LIBEPCI'] != metropole_name) | ((df['LIBEPCI'] == metropole_name) & (df['type_local'] != local))]
         else:
-            # if no metropole name is given, filter data for the given local across all metropoles
+            # Filter data for the given local across all metropoles
             print(f"Filtering data for '{local}'")
             df_metropole = df[df['type_local'] == local]
             df_other_metropoles = df[df['type_local'] != local]
 
-        # filter data based on given bati and piece constraints
+        # Filter data based on given 'bati' and 'piece' constraints
         df_metropole = df_metropole[(df_metropole['surface_reelle_bati'] <= bati) &
                                     (df_metropole['nombre_pieces_principales'] <= piece)]
 
@@ -82,13 +93,13 @@ def filtre_prix(df, metric_prix, quantile_nv = 0.99):
 
     ++++++ Be careful to use the discounted price ++++++
 
-    Parameters:
-    df (pd.DataFrame): Input dataset.
-    metric_prix (str): Name of the column with the price data.
-    quantile_nv (float, optional): The quantile value to compute (default is 0.99).
+    Args:
+        df (pd.DataFrame): Input dataset.
+        metric_prix (str): Name of the column with the price data.
+        quantile_nv (float, optional): The quantile value to compute (default is 0.99).
 
     Returns:
-    pd.DataFrame: The filtered dataset.
+        pd.DataFrame: The filtered dataset.
 
     """
     try:
