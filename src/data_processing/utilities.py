@@ -26,10 +26,6 @@ from sklearn.linear_model import LinearRegression
 import pandas as pd
 import numpy as np
 
-# Import tables import numpy as np
-PATH_TO_METROPOLES = 'data/open_data/metropoles_communes.csv'
-metropoles = pd.read_csv(PATH_TO_METROPOLES, delimiter=';', header=5)
-
 
 def read_lycees():
     """
@@ -72,8 +68,12 @@ def get_top_zones(df, nb_top_zones):
         pandas.DataFrame: A new DataFrame containing only the top 'nb_top_zones' metropoles 
         with the highest number of real estate transactions.
     """
+    # Import tables import numpy as np
+    path_to_metropoles = 'data/open_data/metropoles_communes.csv'
     try:
+
         print('Selecting top 10 metropoles...')
+        metropoles = pd.read_csv(path_to_metropoles, delimiter=';', header=5)
 
         # Correct the spelling of regions
         df.loc[df.nom_commune.str.startswith('Marseille '), 'nom_commune'] = 'Marseille'

@@ -131,7 +131,7 @@ def plot_flats_houses_shares(data, output_dir=None):
   print("Generating percentage of flats and houses for each metropole...")
 
   # Set the figure size
-  plt.figure(figsize=(20, 8))
+  plt.figure(figsize=(10, 5))
 
   # Calculate the percentage of flats and houses for each LIBEPCI
   total = data.groupby('LIBEPCI')['type_local'].count().reset_index()
@@ -178,7 +178,7 @@ def box_flats_houses(data, output_dir=None):
   try:
     print("Generating box plots of 'surface_reelle_bati' and 'nombre_pieces_principales'...")
 
-    fig = plt.figure(figsize=(20, 8))
+    fig = plt.figure(figsize=(10, 5))
 
     plt.subplot(1, 2, 1)
     sns.boxplot(data=data, x="type_local", y="surface_reelle_bati", palette=['grey', 'orange'])
@@ -217,7 +217,7 @@ def boxen_flats_houses(data, output_dir=None):
     print("Generating boxen plots of 'surface_reelle_bati' and 'nombre_pieces_principales'...")
 
     # Create a figure with two subplots side by side
-    fig = plt.figure(figsize=(20, 8))
+    fig = plt.figure(figsize=(10, 5))
     plt.subplot(1, 2, 1)
 
     # Generate the boxen plot for surface_reelle_bati column, comparing flats and houses
@@ -308,7 +308,7 @@ def plot_var_iris(iris, area, var, output_dir=None):
     data = iris[iris.NOM_COM == area]
     if data.empty:
       raise ValueError(f"The specified area '{area}' was not found in the IRIS dataset.")
-    figure = data.plot(column=var, legend=True, cmap=cmap, figsize=(20,10), legend_kwds={'label': "prix m2 moyen des biens de l'IRIS"})
+    figure = data.plot(column=var, legend=True, cmap=cmap, figsize=(10, 5), legend_kwds={'label': "prix m2 moyen des biens de l'IRIS"})
     figure.set_axis_off()
 
     if output_dir:
@@ -349,10 +349,10 @@ def bien_prix_m2(commune, data, area, output_dir=None):
     if area_data.empty:
       raise ValueError(f"No data found for {area}")
 
-    base = commune[commune.nom == area].plot(figsize=(20,10), alpha=0.1)
+    base = commune[commune.nom == area].plot(figsize=(10, 5), alpha=0.1)
     figure = area_data.plot(ax=base,
                             column='prix_m2_actualise',
-                            figsize=(20,10),
+                            figsize=(10, 5),
                             alpha=0.2,
                             legend=True,
                             cmap=cmap,
@@ -389,13 +389,13 @@ def iris_bien(data, iris, area, output_dir=None):
     cmap = plt.get_cmap("jet")
     data.to_crs(iris.crs)
     base = iris.loc[iris.NOM_COM == area].plot(column='DISP_MED19',
-                                              figsize=(20,10),
+                                              figsize=(10, 5),
                                               cmap=cmap,
                                               legend=True,
                                               legend_kwds={'label': "revenu médian dans l'IRIS"})
     figure = data[data.NOM_COM == area].plot(ax=base,
                                                 column='prix_m2_actualise',
-                                                figsize=(20,10),
+                                                figsize=(10, 5),
                                                 legend=True,
                                                 cmap=cmap,
                                                 legend_kwds={'label': "prix m2 des biens"})
@@ -434,9 +434,9 @@ def iris_bien_moyen(data, iris, area, metrique, var_iris, name_var_iris, output_
 
     cmap = plt.get_cmap("jet")
 
-    inter = data.groupby(['DCOMIRIS_right'])[[metrique]].mean()
+    inter = data.groupby(['DCOMIRIS'])[[metrique]].mean()
     inter = inter.reset_index()
-    iris_moyenne = inter.merge(iris, how='right', left_on='DCOMIRIS_right', right_on='DCOMIRIS')
+    iris_moyenne = inter.merge(iris, how='right', left_on='DCOMIRIS', right_on='DCOMIRIS')
     iris_moyenne = gpd.GeoDataFrame(iris_moyenne[[metrique, 'DCOMIRIS', 'NOM_COM']], geometry=iris_moyenne['geometry'])
 
     iris_moyenne['center'] = iris_moyenne.centroid
@@ -447,13 +447,13 @@ def iris_bien_moyen(data, iris, area, metrique, var_iris, name_var_iris, output_
       iris_moyenne = iris_moyenne.set_geometry('center').to_crs(str(iris.crs))
 
     base = iris.loc[iris.NOM_COM == area].plot(column=var_iris,
-                                                figsize=(20,10),
+                                                figsize=(10, 5),
                                                 legend=True,
                                                 cmap=cmap,
                                                 legend_kwds={'label': f"{name_var_iris}. dans l'IRIS"})
     figure = iris_moyenne[iris_moyenne.NOM_COM == area].plot(ax=base,
                                                             column=metrique,
-                                                            figsize=(20,10),
+                                                            figsize=(10, 5),
                                                             legend=True,
                                                             cmap=cmap,
                                                             legend_kwds={'label': f"{metrique}. dans l'IRIS"})
@@ -486,12 +486,12 @@ def plot_equi_commune(equipements, communes, area, num_com, output_dir=None):
     print(f"Generating 'equipements' distribution in {area}_{num_com}...")
 
     # Create a base map of the commune
-    base = communes[communes.nom == area].plot(figsize=(20,10), alpha=0.1)
+    base = communes[communes.nom == area].plot(figsize=(10, 5), alpha=0.1)
 
     # Plot the equipements on the base map
     figure = equipements[equipements['DEPCOM'] == num_com].plot(ax=base,
                                                             column='TYPEQU',
-                                                            figsize=(20,10),
+                                                            figsize=(10, 5),
                                                             legend=True,
                                                             cmap=plt.get_cmap("jet")
                                                             # legend_kwds={'label': "Type d'équipement"}
@@ -530,12 +530,12 @@ def plot_equi_iris(equipements, iris, num_iris, output_dir=None):
 
   try:
       # plot the IRIS base map
-    base = iris[iris.DCOMIRIS == num_iris].plot(figsize=(20,10), alpha=0.1)
+    base = iris[iris.DCOMIRIS == num_iris].plot(figsize=(10, 5), alpha=0.1)
 
     # plot the choropleth map
     figure = equipements[equipements['DCIRIS'] == num_iris].plot(ax=base,
                                                                         column='TYPEQU',
-                                                                        figsize=(20,10),
+                                                                        figsize=(10, 5),
                                                                         legend=True,
                                                                         cmap=plt.get_cmap("jet"))
 
@@ -617,6 +617,10 @@ def plot_corr_spatiale(data, iris, communes, area, col_1='prix_m2_actualise', co
     """
 
     try:
+      print(f"Plotting correlation for: {area} using {method} correlation..")
+      print(f"Note: you can specify 'pearson' or 'kendall 'correlations as arguments.")
+
+
       # Calculate the spatial correlation for each iris in the area
       base_area = iris.loc[iris.NOM_COM == area].reset_index(drop=True)
       column_corr = []
@@ -626,10 +630,10 @@ def plot_corr_spatiale(data, iris, communes, area, col_1='prix_m2_actualise', co
       base_area['corr_spatiale'] = column_corr
 
       # Plot the spatial correlation on the map
-      base = communes[communes.nom == area].plot(figsize=(20, 10), alpha=0.1)
+      base = communes[communes.nom == area].plot(figsize=(10, 5), alpha=0.1)
       figure = base_area.plot(ax=base,
                             column='corr_spatiale',
-                            figsize=(20, 10),
+                            figsize=(10, 5),
                             legend=True,
                             cmap=plt.get_cmap("jet"),
                             legend_kwds={'label': "Corrélation spatiale dans l'IRIS ({}) dans la ville de {}".format(method, area)})
