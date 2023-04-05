@@ -94,6 +94,7 @@ The project documentation can be found at `docs/index.html`.
 │   └── plots
 ├── requirements.txt
 ├── setup.py
+├── screenshots
 ├── src
 │   ├── data_processing
 │   │   ├── amenities.py
