@@ -4,4 +4,7 @@ src
 .. toctree::
    :maxdepth: 4
 
-   src
+   src.data_processing
+   src.eda
+   src.machine_learning
+   src.utils
