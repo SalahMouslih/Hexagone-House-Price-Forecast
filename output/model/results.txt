@@ -1,5 +1,180 @@
-Métropole du Grand Paris-Appartement-linear-best_score: 0.7714339215774003, best_param: {'poly_features__degree': 1}, rmse: 1517.0310568521784, score: 0.6778204188859992, median: 11.0083344179692, mean: 15.472795754958454
-Métropole du Grand Paris-Appartement-xgboost-best_score: 0.585898740374199, best_param: {}, rmse: 2084.4793635093347, score: 0.11841407703194362, median: 21.204975183913156, mean: 21.951150272562515
-Métropole du Grand Paris-Appartement-xgboost-best_score: 0.585898740374199, best_param: {}, rmse: 2084.4793635093347, score: 0.11841407703194362, median: 21.204975183913156, mean: 21.951150272562515
-Métropole du Grand Paris-Appartement-xgboost-best_score: 0.585898740374199, best_param: {}, rmse: 2084.4793635093347, score: 0.11841407703194362, median: 21.204975183913156, mean: 21.951150272562515
-Métropole du Grand Paris-Appartement-xgboost-best_score: 0.585898740374199, best_param: {}, rmse: 2084.4793635093347, score: 0.11841407703194362, median: 21.204975183913156, mean: 21.951150272562515
+Métropole Nice Côte d'Azur-Maison-linear-best_score: 0.48660606749153973,best_param :{'poly_features__degree': 1} rmse:121129838793817.47 ,score:-8.007528867386727e+21,median: prix_m2_actualise    2.687568e+12
+dtype: float64, mean:prix_m2_actualise    2.970062e+12
+dtype: float64
+Métropole Nice Côte d'Azur-Appartement-linear-best_score: 0.46555857772776954,best_param :{'poly_features__degree': 1} rmse:82277697082.87471 ,score:-9658803028032480.0,median: prix_m2_actualise    1.919813e+09
+dtype: float64, mean:prix_m2_actualise    2.010425e+09
+dtype: float64
+Métropole Nice Côte d'Azur-Maison-random_forest-best_score: 0.5199939138167554,best_param :{'rd__n_estimators': 200} rmse:1446.386026768443 ,score:-0.04725918033849341,median: prix_m2_actualise    17.314869
+dtype: float64, mean:prix_m2_actualise    24.483689
+dtype: float64
+Rennes Métropole-Appartement-linear-best_score: 0.5874719833353702,best_param :{'poly_features__degree': 1} rmse:647.5767046195408 ,score:-0.13973763350967938,median: prix_m2_actualise    13.216991
+dtype: float64, mean:prix_m2_actualise    15.377753
+dtype: float64
+Métropole d'Aix-Marseille-Provence-Maison-linear-best_score: 0.344889720201315,best_param :{'poly_features__degree': 1} rmse:99473172188.88852 ,score:-2.3815012552762856e+16,median: prix_m2_actualise    2.518572e+09
+dtype: float64, mean:prix_m2_actualise    2.632900e+09
+dtype: float64
+Rennes Métropole-Maison-linear-best_score: 0.6345334239988786,best_param :{'poly_features__degree': 1} rmse:682.0738943059471 ,score:0.042069708204866774,median: prix_m2_actualise    12.22594
+dtype: float64, mean:prix_m2_actualise    15.07368
+dtype: float64
+Toulouse Métropole-Appartement-linear-best_score: 0.6151935785157707,best_param :{'poly_features__degree': 1} rmse:87799803413553.12 ,score:-1.7243648128987863e+22,median: prix_m2_actualise    2.858598e+12
+dtype: float64, mean:prix_m2_actualise    2.903069e+12
+dtype: float64
+Bordeaux Métropole-Appartement-linear-best_score: 0.6206504833194183,best_param :{'poly_features__degree': 1} rmse:406470055295068.7 ,score:-2.1285752985174197e+23,median: prix_m2_actualise    1.026872e+13
+dtype: float64, mean:prix_m2_actualise    1.059481e+13
+dtype: float64
+Montpellier Méditerranée Métropole-Maison-linear-best_score: 0.32189647357581613,best_param :{'poly_features__degree': 1} rmse:756.5199072641709 ,score:-1.6045450110747033,median: prix_m2_actualise    12.982185
+dtype: float64, mean:prix_m2_actualise    16.051789
+dtype: float64
+Nantes Métropole-Maison-linear-best_score: -3.2847656167002144e+16,best_param :{'poly_features__degree': 1} rmse:6857501443172.173 ,score:-1.568144820063713e+20,median: prix_m2_actualise    1.827436e+11
+dtype: float64, mean:prix_m2_actualise    1.860493e+11
+dtype: float64
+Métropole du Grand Paris-Maison-linear-best_score: -2.8384909392225526e+18,best_param :{'poly_features__degree': 2} rmse:58699481799981.66 ,score:-0.0011748212343858366,median: prix_m2_actualise    7.235356e+11
+dtype: float64, mean:prix_m2_actualise    9.105542e+11
+dtype: float64
+Montpellier Méditerranée Métropole-Appartement-linear-best_score: 0.563183956706189,best_param :{'poly_features__degree': 1} rmse:137618449658146.11 ,score:-1.3473424133234801,median: prix_m2_actualise    3.099566e+12
+dtype: float64, mean:prix_m2_actualise    3.360686e+12
+dtype: float64
+Métropole d'Aix-Marseille-Provence-Appartement-linear-best_score: -4.221195498480218e+18,best_param :{'poly_features__degree': 2} rmse:669752090949.5037 ,score:-0.0032294744780656526,median: prix_m2_actualise    1.694927e+10
+dtype: float64, mean:prix_m2_actualise    2.009148e+10
+dtype: float64
+Nantes Métropole-Appartement-linear-best_score: 0.5582865949425379,best_param :{'poly_features__degree': 1} rmse:20417415515271.992 ,score:-1.0629668113159313e+21,median: prix_m2_actualise    5.755245e+11
+dtype: float64, mean:prix_m2_actualise    6.139323e+11
+dtype: float64
+Bordeaux Métropole-Maison-linear-best_score: -2.2141293807488765e+18,best_param :{'poly_features__degree': 1} rmse:71229470969292.03 ,score:-8.351515976019442e+21,median: prix_m2_actualise    1.666501e+12
+dtype: float64, mean:prix_m2_actualise    1.738981e+12
+dtype: float64
+Toulouse Métropole-Maison-linear-best_score: 0.45506971615290714,best_param :{'poly_features__degree': 1} rmse:718.3834848461697 ,score:-0.4723779944658073,median: prix_m2_actualise    12.23603
+dtype: float64, mean:prix_m2_actualise    16.190235
+dtype: float64
+Métropole Européenne de Lille-Appartement-linear-best_score: 0.6858369994628712,best_param :{'poly_features__degree': 1} rmse:603.8351279567621 ,score:0.39886379596041344,median: prix_m2_actualise    12.019438
+dtype: float64, mean:prix_m2_actualise    15.1667
+dtype: float64
+Rennes Métropole-Maison-random_forest-best_score: 0.6579006212651834,best_param :{'rd__n_estimators': 200} rmse:660.055528282086 ,score:0.15562663918534236,median: prix_m2_actualise    12.448458
+dtype: float64, mean:prix_m2_actualise    14.728066
+dtype: float64
+Montpellier Méditerranée Métropole-Maison-random_forest-best_score: 0.3607076346879164,best_param :{'rd__n_estimators': 100} rmse:731.7145165675922 ,score:-0.762918501206233,median: prix_m2_actualise    12.260099
+dtype: float64, mean:prix_m2_actualise    15.342752
+dtype: float64
+Métropole Européenne de Lille-Maison-linear-best_score: 0.4593522764400067,best_param :{'poly_features__degree': 1} rmse:10906551017530.271 ,score:-4.966081879914652e+20,median: prix_m2_actualise    4.269799e+11
+dtype: float64, mean:prix_m2_actualise    4.534483e+11
+dtype: float64
+Rennes Métropole-Appartement-random_forest-best_score: 0.6339548316532705,best_param :{'rd__n_estimators': 200} rmse:642.8935819227102 ,score:0.06405154055312556,median: prix_m2_actualise    12.921456
+dtype: float64, mean:prix_m2_actualise    15.230484
+dtype: float64
+Métropole de Lyon-Maison-linear-best_score: 0.41458922009049276,best_param :{'poly_features__degree': 1} rmse:1073.5957622668052 ,score:-1.1749085522928189,median: prix_m2_actualise    14.035514
+dtype: float64, mean:prix_m2_actualise    17.086962
+dtype: float64
+Métropole d'Aix-Marseille-Provence-Maison-random_forest-best_score: 0.47001444573502965,best_param :{'rd__n_estimators': 200} rmse:801.4526362327516 ,score:-0.13190366272026033,median: prix_m2_actualise    11.257954
+dtype: float64, mean:prix_m2_actualise    15.067175
+dtype: float64
+Toulouse Métropole-Maison-random_forest-best_score: 0.47127860346344924,best_param :{'rd__n_estimators': 200} rmse:693.4991209840031 ,score:-0.1965000319339627,median: prix_m2_actualise    11.518211
+dtype: float64, mean:prix_m2_actualise    15.396317
+dtype: float64
+Toulouse Métropole-Appartement-random_forest-best_score: 0.6393294179334118,best_param :{'rd__n_estimators': 200} rmse:556.4271536321863 ,score:0.4130179601384618,median: prix_m2_actualise    9.966724
+dtype: float64, mean:prix_m2_actualise    13.139864
+dtype: float64
+Métropole de Lyon-Appartement-linear-best_score: 0.6496856549958581,best_param :{'poly_features__degree': 1} rmse:795.054057436587 ,score:0.286848819528557,median: prix_m2_actualise    12.082315
+dtype: float64, mean:prix_m2_actualise    14.979486
+dtype: float64
+Métropole Nice Côte d'Azur-Appartement-random_forest-best_score: 0.46845611675362314,best_param :{'rd__n_estimators': 200} rmse:898.3627860619127 ,score:0.0341158318905419,median: prix_m2_actualise    11.79171
+dtype: float64, mean:prix_m2_actualise    15.906673
+dtype: float64
+Bordeaux Métropole-Appartement-random_forest-best_score: 0.6408777404973346,best_param :{'rd__n_estimators': 200} rmse:695.8283635039036 ,score:0.44514535098081587,median: prix_m2_actualise    9.417081
+dtype: float64, mean:prix_m2_actualise    13.047243
+dtype: float64
+Métropole du Grand Paris-Maison-random_forest-best_score: 0.689475342107866,best_param :{'rd__n_estimators': 200} rmse:1299.4516833896428 ,score:0.4141290342336491,median: prix_m2_actualise    12.668843
+dtype: float64, mean:prix_m2_actualise    16.4144
+dtype: float64
+Bordeaux Métropole-Maison-random_forest-best_score: 0.470818745553697,best_param :{'rd__n_estimators': 200} rmse:864.0603550902966 ,score:-0.09049469147459033,median: prix_m2_actualise    11.621859
+dtype: float64, mean:prix_m2_actualise    15.758923
+dtype: float64
+Métropole Européenne de Lille-Appartement-random_forest-best_score: 0.7174573957531596,best_param :{'rd__n_estimators': 200} rmse:555.9868691571128 ,score:0.5600195577780773,median: prix_m2_actualise    10.596514
+dtype: float64, mean:prix_m2_actualise    13.825753
+dtype: float64
+Montpellier Méditerranée Métropole-Appartement-random_forest-best_score: 0.5790496147892428,best_param :{'rd__n_estimators': 200} rmse:545.4926699707559 ,score:0.3425310781810861,median: prix_m2_actualise    10.051322
+dtype: float64, mean:prix_m2_actualise    12.900276
+dtype: float64
+Nantes Métropole-Maison-random_forest-best_score: 0.453352804405526,best_param :{'rd__n_estimators': 200} rmse:710.3226877121273 ,score:-0.479248384562764,median: prix_m2_actualise    11.613076
+dtype: float64, mean:prix_m2_actualise    13.890534
+dtype: float64
+Nantes Métropole-Appartement-random_forest-best_score: 0.5744228012346483,best_param :{'rd__n_estimators': 200} rmse:614.7037125654991 ,score:0.19236872659543436,median: prix_m2_actualise    11.424538
+dtype: float64, mean:prix_m2_actualise    13.884825
+dtype: float64
+Métropole de Lyon-Maison-random_forest-best_score: 0.4642999517373192,best_param :{'rd__n_estimators': 200} rmse:1001.1179475314982 ,score:-0.5919193311790527,median: prix_m2_actualise    12.693497
+dtype: float64, mean:prix_m2_actualise    16.058535
+dtype: float64
+Métropole du Grand Paris-Appartement-linear-best_score: 0.7909823182269191,best_param :{'poly_features__degree': 1} rmse:71627250570.25484 ,score:-21445.356820702982,median: prix_m2_actualise    9.037692e+08
+dtype: float64, mean:prix_m2_actualise    1.086674e+09
+dtype: float64
+Métropole Européenne de Lille-Maison-random_forest-best_score: 0.4822189882264231,best_param :{'rd__n_estimators': 200} rmse:566.071122784569 ,score:-0.15773228587706067,median: prix_m2_actualise    13.816207
+dtype: float64, mean:prix_m2_actualise    17.594214
+dtype: float64
+Métropole d'Aix-Marseille-Provence-Appartement-random_forest-best_score: 0.6153162579271652,best_param :{'rd__n_estimators': 200} rmse:641.3748129506541 ,score:0.5264597979096547,median: prix_m2_actualise    10.512913
+dtype: float64, mean:prix_m2_actualise    14.953197
+dtype: float64
+Métropole de Lyon-Appartement-random_forest-best_score: 0.6627217149686411,best_param :{'rd__n_estimators': 200} rmse:748.1594559881261 ,score:0.4687861873116177,median: prix_m2_actualise    11.015688
+dtype: float64, mean:prix_m2_actualise    14.03152
+dtype: float64
+Métropole du Grand Paris-Appartement-random_forest-best_score: 0.7889571055599807,best_param :{'rd__n_estimators': 200} rmse:1469.3859743965388 ,score:0.7423629152665966,median: prix_m2_actualise    9.20851
+dtype: float64, mean:prix_m2_actualise    14.055572
+dtype: float64
+Montpellier Méditerranée Métropole-Maison-xgboost-best_score: 0.3622298100970626,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:722.2441563436334 ,score:-0.7192272234845942,median: prix_m2_actualise    12.444958
+dtype: float64, mean:prix_m2_actualise    15.258312
+dtype: float64
+Rennes Métropole-Maison-xgboost-best_score: 0.6614632792018719,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:648.169836475013 ,score:0.18817867291516643,median: prix_m2_actualise    12.143709
+dtype: float64, mean:prix_m2_actualise    14.643904
+dtype: float64
+Métropole de Lyon-Maison-xgboost-best_score: 0.4752664730765343,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:992.9184476912178 ,score:-0.5017741376932667,median: prix_m2_actualise    13.39886
+dtype: float64, mean:prix_m2_actualise    16.05523
+dtype: float64
+Montpellier Méditerranée Métropole-Appartement-xgboost-best_score: 0.5963711342434251,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:540.1363314129751 ,score:0.2699688276360993,median: prix_m2_actualise    9.885208
+dtype: float64, mean:prix_m2_actualise    12.87503
+dtype: float64
+Bordeaux Métropole-Appartement-xgboost-best_score: 0.6495437431689904,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:688.3358215017068 ,score:0.4034513092106353,median: prix_m2_actualise    9.595096
+dtype: float64, mean:prix_m2_actualise    13.117453
+dtype: float64
+Bordeaux Métropole-Maison-xgboost-best_score: 0.48629233891875234,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:848.701268261986 ,score:-0.0885412262961971,median: prix_m2_actualise    11.766764
+dtype: float64, mean:prix_m2_actualise    15.549792
+dtype: float64
+Nantes Métropole-Appartement-xgboost-best_score: 0.59180824447153,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:611.4583409901363 ,score:0.09587661790818336,median: prix_m2_actualise    11.681031
+dtype: float64, mean:prix_m2_actualise    13.993152
+dtype: float64
+Métropole Européenne de Lille-Maison-xgboost-best_score: 0.5012169813504395,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:562.659209708523 ,score:-0.2366430887661355,median: prix_m2_actualise    14.142089
+dtype: float64, mean:prix_m2_actualise    17.670513
+dtype: float64
+Métropole Nice Côte d'Azur-Maison-xgboost-best_score: 0.4919942972334126,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:1461.4446692198444 ,score:-0.005524046835061025,median: prix_m2_actualise    18.019686
+dtype: float64, mean:prix_m2_actualise    24.641901
+dtype: float64
+Toulouse Métropole-Maison-xgboost-best_score: 0.4750583390531751,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:677.2100678911917 ,score:-0.12173002991563009,median: prix_m2_actualise    11.35549
+dtype: float64, mean:prix_m2_actualise    15.138193
+dtype: float64
+Nantes Métropole-Maison-xgboost-best_score: 0.46349422827185166,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:695.8720009780344 ,score:-0.40811145557460793,median: prix_m2_actualise    11.527115
+dtype: float64, mean:prix_m2_actualise    13.643891
+dtype: float64
+Métropole Européenne de Lille-Appartement-xgboost-best_score: 0.7220423755333143,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:556.3796241107834 ,score:0.5246989953155792,median: prix_m2_actualise    10.86697
+dtype: float64, mean:prix_m2_actualise    14.040762
+dtype: float64
+Rennes Métropole-Appartement-xgboost-best_score: 0.6432702772789741,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:637.6487038006267 ,score:-0.0491610294945779,median: prix_m2_actualise    13.195802
+dtype: float64, mean:prix_m2_actualise    15.167785
+dtype: float64
+Métropole d'Aix-Marseille-Provence-Maison-xgboost-best_score: 0.4853673557354452,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:790.9075055035918 ,score:-0.13147746683491524,median: prix_m2_actualise    11.302956
+dtype: float64, mean:prix_m2_actualise    14.948788
+dtype: float64
+Toulouse Métropole-Appartement-xgboost-best_score: 0.6497477657784455,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:560.027774047436 ,score:0.3277408269541918,median: prix_m2_actualise    10.237757
+dtype: float64, mean:prix_m2_actualise    13.312381
+dtype: float64
+Métropole Nice Côte d'Azur-Appartement-xgboost-best_score: 0.49816569072682926,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:897.9778269188067 ,score:-0.12178476233831104,median: prix_m2_actualise    12.016919
+dtype: float64, mean:prix_m2_actualise    16.12585
+dtype: float64
+Métropole d'Aix-Marseille-Provence-Appartement-xgboost-best_score: 0.6322564703827639,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:646.9659199684852 ,score:0.4636962978253092,median: prix_m2_actualise    11.017399
+dtype: float64, mean:prix_m2_actualise    15.373294
+dtype: float64
+Métropole de Lyon-Appartement-xgboost-best_score: 0.6771139424842776,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:756.2895405071226 ,score:0.3878554639573625,median: prix_m2_actualise    11.554088
+dtype: float64, mean:prix_m2_actualise    14.324105
+dtype: float64
+Métropole du Grand Paris-Maison-xgboost-best_score: 0.701772064276847,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:1266.9139123748012 ,score:0.44470774914510425,median: prix_m2_actualise    12.506279
+dtype: float64, mean:prix_m2_actualise    16.053561
+dtype: float64
+Métropole du Grand Paris-Appartement-xgboost-best_score: 0.8017154129482176,best_param :{'xg__n_estimators': 1000, 'xg__eta': 0.02} rmse:1464.7092338889518 ,score:0.7316805147523238,median: prix_m2_actualise    9.74018
+dtype: float64, mean:prix_m2_actualise    14.451721
+dtype: float64

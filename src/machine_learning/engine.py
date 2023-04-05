@@ -35,7 +35,7 @@ def ml_processing(path="data/processed/processed_data.csv"):
         results_dataframe.append(result)
     print("Save result dataframe to disk")    
     result=pd.concat(results_dataframe)
-    result.to_csv('output/model/result.csv',index=False)
+    result.to_csv('output/model/results.csv',index=False)
 
 
     

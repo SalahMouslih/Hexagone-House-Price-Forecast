@@ -5,3 +5,4 @@ data/processed/*
 *.pyc
 .DS_Store
 data/open_data/*
+data/
