@@ -18,6 +18,7 @@ Next, create and activate a virtual environment then install the required packag
 python3 -m venv env 
 source env/bin/activate # activate the virtual environment (Unix)
 env\Scripts\activate    # activate the virtual environment (Windows)
+```
 
 ```
 pip install -r requirements.txt
@@ -71,6 +72,53 @@ To see the available command-line arguments, run the following command:
 
 ## Documentation
 The project documentation can be found at `docs/index.html`.
+
+## General structure
+
+```
+├── README.md
+├── data
+│   ├── open_data
+│   │   └── open_data.zip
+│   ├── processed  
+│   └── raw
+│         └──  dvf_data.zip
+├── models
+├── notebooks
+│   ├── processing_notebook.py
+│   ├── eda_notebook.py
+│   └── ml_notebook.py
+├── output
+│   ├── models
+│   └── plots
+├── requirements.txt
+├── setup.py
+├── src
+│   ├── data_processing
+│   │   ├── amenities.py
+│   │   ├── clean.py
+│   │   ├── clean.pyc
+│   │   ├── discount.py
+│   │   ├── education.py
+│   │   ├── engine.py
+│   │   ├── engine.pyc
+│   │   ├── filters.py
+│   │   ├── stats.py
+│   │   └── utilities.py
+│   ├── eda
+│   │   ├── core.py
+│   │   ├── eda_engine.py
+│   │   └── utilities.py
+│   ├── machine_learning
+│   │   ├── engine.py
+│   │   ├── preprocess.py
+│   │   ├── scores.py
+│   │   └── utilities.py
+│   ├── main.py
+│   └── utils
+└── tests
+```
+
 
 ## Licence
 ## Acknowledgments 
