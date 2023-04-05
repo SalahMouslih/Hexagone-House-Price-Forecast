@@ -1,20 +1,16 @@
-.. My Project documentation master file, created by
-   sphinx-quickstart on Fri Apr  4 14:44:09 2023.
+.. House prices Prediction documentation master file, created by
+   sphinx-quickstart on Wed Apr  5 18:11:40 2023.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to My Project's documentation!
-=======================================
+Welcome to House prices Prediction's documentation!
+===================================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   ../src
-   ../data
-   ../models
-   ../notebooks
-   ../tests
+   modules
 
 Indices and tables
 ==================
