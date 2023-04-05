@@ -1,8 +1,6 @@
-env
 venv
+*.pyc
 data/raw/*
 data/processed/*
-*.pyc
-.DS_Store
 data/open_data/*
-data/
+.DS_Store

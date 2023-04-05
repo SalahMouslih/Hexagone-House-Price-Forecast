@@ -1,21 +1,40 @@
-from data_processing.amenities import equipements_prep, read_equi
+"""
+The preprocessing_engine function is the main engine of preprocessing. It takes a list of 
+file paths as input and preprocesses DVF data in an end-to-end fashion.
+
+Inputs:
+
+data_paths (list of str): A list of file paths where DVF data is stored.
+trimestre_actu (str): A string representing the current quarter in the format 
+"YYYY-TX" (e.g., "2022-T2").
+
+Outputs:
+
+dvf_geo (GeoDataFrame): A GeoDataFrame containing the preprocessed data that is ready for modeling
+"""
+import os
+import pandas as pd
+from utils.common import convert_gpd
+from data_processing.amenities import equipements_prep
 from data_processing.clean import clean_multivente
 from data_processing.discount import fonction_final_prix
 from data_processing.education import prep_brevet, prep_lyc
 from data_processing.filters import select_bien, filtre_dur, filtre_prix
-from data_processing.utilities import calculate_closest_metric, choose_metric_name, iris_prep, get_top_zones,convert_gpd, read_dvfs, read_iris, read_lyc, select_variables
-import pandas as pd
-import os
+from data_processing.utilities import (
+    calculate_closest_metric, choose_metric_name, 
+    iris_prep, get_top_zones, read_dvfs, 
+    read_iris, read_lycees, select_variables
+    )
 
-trimestre_actu = '2022-T2'
-test_trimestre=['2021-T3','2021-T4','2022-T1','2022-T2']
-surface_max_maison = 360
-surface_max_appartement = 200
-nombre_pieces_max_maison = 10
-nombre_max_appartement = 6
-
-def preprocessing_engine(data_paths, trimestre_actu=trimestre_actu, test_trimestre=test_trimestre):
+def preprocessing_engine(data_paths, trimestre_actu='2022-T2'):
     """Main engine of preprocessing. Preprocesses DVF data in an end-to-end fashion."""
+
+    test_trimestre = ['2021-T3','2021-T4','2022-T1','2022-T2']
+    surface_max_maison = 360
+    surface_max_appartement = 200
+    nombre_pieces_max_maison = 10
+    nombre_max_appartement = 6
+
     try:
         # Read data
         data = read_dvfs(data_paths)
@@ -51,7 +70,8 @@ def preprocessing_engine(data_paths, trimestre_actu=trimestre_actu, test_trimest
     dvf_geo = convert_gpd(dvf_train)
 
     # Create the variable "prix moyen au m2 des 10 biens les plus proches"
-    dvf_geo = calculate_closest_metric(dvf = dvf_geo, table_info = dvf_geo[~dvf_geo['trimestre_vente'].isin(test_trimestre)],
+    dvf_geo = calculate_closest_metric(dvf = dvf_geo,
+            table_info = dvf_geo[~dvf_geo['trimestre_vente'].isin(test_trimestre)],
             k_neighbors = 10,
             metric_of_interest = 'prix_m2_actualise',
             new_metric_name = 'prix_m2_zone')
@@ -60,7 +80,7 @@ def preprocessing_engine(data_paths, trimestre_actu=trimestre_actu, test_trimest
 
     # Get the taux de mention for each lycée and collège as well as their geographical coordinates
     try:
-        geo_etab, brevet, lyc = read_lyc()
+        geo_etab, brevet, lyc = read_lycees()
         lyc_gen_geo = prep_lyc(lyc, geo_etab)
         brevet_geo = prep_brevet(brevet, geo_etab)
 
@@ -84,6 +104,7 @@ def preprocessing_engine(data_paths, trimestre_actu=trimestre_actu, test_trimest
     # Add information about the IRIS area
     iris_value, iris_shape = read_iris()
     iris = iris_prep(iris_value, iris_shape)
+    ##save_iris(iris)
     dvf_geo = dvf_geo.sjoin(iris, how = 'left', predicate = 'within')
 
     #Choose the metric name for income
@@ -113,7 +134,6 @@ def preprocessing_engine(data_paths, trimestre_actu=trimestre_actu, test_trimest
             print('Finished pre-processing')
             print('****************************')
             print('Processed data saved to', output_dir)
-
         except IOError:
             print("Error: could not write processed data to file")
             return None

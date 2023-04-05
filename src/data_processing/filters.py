@@ -1,8 +1,20 @@
+"""
+This module contains functions for filtering and selecting data from a given dataset.
+
+Functions:
+
+- select_bien(df): Filter the dataset to keep only properties of type 'Maison' or 'Appartement' that are being sold.
+- filtre_dur(df, bati, piece, local, metropole_name=None): Filter the dataset to keep only properties of a given type,
+ within or outside a given metropolitan area, and within given building surface and number of rooms constraints.
+- filtre_prix(df, metric_prix, quantile_nv = 0.99): Filter the dataset to keep only properties with a price per square 
+meter below the 99th percentile for each city and property type.
+
+"""
+
 import pandas as pd
 import numpy as np
 
-def select_bien(df):
-    
+def select_bien(df):    
     try:
         print("Filtering property types...")
 
@@ -16,10 +28,12 @@ def select_bien(df):
 
         return df
 
-    except Exception as e:
-        print(f"Error: {e}")
+    except KeyError as ke:
+        print(f"KeyError: {ke}")
+        return None 
+    except TypeError as te:
+        print(f"TypeError: {te}")
         return None
-
 
 def filtre_dur(df, bati, piece, local, metropole_name=None):
     """
@@ -33,8 +47,7 @@ def filtre_dur(df, bati, piece, local, metropole_name=None):
     metropole_name (str, optional): Name of the metropolitan area to be filtered.
 
     Returns:
-    pd.DataFrame: The filtered dataset.
-    
+    pd.DataFrame: The filtered dataset.    
     """
     try:
         # if a metropole name is given, filter data for the given local in that metropole
@@ -56,17 +69,16 @@ def filtre_dur(df, bati, piece, local, metropole_name=None):
         # merge filtered data for the given local in metropole with data for other metropoles
         filtered_df = pd.concat([df_metropole, df_other_metropoles])
 
-        return filtered_df
-    
+        return filtered_df    
     except Exception as e:
         print(f"Error occurred in filtre_dur(): {str(e)}")
         return None
 
-
 def filtre_prix(df, metric_prix, quantile_nv = 0.99):
     """ 
-    Compute the 99th percentile for each city (more precise than EPCI) and property type (Appartement, Maison)
-    Filter properties based on their price per square meter being below the 99th percentile
+    Compute the 99th percentile for each city (more precise than EPCI) and property 
+    type (Appartement, Maison).Filter properties based on their price per square meter 
+    being below the 99th percentile
 
     ++++++ Be careful to use the discounted price ++++++
 
@@ -82,7 +94,8 @@ def filtre_prix(df, metric_prix, quantile_nv = 0.99):
     try:
         print('Filtering prices...')
 
-        # Remove properties with prices below 1000 euros per square meter or above 20000 euros per square meter
+        # Remove properties with prices below 1000 euros per square meter or above 20000 euros 
+        #per square meter
         df = df[(df[metric_prix] >= 1000) & (df[metric_prix] <= 20000)]
 
         # Compute the 99th percentile for each city and property type
