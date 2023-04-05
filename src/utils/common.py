@@ -1,3 +1,6 @@
+"""
+his module provides a collection of frequently used functions for reading and manipulating geographical data, which can be utilized across various modules
+"""
 import pandas as pd
 import geopandas as gpd
 
@@ -5,6 +8,14 @@ import geopandas as gpd
 def read_data(data_paths):
     """
     Read data from the given path(s) and return a single concatenated dataframe.
+
+    Args:
+        data_paths: A string or list of strings representing the file path(s) to read data from.
+
+    Returns:
+        A pandas dataframe consisting of the concatenated data from all the files at the 
+    specified path(s), with a maximum of 1000 rows.
+        If an error occurs during the data reading process, None is returned.
     """
     try:
         print('Reading data...')
@@ -13,7 +24,7 @@ def read_data(data_paths):
             data = pd.read_csv(data_paths)
         else:
             data = pd.concat(map(pd.read_csv, data_paths))
-        return data
+        return data[:1000]
     except FileNotFoundError as e:
         print(f"Error occurred while reading data: {e}")
         return None
@@ -24,6 +35,12 @@ def read_data(data_paths):
 def read_tables(*data_paths):
     """
     Read multiple csv files from the given paths and return a list of dataframes.
+
+    Args:
+        data_paths: One or more strings representing the file path(s) to read data from.
+
+    Returns:
+        A list of pandas dataframes, each containing the data from one of the specified files.
     """
     dataframes = [] 
 
@@ -71,19 +88,28 @@ def get_metropoles(data):
         print(f"An error occurred: {e}")
         return None
 
-def convert_gpd(df, equi=False):
+def convert_gpd(data, equi=False):
     """
-    Function convert_gpd converts a pandas DataFrame to a GeoDataFrame using the geometry
-    attribute which is created from the longitude and latitude columns of the input DataFrame
+    Converts a pandas DataFrame to a GeoDataFrame using the geometry attribute.
+    
+    Args:
+        : A pandas DataFrame with longitude and latitude columns.
+        equi: A boolean flag indicating whether the speicified DataFrame is 'equipements'.
+
+    Returns:
+        A GeoDataFrame with a 'geometry' column containing points corresponding to the latitude and 
+        longitude or Lambert coordinates of the input DataFrame.
+    
+    Raises:
+        ValueError: If the input DataFrame does not contain the expected columns.
     """
     try:
         if equi:
             return gpd.GeoDataFrame(
-                df, geometry = gpd.points_from_xy(df.LAMBERT_X, df.LAMBERT_Y)
+                data, geometry = gpd.points_from_xy(data.LAMBERT_X, data.LAMBERT_Y)
             )
-        else :
-            return gpd.GeoDataFrame(
-                df, geometry = gpd.points_from_xy(df.longitude, df.latitude)
+        return gpd.GeoDataFrame(
+                data, geometry = gpd.points_from_xy(data.longitude, data.latitude)
             )
     except ValueError as e:
         print(f"Error converting to GeoDataFrame: {e}")
@@ -91,7 +117,14 @@ def convert_gpd(df, equi=False):
 
 def read_iris():
     """
-    Read IRIS tables and return iris_value and iris_shape.
+    Reads IRIS tables and returns iris_value and iris_shape.
+    
+    Returns:
+        A tuple containing iris_value, a pandas DataFrame, and iris_shape, a GeoDataFrame.
+    
+    Raises:
+        FileNotFoundError: If either of the IRIS table files is not found.
+        Exception: If an error occurs while reading the tables.
     """
     iris_value_path = 'data/open_data/IRIS_donnees.csv'
     iris_shape_path = 'data/open_data/IRIS_contours.shp'
@@ -125,13 +158,13 @@ def read_equi():
     except IOError:
         print("Error: could not read amenities file.")
         return None
-
 def iris_prep(iris_value, iris_shape):
     """
     Merge iris_shape and iris_value tables to obtain the polygons and the IRIS values in the same table.
 
-    Parameters: None
-    Returns: A pandas dataframe containing the merged iris data with no duplicate entries based on 'DCOMIRIS' column.
+    Args: None
+    Returns: A pandas dataframe containing the merged iris data with no duplicate entries based on 
+    'DCOMIRIS' column.
     """
     try:
         # Remove duplicates from iris_shape and iris_value tables
@@ -148,5 +181,7 @@ def iris_prep(iris_value, iris_shape):
         return iris
     except KeyError as e:
         print(f"Error: {str(e)} column not found in input data")
+        return None
     except Exception as e:
         print(f"Error: {str(e)}")
+        return None
