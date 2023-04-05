@@ -4,7 +4,7 @@ This project includes a command-line interface to run engines for exploratory da
 
 ### Installation
 
-To use this project, fisst clone the repository
+To use this project, first clone the repository
 
 ```
 git clone https://github.com/salahmouslih/data-challenge.git
@@ -33,9 +33,9 @@ Specifically, you need to unzip the raw data file(s) and place the extracted fil
 
 Once the data is in the correct directory, you can proceed with running the main.py script with the desired command line arguments. The available options are:
 
-- preprocess : preprocess the specified raw data file(s).
-- ml : run the machine learning engine.
-- eda : run the exploratory data analysis engine.
+- **preprocess** : preprocess the specified raw data file(s).
+- **ml** : run the machine learning engine.
+- **eda** : run the exploratory data analysis engine.
 
 #### Pre-processing Engine
 To preprocess the raw data, run the following command:
