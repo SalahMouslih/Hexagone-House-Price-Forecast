@@ -13,7 +13,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from data_processing.engine import preprocessing_engine
-#from machine_learning.engine import machine_learning_engine
+from machine_learning.engine import ml_engine
 from eda.eda_engine import eda_engine
 
 
@@ -68,7 +68,7 @@ def main():
             logging.error("An error occurred while performing EDA")
     elif args.ml:
         logging.info('Running the machine learning engine')
-        machine_learning_engine()
+        ml_engine()
     else:
         parser.print_help()
 

@@ -3,7 +3,7 @@
 import pandas as pd
 import warnings
 from machine_learning.scores import train_score_save
-from machine_learning.utils import read_data
+from machine_learning.utilities import read_data
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 def run_model(params, data):
@@ -30,7 +30,7 @@ def run_model(params, data):
         return None
 
 
-def ml_processing(path="data/processed/processed_data.csv"):
+def ml_engine(path="data/processed/processed_data.csv"):
     '''
     Run machine learning model benchmark for all metropole, type_local, and model(Linear, xgboost, random).
     It will generate a result.txt, result.csv, and feature importance for ensemble methods.
