@@ -1,4 +1,14 @@
+import numpy as np
+import xgboost as xgb
 import pandas as pd
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
 
 trimestres=['2021-T3', '2021-T4', '2022-T1', '2022-T2']
 to_drop=['adresse_numero', 'adresse_suffixe','numero_disposition',
@@ -35,7 +45,8 @@ def train_test_split(df, metropole=None, type_local=None, random_state=42, split
 
     # Filter by price quartile if quartile is specified
     if quartile:
-        df = df[df.prix_m2_actualise < df.prix_m2_actualise.quantile(1 - quartile)][df.prix_m2_actualise > df.prix_m2_actualise.quantile(quartile)]
+        df = df[df.prix_m2_actualise < df.prix_m2_actualise.quantile(1 - quartile)]
+        df= df[df.prix_m2_actualise > df.prix_m2_actualise.quantile(quartile)]
 
     # Filter by metropole if specified
     if metropole:
@@ -67,7 +78,17 @@ def train_test_split(df, metropole=None, type_local=None, random_state=42, split
         test_df['prix_m2_actualise'] = test_df['prix_m2']
         return pd.concat([shuffled_df, test_df], axis=0)
 
-def pre_process(data, type_local):
+def preprocess_ml(data, type_local):
+    """
+    Clean the input data for use in machine learning models.
+
+    Args:
+        data (pd.DataFrame): The input dataframe to be cleaned.
+        type_local (str): The type of local to be cleaned (e.g. 'Appartement', 'Maison').
+
+    Returns:
+        pd.DataFrame: The cleaned dataframe.
+    """
     
     # Drop unnecessary columns
     drop_clean=list(set(data.columns)&set(to_drop))
@@ -81,8 +102,8 @@ def pre_process(data, type_local):
 
     # Remove highly correlated columns
     upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(np.bool))
-    to_drop = [column for column in upper.columns if any(upper[column] > 0.95)]
-    data = data.drop(to_drop, axis=1)
+    to_drop_col = [column for column in upper.columns if any(upper[column] > 0.95)]
+    data = data.drop(to_drop_col, axis=1)
 
     # Drop surface_terrain column for apartments
     if type_local=="Appartement":
@@ -92,3 +113,58 @@ def pre_process(data, type_local):
     data = data.dropna()
 
     return data
+
+
+def build_pipeline(model,data):
+    '''
+    Build a pipeline using RandomSearchCV or GridSearchCV to optimize the hyperparameters for the specified machine learning model
+    Args:
+    model : str, the name of the machine learning model to be used
+    data : pandas DataFrame, preprocessed data to be used in the pipeline
+    Returns:
+    clf : the resulting pipeline after applying the RandomSearchCV or GridSearchCV
+    '''
+    numerical_columns = list(data.select_dtypes(exclude=["object","string"]).columns)
+    target='prix_m2_actualise'
+    numerical_columns=[col for col in numerical_columns if col!=target]
+    categorical_columns=['code_departement'] 
+    folds = 3
+    numeric_transformer = Pipeline(
+        steps=[("imputer", SimpleImputer(strategy="median")), ("scaler", StandardScaler())]
+            )
+
+    categorical_transformer = Pipeline(
+        steps=[
+            ("encoder", OneHotEncoder(handle_unknown="ignore"))
+        ]
+        )
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ("num", numeric_transformer,numerical_columns),
+            ("cat", categorical_transformer,categorical_columns),
+        ])
+    rd=RandomForestRegressor(n_jobs=-1)
+    xg_reg = xgb.XGBRegressor(n_jobs=-1)
+    if model=='linear':
+        params = {"poly_features__degree": [1,2]}
+        poly_pipeline = Pipeline([('preprocessor',preprocessor),('poly_features', PolynomialFeatures()), ('model', LinearRegression())])
+        clf = GridSearchCV(poly_pipeline, cv=folds, scoring='r2', param_grid=params,n_jobs=-1)
+    elif model=='xgboost':
+        params = {'xg__eta': [0.3, 0.02],'xg__n_estimators': [100,500,1000,5000]}
+        xg = xgb.XGBRegressor(n_jobs = -1)
+        xg_reg = Pipeline(
+        steps=[("preprocessor", preprocessor), ("xg", xg)],verbose=False)
+        clf = RandomizedSearchCV(xg_reg, param_distributions=params, n_iter=2,
+        scoring='r2', n_jobs=-1, cv=folds,random_state=1001 )
+        
+    else:
+        rd_pipeline = Pipeline(
+            steps=[("preprocessor", preprocessor), ("rd", rd)]
+        )
+        params = {
+            'rd__n_estimators':[100,150,200,300]
+        }
+        clf= RandomizedSearchCV(rd_pipeline, param_distributions=params, n_iter=2,
+                scoring='r2', n_jobs=-1, cv=folds,
+                                random_state=1001 )            
+    return clf
