@@ -71,7 +71,7 @@ To see the available command-line arguments, run the following command:
 
 ``` python src/main.py --help``` 
 
-## Documentation
+## Notebooks
 The original notebooks can be found at the `notebooks` folder.
 
 ## Documentation
