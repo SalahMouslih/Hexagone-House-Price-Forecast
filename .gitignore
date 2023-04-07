@@ -4,5 +4,4 @@ data/raw/*
 data/processed/*
 data/open_data/*
 .DS_Store
-docs/*
 build/*

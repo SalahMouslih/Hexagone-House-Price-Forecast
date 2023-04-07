@@ -1,0 +1,748 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.eda.core &#8212; House prices Prediction 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.eda.core</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">EDA Core functions</span>
+<span class="sd">This module contains core functions for visualizing and analyzing processed data.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="k">as</span> <span class="nn">mpatches</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<div class="viewcode-block" id="plot_heatmap"><a class="viewcode-back" href="../../../src.eda.html#src.eda.core.plot_heatmap">[docs]</a><span class="k">def</span> <span class="nf">plot_heatmap</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Plot a heatmap of the correlation matrix between features and &quot;prix_m2_actualise&quot; for a given dataset, </span>
+<span class="sd">  either for all metropoles or for a specific metropole, and save the resulting plot to a directory.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    data (pandas.DataFrame): Input data containing the columns to be used for computing the correlation matrix.</span>
+<span class="sd">    output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. </span>
+<span class="sd">    If not provided, the plots will only be displayed and not saved. Defaults to None.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    None</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">try</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Computing correlation heatmaps per metropole...&quot;</span><span class="p">)</span>
+
+    <span class="n">color</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">diverging_palette</span><span class="p">(</span><span class="mi">29</span><span class="p">,</span> <span class="mi">29</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="s1">&#39;light&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+
+    <span class="c1"># Plot heatmap for a specific metropole</span>
+    <span class="k">for</span> <span class="n">metropole</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">LIBEPCI</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+        <span class="n">heatmap</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">LIBEPCI</span> <span class="o">==</span> <span class="n">metropole</span><span class="p">]</span><span class="o">.</span><span class="n">corr</span><span class="p">()[[</span><span class="s1">&#39;prix_m2_actualise&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;prix_m2_actualise&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> 
+                              <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+        <span class="n">heatmap</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Features Correlating with </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;prix_m2_actualise&#39;</span><span class="p">,</span> <span class="n">metropole</span><span class="p">),</span> <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fontsize&#39;</span><span class="p">:</span> <span class="mi">18</span><span class="p">},</span> <span class="n">pad</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">output_dir</span><span class="p">:</span>
+          <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;correlation_heatmap_</span><span class="si">{</span><span class="n">metropole</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+          <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+  <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+      <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred while plotting heatmap: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="plot_correlation_matrix"><a class="viewcode-back" href="../../../src.eda.html#src.eda.core.plot_correlation_matrix">[docs]</a><span class="k">def</span> <span class="nf">plot_correlation_matrix</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Compute the correlation matrix and plot it as a heatmap.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    data (pandas.DataFrame): Input data.</span>
+<span class="sd">    output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. </span>
+<span class="sd">    If not provided, the plots will only be displayed and not saved. Defaults to None.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    None</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Computing the correlation matrix...&quot;</span><span class="p">)</span>
+
+  <span class="c1"># Compute the correlation matrix</span>
+  <span class="n">corr</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+
+  <span class="c1"># Generate a mask for the upper triangle</span>
+  <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">))</span>
+
+  <span class="c1"># Set up the matplotlib figure and title</span>
+  <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+  <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Correlation Matrix&#39;</span><span class="p">)</span>
+
+  <span class="c1"># Generate a custom diverging colormap</span>
+  <span class="n">cmap</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">diverging_palette</span><span class="p">(</span><span class="mi">230</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">as_cmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+  <span class="c1"># Draw the heatmap with the mask and correct aspect ratio</span>
+  <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">.3</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+              <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;shrink&quot;</span><span class="p">:</span> <span class="mf">.5</span><span class="p">})</span>
+  
+  <span class="k">if</span> <span class="n">output_dir</span><span class="p">:</span>
+    <span class="c1"># Save the resulting plot to the specified directory</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;correlation_matrix.png&quot;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="distribution_target_type_and_metropoles"><a class="viewcode-back" href="../../../src.eda.html#src.eda.core.distribution_target_type_and_metropoles">[docs]</a><span class="k">def</span> <span class="nf">distribution_target_type_and_metropoles</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot the distribution of prix_m2_actualise for different types of properties (flats and houses) for all metropoles, </span>
+<span class="sd">    and save the resulting plot to a directory.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    data (pandas.DataFrame): Input data containing the column &quot;prix_m2_actualise&quot; and &quot;type_local&quot;.</span>
+<span class="sd">    output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. </span>
+<span class="sd">    If not provided, the plots will only be displayed and not saved. Defaults to None.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">  None</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">try</span><span class="p">:</span>
+
+      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating target variable distribution per metropole...&quot;</span><span class="p">)</span>
+      <span class="c1"># Iterate over the unique values of &quot;data.LIBEPCI&quot; and plot the distribution of &quot;prix_m2_actualise&quot;</span>
+      <span class="c1"># for each metropole on a separate subplot</span>
+      <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">met</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">LIBEPCI</span><span class="o">.</span><span class="n">unique</span><span class="p">()):</span>
+          <span class="n">fig</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">displot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">LIBEPCI</span> <span class="o">==</span> <span class="n">met</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;prix_m2_actualise&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;type_local&quot;</span><span class="p">,</span> <span class="n">kde</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+          <span class="n">fig</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Distribution of prix_m2_actualise for flats and houses, </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">met</span><span class="p">))</span>
+          <span class="k">if</span> <span class="n">output_dir</span><span class="p">:</span>
+            <span class="c1"># Save the resulting plot to the specified directory</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;prix_m2_distribution_</span><span class="si">{</span><span class="n">met</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+          <span class="k">else</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+  <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+      <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred while creating the plots: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="plot_flats_houses_shares"><a class="viewcode-back" href="../../../src.eda.html#src.eda.core.plot_flats_houses_shares">[docs]</a><span class="k">def</span> <span class="nf">plot_flats_houses_shares</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Plot the percentage of flats and houses for each metropole, and save the resulting plot to a directory.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    data (pandas.DataFrame): Input data containing the columns &quot;LIBEPCI&quot; and &quot;type_local&quot;.</span>
+<span class="sd">    output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. </span>
+<span class="sd">    If not provided, the plots will only be displayed and not saved. Defaults to None.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    None</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating percentage of flats and houses for each metropole...&quot;</span><span class="p">)</span>
+
+  <span class="c1"># Set the figure size</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+
+  <span class="c1"># Calculate the percentage of flats and houses for each LIBEPCI</span>
+  <span class="n">total</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;LIBEPCI&#39;</span><span class="p">)[</span><span class="s1">&#39;type_local&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+  <span class="n">type_local</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">type_local</span><span class="o">==</span><span class="s1">&#39;Appartement&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;LIBEPCI&#39;</span><span class="p">)[</span><span class="s1">&#39;type_local&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+  <span class="n">type_local</span><span class="p">[</span><span class="s1">&#39;type_local&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">/</span> <span class="n">j</span> <span class="o">*</span> <span class="mi">100</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">type_local</span><span class="p">[</span><span class="s1">&#39;type_local&#39;</span><span class="p">],</span> <span class="n">total</span><span class="p">[</span><span class="s1">&#39;type_local&#39;</span><span class="p">])]</span>
+  <span class="n">total</span><span class="p">[</span><span class="s1">&#39;type_local&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">/</span> <span class="n">j</span> <span class="o">*</span> <span class="mi">100</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">total</span><span class="p">[</span><span class="s1">&#39;type_local&#39;</span><span class="p">],</span> <span class="n">total</span><span class="p">[</span><span class="s1">&#39;type_local&#39;</span><span class="p">])]</span>
+
+  <span class="c1"># Create a bar chart for flats and houses</span>
+  <span class="n">bar1</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;LIBEPCI&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;type_local&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">total</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">)</span>
+  <span class="n">bar2</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;LIBEPCI&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;type_local&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">type_local</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">)</span>
+
+  <span class="c1"># Add legend</span>
+  <span class="n">top_bar</span> <span class="o">=</span> <span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Maison&#39;</span><span class="p">)</span>
+  <span class="n">bottom_bar</span> <span class="o">=</span> <span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Appartement&#39;</span><span class="p">)</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="p">[</span><span class="n">top_bar</span><span class="p">,</span> <span class="n">bottom_bar</span><span class="p">])</span>
+
+  <span class="c1"># Rotate x-axis labels for better readability</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+
+  <span class="c1"># Set plot title</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Percentage of Flats and Houses by Metropole&quot;</span><span class="p">)</span>
+
+  <span class="k">if</span> <span class="n">output_dir</span><span class="p">:</span>
+    <span class="c1"># Save the resulting plot to the specified directory</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;flats_houses_shares.png&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="box_flats_houses"><a class="viewcode-back" href="../../../src.eda.html#src.eda.core.box_flats_houses">[docs]</a><span class="k">def</span> <span class="nf">box_flats_houses</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Create and display box plots for the features &#39;surface_reelle_bati&#39; and &#39;nombre_pieces_principales&#39;</span>
+<span class="sd">  for different types of properties (flats and houses) using the given data.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    data (pandas.DataFrame): Input data containing the columns &#39;type_local&#39;, &#39;surface_reelle_bati&#39;, and &#39;nombre_pieces_principales&#39;.</span>
+<span class="sd">    output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. If not provided, the plots will only be displayed and not saved. Defaults to None.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    None</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">try</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating box plots of &#39;surface_reelle_bati&#39; and &#39;nombre_pieces_principales&#39;...&quot;</span><span class="p">)</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;type_local&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;surface_reelle_bati&quot;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="s1">&#39;orange&#39;</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Type of Property&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Surface Reelle Bati&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Boxplot of Surface Reelle Bati for Flats and Houses&#39;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;type_local&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;nombre_pieces_principales&quot;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="s1">&#39;orange&#39;</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Type of Property&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Nombre Pieces Principales&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Boxplot of Nombre Pieces Principales for Flats and Houses&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">output_dir</span><span class="p">:</span>
+      <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;boxplots.png&quot;</span><span class="p">)</span>
+      <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+  <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred while creating and saving box plots: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="boxen_flats_houses"><a class="viewcode-back" href="../../../src.eda.html#src.eda.core.boxen_flats_houses">[docs]</a><span class="k">def</span> <span class="nf">boxen_flats_houses</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Generate boxen plots for the surface_reelle_bati and nombre_pieces_principales columns, comparing flats and houses.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    data (pandas.DataFrame): Input data containing the columns &quot;type_local&quot;, &quot;surface_reelle_bati&quot;, and &quot;nombre_pieces_principales&quot;.</span>
+<span class="sd">    output_dir (str, optional): Path to the directory where the figure will be saved. If None, the figure will be displayed using plt.show(). Default is None.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    None</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">try</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating boxen plots of &#39;surface_reelle_bati&#39; and &#39;nombre_pieces_principales&#39;...&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create a figure with two subplots side by side</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Generate the boxen plot for surface_reelle_bati column, comparing flats and houses</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">boxenplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;type_local&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;surface_reelle_bati&quot;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="s1">&#39;orange&#39;</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Type of Property&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Surface Reelle Bati&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Boxen Plot of Surface Reelle Bati for Flats and Houses&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># Generate the boxen plot for nombre_pieces_principales column, comparing flats and houses</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">boxenplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;type_local&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;nombre_pieces_principales&quot;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="s1">&#39;orange&#39;</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Type of Property&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Nombre Pieces Principales&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Boxen Plot of Nombre Pieces Principales for Flats and Houses&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Save the figure to the specified directory or display using plt.show()</span>
+    <span class="k">if</span> <span class="n">output_dir</span><span class="p">:</span>
+      <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;boxen_plot.png&quot;</span><span class="p">)</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+  <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred while generating boxen plots: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="box_flats_houses_metropoles"><a class="viewcode-back" href="../../../src.eda.html#src.eda.core.box_flats_houses_metropoles">[docs]</a><span class="k">def</span> <span class="nf">box_flats_houses_metropoles</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Plot boxenplots of surface_reelle_bati and nombre_pieces_principales for different types of properties (flats and houses) </span>
+<span class="sd">  and metropoles, and save the resulting plot to a directory.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    data (pandas.DataFrame): Input data containing the columns &quot;type_local&quot;, &quot;surface_reelle_bati&quot;, &quot;nombre_pieces_principales&quot;, and &quot;LIBEPCI&quot;.</span>
+<span class="sd">    output_dir (str): Path to the directory where the plot will be saved.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    None</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating boxen plots of &#39;surface_reelle_bati&#39; and &#39;nombre_pieces_principales&#39; per metropole...&quot;</span><span class="p">)</span>
+    <span class="c1"># Define color palette</span>
+    <span class="n">palette</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">dark_palette</span><span class="p">(</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+  
+    <span class="c1"># Set up the figure</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">15</span><span class="p">))</span>
+
+    <span class="c1"># Plot boxenplot for surface_reelle_bati</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">boxenplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;type_local&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;surface_reelle_bati&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;LIBEPCI&quot;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">move_legend</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="s2">&quot;upper left&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># Plot boxenplot for nombre_pieces_principales</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">ax2</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">boxenplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;type_local&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;nombre_pieces_principales&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;LIBEPCI&quot;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">move_legend</span><span class="p">(</span><span class="n">ax2</span><span class="p">,</span> <span class="s2">&quot;upper left&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">output_dir</span><span class="p">:</span>
+      <span class="c1"># Save the resulting plot to the specified directory</span>
+      <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;boxenplot_par_metropole.png&quot;</span><span class="p">)</span>
+      <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+  <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error occurred while plotting boxenplots: &quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span></div>
+  
+<div class="viewcode-block" id="plot_var_iris"><a class="viewcode-back" href="../../../src.eda.html#src.eda.core.plot_var_iris">[docs]</a><span class="k">def</span> <span class="nf">plot_var_iris</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="n">area</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Plot a variable for a specific area using the IRIS dataset.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    iris (geopandas.GeoDataFrame): The GeoDataFrame containing IRIS information.</span>
+<span class="sd">    area (str): The name of the area to plot.</span>
+<span class="sd">    var (str): The name of the variable to plot.</span>
+<span class="sd">    output_dir (str, optional): The output directory to save the plot to.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    None</span>
+
+<span class="sd">  Raises:</span>
+<span class="sd">    ValueError: If the specified area is not found in the IRIS dataset.</span>
+<span class="sd">    Exception: If an error occurs while plotting the variable.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating &#39;prix m2 moyen&#39; for </span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;jet&quot;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">iris</span><span class="p">[</span><span class="n">iris</span><span class="o">.</span><span class="n">NOM_COM</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The specified area &#39;</span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">&#39; was not found in the IRIS dataset.&quot;</span><span class="p">)</span>
+    <span class="n">figure</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="n">var</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s2">&quot;prix m2 moyen des biens de l&#39;IRIS&quot;</span><span class="p">})</span>
+    <span class="n">figure</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">output_dir</span><span class="p">:</span>
+      <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;prix m2 moyen des biens de l&#39;IRIS, </span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+  <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+  <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred while plotting the variable: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="bien_prix_m2"><a class="viewcode-back" href="../../../src.eda.html#src.eda.core.bien_prix_m2">[docs]</a><span class="k">def</span> <span class="nf">bien_prix_m2</span><span class="p">(</span><span class="n">commune</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">area</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Plot all the properties of an area on top of the &#39;commune&#39;. </span>
+<span class="sd">  Color corresponds to prix_m2.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    commune (GeoDataFrame): GeoDataFrame representing the commune.</span>
+<span class="sd">    data (geopandas.GeoDataFrame): The GeoDataFrame containing property information.</span>
+<span class="sd">    area (str): the name of the area to plot (e.g. &quot;Paris&quot;, &quot;Marseille&quot;, &quot;Lyon&quot;)  - area (str): name of the area of interest.</span>
+<span class="sd">    output_dir (str, optional): output directory to save the plot.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    None</span>
+
+<span class="sd">  Raises:</span>
+<span class="sd">    ValueError: If the area is not found in the data DataFrame.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating &#39;prix m2&#39; des biens for </span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;jet&quot;</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">commune</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
+    <span class="n">area_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;NOM_COM&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">area_data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No data found for </span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">base</span> <span class="o">=</span> <span class="n">commune</span><span class="p">[</span><span class="n">commune</span><span class="o">.</span><span class="n">nom</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">figure</span> <span class="o">=</span> <span class="n">area_data</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">base</span><span class="p">,</span>
+                            <span class="n">column</span><span class="o">=</span><span class="s1">&#39;prix_m2_actualise&#39;</span><span class="p">,</span>
+                            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
+                            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                            <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                            <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                            <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s2">&quot;prix m2 des biens&quot;</span><span class="p">})</span>
+    <span class="n">figure</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">output_dir</span><span class="p">:</span>
+      <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;prix m2 des biens de l&#39;IRIS, </span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+  <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+      <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred while plotting properties: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="iris_bien"><a class="viewcode-back" href="../../../src.eda.html#src.eda.core.iris_bien">[docs]</a><span class="k">def</span> <span class="nf">iris_bien</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">iris</span><span class="p">,</span> <span class="n">area</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Plot all the properties in a area on the background of the IRIS.</span>
+<span class="sd">  Colors correspond to the median income (IRIS) and the price_m2 of each property.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">      data (geopandas.GeoDataFrame): The GeoDataFrame containing property information.</span>
+<span class="sd">      iris (geopandas.GeoDataFrame): The GeoDataFrame containing IRIS information.</span>
+<span class="sd">      area (str): the name of the area to plot (e.g. &quot;Paris&quot;, &quot;Marseille&quot;, &quot;Lyon&quot;)</span>
+<span class="sd">      output_dir (str): Optional directory path to save the output plot.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">      None.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">try</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating `revenus médian` et `prix_m2` for </span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;jet&quot;</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">iris</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iris</span><span class="o">.</span><span class="n">NOM_COM</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;DISP_MED19&#39;</span><span class="p">,</span>
+                                              <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
+                                              <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                                              <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                              <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s2">&quot;revenu médian dans l&#39;IRIS&quot;</span><span class="p">})</span>
+    <span class="n">figure</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">NOM_COM</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">base</span><span class="p">,</span>
+                                                <span class="n">column</span><span class="o">=</span><span class="s1">&#39;prix_m2_actualise&#39;</span><span class="p">,</span>
+                                                <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
+                                                <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                                                <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s2">&quot;prix m2 des biens&quot;</span><span class="p">})</span>
+    <span class="n">figure</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="n">output_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;revenu médian_vs_prix m2 des biens_</span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+  <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred while plotting: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="iris_bien_moyen"><a class="viewcode-back" href="../../../src.eda.html#src.eda.core.iris_bien_moyen">[docs]</a><span class="k">def</span> <span class="nf">iris_bien_moyen</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">iris</span><span class="p">,</span> <span class="n">area</span><span class="p">,</span> <span class="n">metrique</span><span class="p">,</span> <span class="n">var_iris</span><span class="p">,</span> <span class="n">name_var_iris</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Plot the average of a given metric for each IRIS in a specific area, along with the corresponding values of a</span>
+<span class="sd">  variable for each IRIS, on the map of the area. The colors on the map correspond to the average metric values</span>
+<span class="sd">  (per IRIS) and the variable values (per IRIS).</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    data (geopandas.GeoDataFrame): The GeoDataFrame containing property information.</span>
+<span class="sd">    iris (geopandas.GeoDataFrame): The GeoDataFrame containing IRIS information.</span>
+<span class="sd">    area (str): the name of the area to plot (e.g. &quot;Paris&quot;, &quot;Marseille&quot;, &quot;Lyon&quot;)</span>
+<span class="sd">    metrique (str): the name of the metric to use for the color scale on the map</span>
+<span class="sd">    var_iris (str): the name of the variable to use for the color scale on the map</span>
+<span class="sd">    name_var_iris (str): a display name for the variable, to use in the color scale label on the map</span>
+<span class="sd">    output_dir (str): optional, the path to a directory where the resulting plot will be saved</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    None</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">try</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating `</span><span class="si">{</span><span class="n">var_iris</span><span class="si">}</span><span class="s2">` et `prix_m2` for </span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;jet&quot;</span><span class="p">)</span>
+
+    <span class="n">inter</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;DCOMIRIS_right&#39;</span><span class="p">])[[</span><span class="n">metrique</span><span class="p">]]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">inter</span> <span class="o">=</span> <span class="n">inter</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">iris_moyenne</span> <span class="o">=</span> <span class="n">inter</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;DCOMIRIS_right&#39;</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;DCOMIRIS&#39;</span><span class="p">)</span>
+    <span class="n">iris_moyenne</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">iris_moyenne</span><span class="p">[[</span><span class="n">metrique</span><span class="p">,</span> <span class="s1">&#39;DCOMIRIS&#39;</span><span class="p">,</span> <span class="s1">&#39;NOM_COM&#39;</span><span class="p">]],</span> <span class="n">geometry</span><span class="o">=</span><span class="n">iris_moyenne</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">])</span>
+
+    <span class="n">iris_moyenne</span><span class="p">[</span><span class="s1">&#39;center&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iris_moyenne</span><span class="o">.</span><span class="n">centroid</span>
+    
+    <span class="k">if</span> <span class="n">iris_moyenne</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="n">iris_moyenne</span> <span class="o">=</span> <span class="n">iris_moyenne</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">2154</span><span class="p">)</span> <span class="c1"># sets the initial crs of the dataframe</span>
+      <span class="n">iris_moyenne</span> <span class="o">=</span> <span class="n">iris_moyenne</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">iris</span><span class="o">.</span><span class="n">crs</span><span class="p">))</span>
+      <span class="n">iris_moyenne</span> <span class="o">=</span> <span class="n">iris_moyenne</span><span class="o">.</span><span class="n">set_geometry</span><span class="p">(</span><span class="s1">&#39;center&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">iris</span><span class="o">.</span><span class="n">crs</span><span class="p">))</span>
+
+    <span class="n">base</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iris</span><span class="o">.</span><span class="n">NOM_COM</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="n">var_iris</span><span class="p">,</span>
+                                                <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
+                                                <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                                                <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name_var_iris</span><span class="si">}</span><span class="s2">. dans l&#39;IRIS&quot;</span><span class="p">})</span>
+    <span class="n">figure</span> <span class="o">=</span> <span class="n">iris_moyenne</span><span class="p">[</span><span class="n">iris_moyenne</span><span class="o">.</span><span class="n">NOM_COM</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">base</span><span class="p">,</span>
+                                                            <span class="n">column</span><span class="o">=</span><span class="n">metrique</span><span class="p">,</span>
+                                                            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
+                                                            <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                            <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                                                            <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">metrique</span><span class="si">}</span><span class="s2">. dans l&#39;IRIS&quot;</span><span class="p">})</span>
+    <span class="n">figure</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">output_dir</span><span class="p">:</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">metrique</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">name_var_iris</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+  <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred while plotting data: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="plot_equi_commune"><a class="viewcode-back" href="../../../src.eda.html#src.eda.core.plot_equi_commune">[docs]</a><span class="k">def</span> <span class="nf">plot_equi_commune</span><span class="p">(</span><span class="n">equipements</span><span class="p">,</span> <span class="n">communes</span><span class="p">,</span> <span class="n">area</span><span class="p">,</span> <span class="n">num_com</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Plot the equipements in a given &#39;commune&#39;.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    equipements (geopandas.GeoDataFrame): The GeoDataFrame containing equipements information.</span>
+<span class="sd">    communes (geopandas.GeoDataFrame): The GeoDataFrame containing communes information.</span>
+<span class="sd">    area (str): Name of the commune to plot.</span>
+<span class="sd">    num_com (str): Departmental code of the commune.</span>
+<span class="sd">    size (tuple): Figure size (width, height).</span>
+<span class="sd">    output_file (str): Path to output file to save the plot. Defaults to None.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    None</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">try</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating &#39;equipements&#39; distribution in </span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">num_com</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create a base map of the commune</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">communes</span><span class="p">[</span><span class="n">communes</span><span class="o">.</span><span class="n">nom</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
+    <span class="c1"># Plot the equipements on the base map</span>
+    <span class="n">figure</span> <span class="o">=</span> <span class="n">equipements</span><span class="p">[</span><span class="n">equipements</span><span class="p">[</span><span class="s1">&#39;DEPCOM&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">num_com</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">base</span><span class="p">,</span>
+                                                            <span class="n">column</span><span class="o">=</span><span class="s1">&#39;TYPEQU&#39;</span><span class="p">,</span>
+                                                            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
+                                                            <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                            <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;jet&quot;</span><span class="p">)</span>
+                                                            <span class="c1"># legend_kwds={&#39;label&#39;: &quot;Type d&#39;équipement&quot;}</span>
+                                                            <span class="p">)</span>
+    <span class="c1"># Hide axis</span>
+    <span class="n">figure</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+
+    <span class="c1"># Save plot to output file if path is provided</span>
+    <span class="k">if</span> <span class="n">output_dir</span><span class="p">:</span>
+      <span class="n">output_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;distribution equipements_</span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">num_com</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+  <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Commune &#39;</span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">&#39; not found in shapefile&quot;</span><span class="p">)</span>
+  <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred while plotting data: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="plot_equi_iris"><a class="viewcode-back" href="../../../src.eda.html#src.eda.core.plot_equi_iris">[docs]</a><span class="k">def</span> <span class="nf">plot_equi_iris</span><span class="p">(</span><span class="n">equipements</span><span class="p">,</span> <span class="n">iris</span><span class="p">,</span> <span class="n">num_iris</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Plots a choropleth map showing the distribution of different types of amenities in a given IRIS.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    equipements (geopandas.GeoDataFrame): The GeoDataFrame containing equipements information.</span>
+<span class="sd">    iris (geopandas.GeoDataFrame): The GeoDataFrame containing IRIS information.</span>
+<span class="sd">    num_iris (str): the code of the IRIS to plot the amenities distribution for</span>
+<span class="sd">    size (tuple): the size of the plot</span>
+<span class="sd">    output_dir (str): the directory to save the plot image to (default is None)</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    None</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating &#39;equipements&#39; distribution in </span><span class="si">{</span><span class="n">num_iris</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+
+  <span class="k">try</span><span class="p">:</span>
+      <span class="c1"># plot the IRIS base map</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">iris</span><span class="p">[</span><span class="n">iris</span><span class="o">.</span><span class="n">DCOMIRIS</span> <span class="o">==</span> <span class="n">num_iris</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
+    <span class="c1"># plot the choropleth map</span>
+    <span class="n">figure</span> <span class="o">=</span> <span class="n">equipements</span><span class="p">[</span><span class="n">equipements</span><span class="p">[</span><span class="s1">&#39;DCIRIS&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">num_iris</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">base</span><span class="p">,</span>
+                                                                        <span class="n">column</span><span class="o">=</span><span class="s1">&#39;TYPEQU&#39;</span><span class="p">,</span>
+                                                                        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
+                                                                        <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                                        <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;jet&quot;</span><span class="p">))</span>
+
+    <span class="n">figure</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+
+    <span class="c1"># save the plot to output directory if given</span>
+    <span class="k">if</span> <span class="n">output_dir</span><span class="p">:</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;distribution equipements_</span><span class="si">{</span><span class="n">num_iris</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+  <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred while plotting the map: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+  <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="corr_iris"><a class="viewcode-back" href="../../../src.eda.html#src.eda.core.corr_iris">[docs]</a><span class="k">def</span> <span class="nf">corr_iris</span><span class="p">(</span><span class="n">data</span><span class="p">:</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">iris</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span> <span class="n">col_1</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">col_2</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the correlation between two columns of a dataset for a given IRIS region.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      data (gpd.GeoDataFrame): input GeoDataFrame</span>
+<span class="sd">      method (str): the correlation method to use (pearson, spearman, kendall)</span>
+<span class="sd">      iris (list): the IRIS region to consider</span>
+<span class="sd">      col_1 (str): the name of the first column</span>
+<span class="sd">      col_2 (str): the name of the second column</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      corr (float): the computed correlation</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">      ValueError: if the provided method is not supported</span>
+<span class="sd">      ValueError: if the provided columns are not found in the dataset</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Select data for the given IRIS region</span>
+    <span class="n">points_iris</span> <span class="o">=</span> <span class="n">data</span><span class="p">[(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;IRIS_x&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">iris</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;IRIS_y&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">iris</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+  
+    <span class="c1"># Select the two columns to compute correlation for</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">points_iris</span><span class="p">[</span><span class="n">col_1</span><span class="p">],</span><span class="n">points_iris</span><span class="p">[</span><span class="n">col_2</span><span class="p">]]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The provided columns &#39;</span><span class="si">{</span><span class="n">col_1</span><span class="si">}</span><span class="s2">&#39; and &#39;</span><span class="si">{</span><span class="n">col_2</span><span class="si">}</span><span class="s2">&#39; are not found in the dataset.&quot;</span><span class="p">)</span>
+  
+    <span class="c1"># Compute correlation if conditions are met</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">y</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;pearson&#39;</span><span class="p">:</span>
+            <span class="n">corr</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;spearman&#39;</span><span class="p">:</span>
+            <span class="n">corr</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;kendall&#39;</span><span class="p">:</span>
+            <span class="n">corr</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">kendalltau</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The correlation method &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39; is not supported.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+  
+    <span class="k">return</span> <span class="n">corr</span></div>
+
+
+<div class="viewcode-block" id="plot_corr_spatiale"><a class="viewcode-back" href="../../../src.eda.html#src.eda.core.plot_corr_spatiale">[docs]</a><span class="k">def</span> <span class="nf">plot_corr_spatiale</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">iris</span><span class="p">,</span> <span class="n">communes</span><span class="p">,</span> <span class="n">area</span><span class="p">,</span> <span class="n">col_1</span><span class="o">=</span><span class="s1">&#39;prix_m2_actualise&#39;</span><span class="p">,</span> <span class="n">col_2</span><span class="o">=</span><span class="s1">&#39;prix_m2_zone&#39;</span><span class="p">,</span> 
+                      <span class="n">method</span><span class="o">=</span><span class="s1">&#39;spearman&#39;</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot the spatial correlation of two columns of a specific area.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      data (gpd.GeoDataFrame): input GeoDataFrame</span>
+<span class="sd">      iris (geopandas.GeoDataFrame): The GeoDataFrame containing IRIS information.</span>
+<span class="sd">      area (str): name of the area to plot the correlation</span>
+<span class="sd">      col_1 (str): the name of the first column to calculate the correlation</span>
+<span class="sd">      col_2 (str): the name of the second column to calculate the correlation</span>
+<span class="sd">      method (str): the method to use for calculating the correlation, defaults to &#39;spearman&#39;</span>
+<span class="sd">      output_dir(str, optional: the directory to save the plot image to (default is None)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      None</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+      <span class="c1"># Calculate the spatial correlation for each iris in the area</span>
+      <span class="n">base_area</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iris</span><span class="o">.</span><span class="n">NOM_COM</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+      <span class="n">column_corr</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="k">for</span> <span class="n">index_iris</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">base_area</span><span class="o">.</span><span class="n">index</span><span class="p">):</span>
+        <span class="n">data_iris</span> <span class="o">=</span> <span class="n">base_area</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index_iris</span><span class="p">]</span>
+        <span class="n">column_corr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">corr_iris</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="p">[</span><span class="n">data_iris</span><span class="p">[</span><span class="s1">&#39;IRIS_x&#39;</span><span class="p">],</span> <span class="n">data_iris</span><span class="p">[</span><span class="s1">&#39;IRIS_y&#39;</span><span class="p">]],</span> <span class="n">col_1</span><span class="p">,</span> <span class="n">col_2</span><span class="p">))</span>
+      <span class="n">base_area</span><span class="p">[</span><span class="s1">&#39;corr_spatiale&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">column_corr</span>
+
+      <span class="c1"># Plot the spatial correlation on the map</span>
+      <span class="n">base</span> <span class="o">=</span> <span class="n">communes</span><span class="p">[</span><span class="n">communes</span><span class="o">.</span><span class="n">nom</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+      <span class="n">figure</span> <span class="o">=</span> <span class="n">base_area</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">base</span><span class="p">,</span>
+                            <span class="n">column</span><span class="o">=</span><span class="s1">&#39;corr_spatiale&#39;</span><span class="p">,</span>
+                            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                            <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                            <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;jet&quot;</span><span class="p">),</span>
+                            <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s2">&quot;Corrélation spatiale dans l&#39;IRIS (</span><span class="si">{}</span><span class="s2">) dans la ville de </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">area</span><span class="p">)})</span>
+      <span class="n">figure</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+      <span class="c1"># save the plot to output directory if given</span>
+      <span class="k">if</span> <span class="n">output_dir</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;correlation_spatiale_</span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">))</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+      <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The area &#39;</span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">&#39; is not available.&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+      <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred while plotting the spatial correlation: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">House prices Prediction</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">src</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, S.Elmouslih, G.Hubert, N.Julien, A.Noarine, N.Tedonze.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

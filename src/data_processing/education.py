@@ -2,13 +2,12 @@
 This module provides functions to preprocess data on schools and merge it with DVF data.
 
 Functions:
-- prep_lyc(data: pd.DataFrame, geo_etab: pd.DataFrame) -> gpd.GeoDataFrame
+    prep_lyc(data: pd.DataFrame, geo_etab: pd.DataFrame) -> gpd.GeoDataFrame
     Filters the given lycée data to only include lycées généraux, calculates the taux de mention for
     each lycée and converts the result to a geopandas dataframe, which is then merged with
     the dvf data.
 
-- prep_brevet(data, geo_etab)
-    Preprocesses brevet data by computing the taux de mention for each college,
+    prep_brevet(data, geo_etab): Preprocesses brevet data by computing the taux de mention for each college,
     converting it to a geopandas dataframe, and merging it with the DVF dataframe.
 
 """
