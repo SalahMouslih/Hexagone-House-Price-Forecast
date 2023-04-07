@@ -1,7 +1,7 @@
 """
 This module contains the main function that runs engines on a set of files.
 The pre-processing engine performs several transformations on the input files to
- prepare them for further processing.
+prepare them for further processing.
 The machine learnibg engine..
 """
 

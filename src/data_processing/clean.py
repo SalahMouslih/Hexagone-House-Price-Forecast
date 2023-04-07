@@ -3,9 +3,11 @@ This module provides functions for cleaning and preprocessing real estate and ed
 
 Functions:
 
-    - clean_type(data, type_bien): Cleans data by removing all properties of a given type (Appartement, Maison, etc.) 
+    clean_type(data, type_bien): 
+        Cleans data by removing all properties of a given type (Appartement, Maison, etc.) 
     where the same property has been counted multiple times.
-    - clean_multivente(data): Cleans a given dataset by removing duplicates and mutations with multiple disposition 
+    clean_multivente(data): 
+        Cleans a given dataset by removing duplicates and mutations with multiple disposition 
     IDs, filtering for 'Vente' transactions, and keeping only one row for each property type if there
     are multiple rows with the same mutation ID.
 """

@@ -3,12 +3,11 @@ This module contains functions for filtering and selecting data from a given dat
 
 Functions:
 
-- select_bien(df): Filter the dataset to keep only properties of type 'Maison' or 'Appartement' that are being sold.
-- filtre_dur(df, bati, piece, local, metropole_name=None): Filter the dataset to keep only properties of a given type,
- within or outside a given metropolitan area, and within given building surface and number of rooms constraints.
-- filtre_prix(df, metric_prix, quantile_nv = 0.99): Filter the dataset to keep only properties with a price per square 
-meter below the 99th percentile for each city and property type.
-
+    -select_bien(df): Filter the dataset to keep only properties of type 'Maison' or 'Appartement' that are being sold.
+    -filtre_dur(df, bati, piece, local, metropole_name=None): Filter the dataset to keep only properties of a given type,
+    within or outside a given metropolitan area, and within given building surface and number of rooms constraints.
+    -filtre_prix(df, metric_prix, quantile_nv = 0.99): Filter the dataset to keep only properties with a price per square 
+    meter below the 99th percentile for each city and property type.
 """
 import pandas as pd
 import numpy as np
