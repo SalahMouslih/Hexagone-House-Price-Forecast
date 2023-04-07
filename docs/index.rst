@@ -10,7 +10,7 @@ Welcome to House prices Prediction's documentation!
    :caption: Contents:
 
 =======
-My Project
+House prices Prediction
 ==========
 
 .. toctree::
