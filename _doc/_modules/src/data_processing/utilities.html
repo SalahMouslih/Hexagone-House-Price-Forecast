@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.data_processing.utilities &mdash; House prices Prediction 1.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            House prices Prediction
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">House prices Prediction</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.data_processing.utilities</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.data_processing.utilities</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">Module for processing data related to real estate transactions.</span>
+
+<span class="sd">This module provides utility functions for reading and processing geographical data on </span>
+<span class="sd">schools and property transactions. It relies on several libraries, including pandas, geopandas, and scikit-learn.</span>
+
+<span class="sd">Functions:</span>
+<span class="sd">- read_lycees(): Read lycees and colleges CSV files and return them as pandas dataframes.</span>
+<span class="sd">- get_top_zones(df, nb_top_zones): Returns a new DataFrame containing only the top &#39;nb_top_zones&#39; </span>
+<span class="sd">metropoles with the highest number of real estate transactions.</span>
+<span class="sd">- get_k_nearest_neighbors(source_points, candidate_points, k_neighbors): Find the k nearest neighbors </span>
+<span class="sd">for all source points from a set of candidate points.</span>
+<span class="sd">- get_nearest_neighbors(left_gdf, right_gdf, k_neighbors, return_distances=False): For each point in left_gdf, </span>
+<span class="sd">find the k-nearest neighbors in right_gdf and return their indices.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">BallTree</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="read_lycees"><a class="viewcode-back" href="../../../src.data_processing.html#src.data_processing.utilities.read_lycees">[docs]</a><span class="k">def</span> <span class="nf">read_lycees</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read lycees and colleges CSV files and return them as pandas dataframes.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        geo_etab_df (pandas.DataFrame): DataFrame containing the geographical coordinates of schools.</span>
+<span class="sd">        brevet_df (pandas.DataFrame): DataFrame containing the results at brevet for each college.</span>
+<span class="sd">        lyc_df (pandas.DataFrame): DataFrame containing the results at &#39;baccalaureat&#39; for each lycee.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading lycees tables...&quot;</span><span class="p">)</span>
+        <span class="c1"># read geographical coordinates of schools</span>
+        <span class="n">geo_etab_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/open_data/geo_brevet.csv&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
+        <span class="c1"># read results at brevet for each college</span>
+        <span class="n">brevet_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/open_data/resultats_brevet.csv&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
+        <span class="c1"># read results at &#39;baccalaureat&#39; for each lycee</span>
+        <span class="n">lyc_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/open_data/resultats_lycées.csv&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">geo_etab_df</span><span class="p">,</span> <span class="n">brevet_df</span><span class="p">,</span> <span class="n">lyc_df</span>
+
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">fnfe</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error reading lycees tables: </span><span class="si">{</span><span class="n">fnfe</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred while reading lycees tables: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>        </div>
+
+<div class="viewcode-block" id="get_top_zones"><a class="viewcode-back" href="../../../src.data_processing.html#src.data_processing.utilities.get_top_zones">[docs]</a><span class="k">def</span> <span class="nf">get_top_zones</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">nb_top_zones</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a new DataFrame containing only the top &#39;nb_top_zones&#39; metropoles </span>
+<span class="sd">    with the highest number of real estate transactions.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (pandas.DataFrame): The input DataFrame.</span>
+<span class="sd">        nb_top_zones (int): The number of top metropoles to select.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas.DataFrame: A new DataFrame containing only the top &#39;nb_top_zones&#39; metropoles </span>
+<span class="sd">        with the highest number of real estate transactions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Import tables import numpy as np</span>
+    <span class="n">path_to_metropoles</span> <span class="o">=</span> <span class="s1">&#39;data/open_data/metropoles_communes.csv&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Selecting top 10 metropoles...&#39;</span><span class="p">)</span>
+        <span class="n">metropoles</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path_to_metropoles</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+        <span class="c1"># Correct the spelling of regions</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">nom_commune</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Marseille &#39;</span><span class="p">),</span> <span class="s1">&#39;nom_commune&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Marseille&#39;</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">nom_commune</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Lyon &#39;</span><span class="p">),</span> <span class="s1">&#39;nom_commune&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Lyon&#39;</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">nom_commune</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Paris &#39;</span><span class="p">),</span> <span class="s1">&#39;nom_commune&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Paris&#39;</span>
+
+        <span class="c1"># Merge dvf and metropole</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">metropoles</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;nom_commune&#39;</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;LIBGEO&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Pick the areas with the highest number of transactions</span>
+        <span class="n">most_frequent</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;LIBEPCI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">nb_top_zones</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;LIBEPCI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">most_frequent</span><span class="p">)]</span>
+
+        <span class="k">return</span> <span class="n">df</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred while selecting the top </span><span class="si">{</span><span class="n">nb_top_zones</span><span class="si">}</span><span class="s2"> zones: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="get_k_nearest_neighbors"><a class="viewcode-back" href="../../../src.data_processing.html#src.data_processing.utilities.get_k_nearest_neighbors">[docs]</a><span class="k">def</span> <span class="nf">get_k_nearest_neighbors</span><span class="p">(</span><span class="n">source_points</span><span class="p">,</span> <span class="n">candidate_points</span><span class="p">,</span> <span class="n">k_neighbors</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the k nearest neighbors for all source points from a set of candidate points.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        source_points: numpy array or list of arrays containing the coordinates of the source points</span>
+<span class="sd">        candidate_points: numpy array or list of arrays containing the coordinates of the candidate points</span>
+<span class="sd">        k_neighbors: integer specifying the number of nearest neighbors to return</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple containing two numpy arrays:</span>
+<span class="sd">        - indices: the indices of the k nearest neighbors in the candidate_points array for each source point</span>
+<span class="sd">        - distances: the distances between each source point and its k nearest neighbors</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">BallTree</span><span class="p">(</span><span class="n">candidate_points</span><span class="p">,</span> <span class="n">leaf_size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;haversine&#39;</span><span class="p">)</span>
+        <span class="n">distances</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">source_points</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k_neighbors</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">indices</span><span class="p">,</span> <span class="n">distances</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="get_nearest_neighbors"><a class="viewcode-back" href="../../../src.data_processing.html#src.data_processing.utilities.get_nearest_neighbors">[docs]</a><span class="k">def</span> <span class="nf">get_nearest_neighbors</span><span class="p">(</span><span class="n">left_gdf</span><span class="p">,</span> <span class="n">right_gdf</span><span class="p">,</span> <span class="n">k_neighbors</span><span class="p">,</span> <span class="n">return_distances</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For each point in left_gdf, find the k-nearest neighbors in right_gdf and return their indices.</span>
+<span class="sd">    Assumes that the input Points are in WGS84 projection (lat/lon).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">left_geom_col_name</span> <span class="o">=</span> <span class="n">left_gdf</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">right_geom_col_name</span> <span class="o">=</span> <span class="n">right_gdf</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="c1">#ensure that index in right gdf is formed of sequential numbers</span>
+    <span class="n">right_gdf</span> <span class="o">=</span> <span class="n">right_gdf</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># convert coordinates to radians</span>
+    <span class="n">left_radians_x</span> <span class="o">=</span> <span class="n">left_gdf</span><span class="p">[</span><span class="n">left_geom_col_name</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">geom</span><span class="p">:</span> <span class="n">geom</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span>
+    <span class="n">left_radians_y</span> <span class="o">=</span> <span class="n">left_gdf</span><span class="p">[</span><span class="n">left_geom_col_name</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">geom</span><span class="p">:</span> <span class="n">geom</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span>
+    <span class="n">left_radians</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">left_radians_x</span><span class="p">,</span> <span class="n">left_radians_y</span><span class="p">]</span>
+
+    <span class="n">right_radians_x</span> <span class="o">=</span> <span class="n">right_gdf</span><span class="p">[</span><span class="n">right_geom_col_name</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">geom</span><span class="p">:</span> <span class="n">geom</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span>
+    <span class="n">right_radians_y</span> <span class="o">=</span> <span class="n">right_gdf</span><span class="p">[</span><span class="n">right_geom_col_name</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">geom</span><span class="p">:</span> <span class="n">geom</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span>
+    <span class="n">right_radians</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">right_radians_x</span><span class="p">,</span> <span class="n">right_radians_y</span><span class="p">]</span>
+
+    <span class="n">indices</span><span class="p">,</span> <span class="n">distances</span> <span class="o">=</span> <span class="n">get_k_nearest_neighbors</span><span class="p">(</span><span class="n">source_points</span><span class="o">=</span><span class="n">left_radians</span><span class="p">,</span>
+                                                 <span class="n">candidate_points</span><span class="o">=</span><span class="n">right_radians</span><span class="p">,</span>
+                                                 <span class="n">k_neighbors</span><span class="o">=</span><span class="n">k_neighbors</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_distances</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">indices</span><span class="p">,</span> <span class="n">distances</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">indices</span></div>
+
+
+<div class="viewcode-block" id="apply_linear_regression"><a class="viewcode-back" href="../../../src.data_processing.html#src.data_processing.utilities.apply_linear_regression">[docs]</a><span class="k">def</span> <span class="nf">apply_linear_regression</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">table_info</span><span class="p">,</span> <span class="n">metric_of_interest</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply linear regression to calculate the intercept of a row with the given metric of interest.&quot;&quot;&quot;</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;indices&#39;</span><span class="p">]</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">table_info</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;surface_reelle_bati&#39;</span><span class="p">,</span> <span class="s1">&#39;nombre_pieces_principales&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">table_info</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="n">metric_of_interest</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="n">lr</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+    <span class="n">lr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">lr</span><span class="o">.</span><span class="n">intercept_</span></div>
+
+
+<div class="viewcode-block" id="calculate_closest_metric"><a class="viewcode-back" href="../../../src.data_processing.html#src.data_processing.utilities.calculate_closest_metric">[docs]</a><span class="k">def</span> <span class="nf">calculate_closest_metric</span><span class="p">(</span><span class="n">dvf</span><span class="p">,</span> <span class="n">table_info</span><span class="p">,</span> <span class="n">k_neighbors</span><span class="p">,</span> <span class="n">metric_of_interest</span><span class="p">,</span> <span class="n">new_metric_name</span><span class="p">,</span> <span class="n">apply_regression</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the new metric based on the k-nearest neighbors in table_info dataframe.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Computing `</span><span class="si">{</span><span class="n">new_metric_name</span><span class="si">}</span><span class="s2">`...&quot;</span><span class="p">)</span>
+        <span class="n">dvf</span><span class="p">[</span><span class="n">new_metric_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">closest_indices</span> <span class="o">=</span> <span class="n">get_nearest_neighbors</span><span class="p">(</span><span class="n">left_gdf</span><span class="o">=</span><span class="n">dvf</span><span class="p">,</span> <span class="n">right_gdf</span><span class="o">=</span><span class="n">table_info</span><span class="p">,</span> <span class="n">k_neighbors</span><span class="o">=</span><span class="n">k_neighbors</span><span class="p">)</span>
+        <span class="n">dvf</span><span class="p">[</span><span class="s1">&#39;indices&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">closest_indices</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">apply_regression</span><span class="p">:</span> 
+            <span class="n">dvf</span><span class="p">[</span><span class="n">new_metric_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">dvf</span><span class="o">.</span><span class="n">swifter</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">apply_linear_regression</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">metric_of_interest</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dvf</span><span class="p">[</span><span class="n">new_metric_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">dvf</span><span class="p">[</span><span class="s1">&#39;indices&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">indices</span><span class="p">:</span> <span class="n">table_info</span><span class="p">[</span><span class="n">metric_of_interest</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">dvf</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: could not calculate closest metric&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="alter_metric_name"><a class="viewcode-back" href="../../../src.data_processing.html#src.data_processing.utilities.alter_metric_name">[docs]</a><span class="k">def</span> <span class="nf">alter_metric_name</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">input_variable_names</span><span class="p">,</span><span class="n">output_variable_names</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate new metrics using my_choose_closest() function and return updated dataframe.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (pandas dataframe): dataframe to calculate new metrics on.</span>
+<span class="sd">        input_variable_names (list): names of variables to calculate new metrics from.</span>
+<span class="sd">        output_variable_names (list): names to give new metrics.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        df (pandas dataframe): updated dataframe with input variables dropped and new metrics added.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Define a helper function to calculate a single new metric using my_choose_closest() function</span>
+    <span class="k">def</span> <span class="nf">calculate_single_metric</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+        <span class="n">input_var</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">output_var</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">calculate_closest_metric</span><span class="p">(</span><span class="n">dvf</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+                                        <span class="n">table_info</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">input_var</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">()],</span> 
+                                        <span class="n">k_neighbors</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                        <span class="n">metric_of_interest</span><span class="o">=</span><span class="n">input_var</span><span class="p">,</span> 
+                                        <span class="n">new_metric_name</span><span class="o">=</span><span class="n">output_var</span><span class="p">)[</span><span class="n">output_var</span><span class="p">]</span>
+    
+    <span class="c1"># Calculate the new metrics using parallel processing</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)(</span>
+        <span class="n">delayed</span><span class="p">(</span><span class="n">calculate_single_metric</span><span class="p">)(</span><span class="nb">vars</span><span class="p">)</span> <span class="k">for</span> <span class="nb">vars</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">input_variable_names</span><span class="p">,</span> <span class="n">output_variable_names</span><span class="p">))</span>
+    
+    <span class="c1"># Create a dictionary of new metric names and values</span>
+    <span class="n">new_metrics_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">output_variable_names</span><span class="p">,</span> <span class="n">results</span><span class="p">))</span>
+    
+    <span class="c1"># Add the new metrics to the df dataframe</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="n">new_metrics_dict</span><span class="p">)</span>
+    
+    <span class="c1"># Drop the input variables from the df dataframe</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">input_variable_names</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">df</span></div>
+
+<span class="n">income_input_variable_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DISP_TP6019&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_Q119&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_MED19&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_Q319&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_EQ19&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_D119&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_D219&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;DISP_D319&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_D419&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_D619&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_D719&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_D819&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_D919&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_RD19&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;DISP_S80S2019&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_GI19&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_PACT19&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_PTSA19&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_PCHO19&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_PBEN19&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;DISP_PPEN19&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_PPAT19&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_PPSOC19&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_PPFAM19&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_PPMINI19&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_PPLOGT19&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;DISP_PIMPOT19&#39;</span><span class="p">,</span> <span class="s1">&#39;DISP_NOTE19&#39;</span><span class="p">]</span>
+<span class="n">income_output_variable_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Taux_pauvreté_seuil_60&#39;</span><span class="p">,</span> <span class="s1">&#39;Q1&#39;</span><span class="p">,</span> <span class="s1">&#39;Mediane&#39;</span><span class="p">,</span> <span class="s1">&#39;Q3&#39;</span><span class="p">,</span> <span class="s1">&#39;Ecart_inter_Q_rapporte_a_la_mediane&#39;</span><span class="p">,</span> <span class="s1">&#39;D1&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;D2&#39;</span><span class="p">,</span> <span class="s1">&#39;D3&#39;</span><span class="p">,</span> <span class="s1">&#39;D4&#39;</span><span class="p">,</span> <span class="s1">&#39;D5&#39;</span><span class="p">,</span> <span class="s1">&#39;D6&#39;</span><span class="p">,</span> <span class="s1">&#39;D7&#39;</span><span class="p">,</span> <span class="s1">&#39;D8&#39;</span><span class="p">,</span> <span class="s1">&#39;D9&#39;</span><span class="p">,</span> <span class="s1">&#39;Rapport_interdécile_D9/D1&#39;</span><span class="p">,</span> <span class="s1">&#39;S80/S20&#39;</span><span class="p">,</span> <span class="s1">&#39;Gini&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;Part_revenus_activite&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_salaire&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_revenus_chomage&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_revenus_non_salariées&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;Part_retraites&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_revenus_patrimoine&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_prestations_sociales&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;Part_prestations_familiales&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_minima_sociaux&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_prestations_logement&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_impôts&#39;</span><span class="p">]</span>
+
+<span class="n">equi_input_variable_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;A203&#39;</span><span class="p">,</span> <span class="s1">&#39;A206&#39;</span><span class="p">,</span> <span class="s1">&#39;B101&#39;</span><span class="p">,</span> <span class="s1">&#39;C101&#39;</span><span class="p">,</span> <span class="s1">&#39;C201&#39;</span><span class="p">,</span> <span class="s1">&#39;D201&#39;</span><span class="p">,</span> <span class="s1">&#39;E107&#39;</span><span class="p">,</span> <span class="s1">&#39;F303&#39;</span><span class="p">,</span> <span class="s1">&#39;F307&#39;</span><span class="p">,</span> <span class="s1">&#39;F313&#39;</span><span class="p">]</span>
+
+<span class="n">equi_output_variable_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Banques&#39;</span><span class="p">,</span> <span class="s1">&#39;Bureaux_de_Poste&#39;</span><span class="p">,</span> <span class="s1">&#39;Commerces&#39;</span><span class="p">,</span> <span class="s1">&#39;Ecoles&#39;</span><span class="p">,</span><span class="s1">&#39;Collèges_Lycées&#39;</span><span class="p">,</span> <span class="s1">&#39;Medecins&#39;</span><span class="p">,</span><span class="s1">&#39;Gares&#39;</span><span class="p">,</span> <span class="s1">&#39;Cinema&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;Bibliotheques&#39;</span><span class="p">,</span> <span class="s1">&#39;Espaces_remarquables_et_patrimoine&#39;</span><span class="p">]</span>            
+
+
+<div class="viewcode-block" id="choose_metric_name"><a class="viewcode-back" href="../../../src.data_processing.html#src.data_processing.utilities.choose_metric_name">[docs]</a><span class="k">def</span> <span class="nf">choose_metric_name</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates a new metric using the given input metric and name.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        df: pandas DataFrame to modify</span>
+<span class="sd">        variable: string indicating the type of metric to create. Should be either &#39;income&#39; or &#39;equip&#39;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A pandas DataFrame with a new column for the selected metric.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="s1">&#39;income&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">alter_metric_name</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">income_input_variable_names</span><span class="p">,</span> <span class="n">income_output_variable_names</span><span class="p">)</span> 
+    <span class="k">elif</span> <span class="n">variable</span> <span class="o">==</span> <span class="s1">&#39;amenity&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">alter_metric_name</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">equi_input_variable_names</span><span class="p">,</span> <span class="n">equi_output_variable_names</span><span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid variable input. Choose either &#39;income&#39; or &#39;amenity&#39;.&quot;</span><span class="p">)</span></div>
+
+
+<span class="n">liste_var_garder</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;id_mutation&#39;</span><span class="p">,</span> <span class="s1">&#39;date_mutation&#39;</span><span class="p">,</span> <span class="s1">&#39;numero_disposition&#39;</span><span class="p">,</span> <span class="s1">&#39;valeur_fonciere&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;adresse_numero&#39;</span><span class="p">,</span> <span class="s1">&#39;adresse_nom_voie&#39;</span><span class="p">,</span> <span class="s1">&#39;adresse_code_voie&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;code_commune&#39;</span><span class="p">,</span> <span class="s1">&#39;nom_commune&#39;</span><span class="p">,</span> <span class="s1">&#39;code_departement&#39;</span><span class="p">,</span> <span class="s1">&#39;LIBEPCI&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;id_parcelle&#39;</span><span class="p">,</span> <span class="s1">&#39;nombre_lots&#39;</span><span class="p">,</span> <span class="s1">&#39;lot1_numero&#39;</span><span class="p">,</span> <span class="s1">&#39;lot1_surface_carrez&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;lot2_numero&#39;</span><span class="p">,</span> <span class="s1">&#39;lot2_surface_carrez&#39;</span><span class="p">,</span> <span class="s1">&#39;lot3_numero&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;lot3_surface_carrez&#39;</span><span class="p">,</span> <span class="s1">&#39;lot4_numero&#39;</span><span class="p">,</span> <span class="s1">&#39;lot4_surface_carrez&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;lot5_numero&#39;</span><span class="p">,</span> <span class="s1">&#39;lot5_surface_carrez&#39;</span><span class="p">,</span> <span class="s1">&#39;type_local&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;surface_reelle_bati&#39;</span><span class="p">,</span> <span class="s1">&#39;nombre_pieces_principales&#39;</span><span class="p">,</span> <span class="s1">&#39;surface_terrain&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="s1">&#39;geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;quantile_prix&#39;</span><span class="p">,</span> <span class="s1">&#39;coeff_actu&#39;</span><span class="p">,</span><span class="s1">&#39;prix_actualise&#39;</span><span class="p">,</span><span class="s1">&#39;prix_m2_actualise&#39;</span><span class="p">,</span><span class="s1">&#39;prix_m2&#39;</span><span class="p">,</span><span class="s1">&#39;trimestre_vente&#39;</span><span class="p">,</span><span class="s1">&#39;prix_m2_zone&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;moyenne&#39;</span><span class="p">,</span><span class="s1">&#39;moyenne_brevet&#39;</span><span class="p">,</span><span class="s1">&#39;DCOMIRIS&#39;</span><span class="p">,</span><span class="s1">&#39;indices&#39;</span><span class="p">,</span> <span class="s1">&#39;Banques&#39;</span><span class="p">,</span> <span class="s1">&#39;Bureaux_de_Poste&#39;</span><span class="p">,</span> <span class="s1">&#39;Commerces&#39;</span><span class="p">,</span> <span class="s1">&#39;Ecoles&#39;</span><span class="p">,</span><span class="s1">&#39;Collèges_Lycées&#39;</span><span class="p">,</span> <span class="s1">&#39;Medecins&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;Gares&#39;</span><span class="p">,</span> <span class="s1">&#39;Cinema&#39;</span><span class="p">,</span> <span class="s1">&#39;Bibliotheques&#39;</span><span class="p">,</span> <span class="s1">&#39;Espaces_remarquables_et_patrimoine&#39;</span><span class="p">,</span> <span class="s1">&#39;DCIRIS&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;Taux_pauvreté_seuil_60&#39;</span><span class="p">,</span> <span class="s1">&#39;Q1&#39;</span><span class="p">,</span> <span class="s1">&#39;Mediane&#39;</span><span class="p">,</span> <span class="s1">&#39;Q3&#39;</span><span class="p">,</span> <span class="s1">&#39;Ecart_inter_Q_rapporte_a_la_mediane&#39;</span><span class="p">,</span> <span class="s1">&#39;D1&#39;</span><span class="p">,</span> <span class="s1">&#39;D2&#39;</span><span class="p">,</span> <span class="s1">&#39;D3&#39;</span><span class="p">,</span> <span class="s1">&#39;D4&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;D5&#39;</span><span class="p">,</span> <span class="s1">&#39;D6&#39;</span><span class="p">,</span> <span class="s1">&#39;D7&#39;</span><span class="p">,</span> <span class="s1">&#39;D8&#39;</span><span class="p">,</span> <span class="s1">&#39;D9&#39;</span><span class="p">,</span> <span class="s1">&#39;Rapport_interdécile_D9/D1&#39;</span><span class="p">,</span> <span class="s1">&#39;S80/S20&#39;</span><span class="p">,</span> <span class="s1">&#39;Gini&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_revenus_activite&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;Part_salaire&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_revenus_chomage&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_revenus_non_salariées&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_retraites&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_revenus_patrimoine&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;Part_prestations_sociales&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_prestations_familiales&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_minima_sociaux&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_prestations_logement&#39;</span><span class="p">,</span><span class="s1">&#39;Part_impôts&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="select_variables"><a class="viewcode-back" href="../../../src.data_processing.html#src.data_processing.utilities.select_variables">[docs]</a><span class="k">def</span> <span class="nf">select_variables</span><span class="p">(</span><span class="n">dvf_geo</span><span class="p">,</span> <span class="n">keep_columns</span> <span class="o">=</span> <span class="n">liste_var_garder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Select variables from dvf_geo dataframe and return updated dataframe.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dvf_geo (pandas dataframe): dataframe to select variables from.</span>
+<span class="sd">        keep_columns (list): list of variables to keep in the updated dataframe.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dvf_geo_final (pandas dataframe): updated dataframe with selected variables.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dvf_geo</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;dvf_geo must be a pandas DataFrame.&quot;</span><span class="p">)</span>
+        
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Keeping variables of interest...&quot;</span><span class="p">)</span>
+        <span class="c1"># Keep columns of interest </span>
+        <span class="n">dvf_geo_final</span> <span class="o">=</span> <span class="n">dvf_geo</span><span class="p">[</span><span class="n">keep_columns</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">dvf_geo_final</span>
+
+    <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred while selecting variables: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred while filtering data: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, S.Elmouslih, G.Hubert, N.Julien, A.Noarine, N.Tedonze.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

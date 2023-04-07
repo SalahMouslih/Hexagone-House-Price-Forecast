@@ -1,0 +1,304 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.eda.utilities &#8212; House prices Prediction 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.eda.utilities</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides utility functions for performing exploratory data analysis (EDA)</span>
+<span class="sd">on processed data from a single CSV file. It includes functions for creating an output directory, </span>
+<span class="sd">selecting variables from a dataframes.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+
+<span class="n">liste</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;prix_m2_actualise&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;nom_commune&#39;</span><span class="p">,</span> <span class="s1">&#39;LIBEPCI&#39;</span><span class="p">,</span> <span class="s1">&#39;code_departement&#39;</span><span class="p">,</span> <span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="s1">&#39;longitude&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;type_local&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;surface_reelle_bati&#39;</span><span class="p">,</span> <span class="s1">&#39;nombre_pieces_principales&#39;</span><span class="p">,</span> <span class="s1">&#39;surface_terrain&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;prix_m2_zone&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;trimestre_vente&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;moyenne&#39;</span><span class="p">,</span> <span class="s1">&#39;moyenne_brevet&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;Banques&#39;</span><span class="p">,</span> <span class="s1">&#39;Bureaux_de_Poste&#39;</span><span class="p">,</span> <span class="s1">&#39;Commerces&#39;</span><span class="p">,</span> <span class="s1">&#39;Ecoles&#39;</span><span class="p">,</span> <span class="s1">&#39;Collèges_Lycées&#39;</span><span class="p">,</span> <span class="s1">&#39;Medecins&#39;</span><span class="p">,</span> <span class="s1">&#39;Gares&#39;</span><span class="p">,</span> <span class="s1">&#39;Cinema&#39;</span><span class="p">,</span> <span class="s1">&#39;Bibliotheques&#39;</span><span class="p">,</span> <span class="s1">&#39;Espaces_remarquables_et_patrimoine&#39;</span><span class="p">,</span> 
+       <span class="s1">&#39;Taux_pauvreté_seuil_60&#39;</span><span class="p">,</span> <span class="s1">&#39;Q1&#39;</span><span class="p">,</span> <span class="s1">&#39;Mediane&#39;</span><span class="p">,</span> <span class="s1">&#39;Q3&#39;</span><span class="p">,</span> <span class="s1">&#39;Ecart_inter_Q_rapporte_a_la_mediane&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;D1&#39;</span><span class="p">,</span> <span class="s1">&#39;D2&#39;</span><span class="p">,</span> <span class="s1">&#39;D3&#39;</span><span class="p">,</span> <span class="s1">&#39;D4&#39;</span><span class="p">,</span> <span class="s1">&#39;D5&#39;</span><span class="p">,</span> <span class="s1">&#39;D6&#39;</span><span class="p">,</span> <span class="s1">&#39;D7&#39;</span><span class="p">,</span> <span class="s1">&#39;D8&#39;</span><span class="p">,</span> <span class="s1">&#39;D9&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;Rapport_interdécile_D9/D1&#39;</span><span class="p">,</span> <span class="s1">&#39;S80/S20&#39;</span><span class="p">,</span> <span class="s1">&#39;Gini&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;Part_revenus_activite&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_salaire&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_revenus_chomage&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_revenus_non_salariées&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_retraites&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_revenus_patrimoine&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;Part_prestations_sociales&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_prestations_familiales&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_minima_sociaux&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_prestations_logement&#39;</span><span class="p">,</span> <span class="s1">&#39;Part_impôts&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="create_output_dir"><a class="viewcode-back" href="../../../src.eda.html#src.eda.utilities.create_output_dir">[docs]</a><span class="k">def</span> <span class="nf">create_output_dir</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates then returns a directory named &quot;data/plots&quot; if it does not exist already.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Path of the output directory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Define the path of the output directory</span>
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="s2">&quot;data/plots/&quot;</span>
+        
+        <span class="c1"># Create the output directory if it does not exist already</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output_dir</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+        
+        <span class="c1"># Return the path of the output directory</span>
+        <span class="k">return</span> <span class="n">output_dir</span>
+    
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error creating output directory: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="select_variables"><a class="viewcode-back" href="../../../src.eda.html#src.eda.utilities.select_variables">[docs]</a><span class="k">def</span> <span class="nf">select_variables</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">keep_columns</span> <span class="o">=</span> <span class="n">liste</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Select variables from dataframe and return updated dataframe.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (pandas dataframe): dataframe to select variables from.</span>
+<span class="sd">        keep_columns (list): list of variables to keep in the updated dataframe.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        df_final (pandas dataframe): updated dataframe with selected variables.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;df must be a pandas DataFrame.&quot;</span><span class="p">)</span>
+        
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Keeping variables of interest...&quot;</span><span class="p">)</span>
+        <span class="c1"># Keep columns of interest </span>
+        <span class="n">df_final</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">keep_columns</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">df_final</span>
+
+    <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred while selecting variables: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred while filtering data: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<span class="n">liste_equipements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;A203&#39;</span><span class="p">,</span> <span class="s1">&#39;A206&#39;</span><span class="p">,</span> <span class="s1">&#39;B101&#39;</span><span class="p">,</span> <span class="s1">&#39;C101&#39;</span><span class="p">,</span>  <span class="s1">&#39;C201&#39;</span><span class="p">,</span> <span class="s1">&#39;D201&#39;</span><span class="p">,</span> <span class="s1">&#39;E107&#39;</span><span class="p">,</span> <span class="s1">&#39;F303&#39;</span><span class="p">,</span> <span class="s1">&#39;F307&#39;</span><span class="p">,</span>  <span class="s1">&#39;F313&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="select_equi"><a class="viewcode-back" href="../../../src.eda.html#src.eda.utilities.select_equi">[docs]</a><span class="k">def</span> <span class="nf">select_equi</span><span class="p">(</span><span class="n">equipements</span><span class="p">,</span> <span class="n">liste_equi</span> <span class="o">=</span> <span class="n">liste_equipements</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Filters the equipements dataframe to select rows whose TYPEQU column is in the given list.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        equipements (pandas.DataFrame): a dataframe containing information about equipements in different IRIS</span>
+<span class="sd">        liste_equi (list): a list of strings containing the names of the equipements to select</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        equipements (pandas.DataFrame): the filtered dataframe</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">equipements</span> <span class="o">=</span> <span class="n">equipements</span><span class="p">[</span><span class="n">equipements</span><span class="p">[</span><span class="s1">&#39;TYPEQU&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">liste_equi</span><span class="p">)]</span>
+        <span class="n">equipements</span> <span class="o">=</span> <span class="n">equipements</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="s1">&#39;A203&#39;</span><span class="p">:</span> <span class="s1">&#39;Banque&#39;</span><span class="p">,</span> <span class="s1">&#39;A206&#39;</span><span class="p">:</span> <span class="s1">&#39;Poste&#39;</span><span class="p">,</span> <span class="s1">&#39;B101&#39;</span><span class="p">:</span> <span class="s1">&#39;Alimentation&#39;</span><span class="p">,</span> <span class="s1">&#39;C101&#39;</span><span class="p">:</span> <span class="s1">&#39;Ecoles&#39;</span><span class="p">,</span>  <span class="s1">&#39;C201&#39;</span><span class="p">:</span> <span class="s1">&#39;College-Lycee&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;D201&#39;</span><span class="p">:</span> <span class="s1">&#39;Medecin&#39;</span><span class="p">,</span> <span class="s1">&#39;E107&#39;</span><span class="p">:</span> <span class="s1">&#39;Gare&#39;</span><span class="p">,</span>  <span class="s1">&#39;F303&#39;</span><span class="p">:</span> <span class="s1">&#39;Cinema&#39;</span><span class="p">,</span> <span class="s1">&#39;F307&#39;</span><span class="p">:</span> <span class="s1">&#39;Bibliotheque&#39;</span><span class="p">,</span>  <span class="s1">&#39;F313&#39;</span><span class="p">:</span> <span class="s1">&#39;Patrimoine&#39;</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">equipements</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred while selecting equipements: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="transform_equi"><a class="viewcode-back" href="../../../src.eda.html#src.eda.utilities.transform_equi">[docs]</a><span class="k">def</span> <span class="nf">transform_equi</span><span class="p">(</span><span class="n">equipements</span><span class="p">,</span> <span class="n">crs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Transforms the equipements dataframe to match the given crs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        equipements (pandas.DataFrame): a dataframe containing information about equipements in different IRIS</span>
+<span class="sd">        crs (str): the coordinate reference system to transform the dataframe to</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        equipements_crs (geopandas.GeoDataFrame): the transformed dataframe</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">equipements</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">equipements</span> <span class="o">=</span> <span class="n">equipements</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">2154</span><span class="p">)</span> <span class="c1"># sets the initial crs of the dataframe</span>
+        <span class="n">equipements_crs</span> <span class="o">=</span> <span class="n">equipements</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span> <span class="c1"># transforms the dataframe to the given crs</span>
+        <span class="k">return</span> <span class="n">equipements_crs</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred while transforming equipements: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+    
+<div class="viewcode-block" id="read_communes"><a class="viewcode-back" href="../../../src.eda.html#src.eda.utilities.read_communes">[docs]</a><span class="k">def</span> <span class="nf">read_communes</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read the shapefile containing the commune data and return a GeoDataFrame.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        communes (GeoDataFrame): A GeoDataFrame containing the commune data.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        FileNotFoundError: If the data file is not found.</span>
+<span class="sd">        Exception: If there is an error while reading the data file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Set the path of the shapefile containing the commune data</span>
+    <span class="n">communes_shape_path</span> <span class="o">=</span> <span class="s1">&#39;data/open_data/communes-20220101.shp&#39;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Read the data from the shapefile and create a GeoDataFrame</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading &#39;communes&#39; tables...&quot;</span><span class="p">)</span>
+        <span class="n">communes</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">communes_shape_path</span><span class="p">)</span>
+
+        <span class="c1"># Return the GeoDataFrame</span>
+        <span class="k">return</span> <span class="n">communes</span>
+
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># If the data file is not found, print an error message and return None</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred while reading data: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># If there is an error while reading the data file, print an error message and return None</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="modify_geo_data"><a class="viewcode-back" href="../../../src.eda.html#src.eda.utilities.modify_geo_data">[docs]</a><span class="k">def</span> <span class="nf">modify_geo_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">iris</span><span class="p">,</span> <span class="n">commune</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Modify columns of communes, data, and iris dataframes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        iris (geoPandas): iris dataset.</span>
+<span class="sd">        data (geoPandas): data dataset.</span>
+<span class="sd">        commune (geoPandas): commune dataset.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: A tuple containing preprocessed iris, data and communes dataframes.</span>
+
+
+<span class="sd">    Raises:</span>
+<span class="sd">        FileNotFoundError: If commune the input file paths is incorrect.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Modify geodataframes&#39;</span><span class="p">)</span>
+       
+        <span class="c1"># Alter data columns</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="mi">4171</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;nom_commune&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;nom_commune&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">NOM_COM</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;PARIS &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="s1">&#39;NOM_COM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Paris&#39;</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">NOM_COM</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;MARSEILLE &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="s1">&#39;NOM_COM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Marseille&#39;</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">NOM_COM</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;LYON &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="s1">&#39;NOM_COM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Lyon&#39;</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;NOM_COM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;NOM_COM&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="c1"># Alter iris columns</span>
+        <span class="n">iris</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iris</span><span class="o">.</span><span class="n">NOM_COM</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;PARIS &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="s1">&#39;NOM_COM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Paris&#39;</span>
+        <span class="n">iris</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iris</span><span class="o">.</span><span class="n">NOM_COM</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;MARSEILLE &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="s1">&#39;NOM_COM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Marseille&#39;</span>
+        <span class="n">iris</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iris</span><span class="o">.</span><span class="n">NOM_COM</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;LYON &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="s1">&#39;NOM_COM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Lyon&#39;</span>
+        <span class="n">iris</span><span class="p">[</span><span class="s1">&#39;NOM_COM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iris</span><span class="p">[</span><span class="s1">&#39;NOM_COM&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        
+        <span class="c1"># Process communes file</span>
+        <span class="n">commune</span><span class="o">.</span><span class="n">nom</span> <span class="o">=</span> <span class="n">commune</span><span class="o">.</span><span class="n">nom</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">iris</span><span class="p">,</span> <span class="n">commune</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error occurred while cleaning data: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">House prices Prediction</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">src</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, S.Elmouslih, G.Hubert, N.Julien, A.Noarine, N.Tedonze.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

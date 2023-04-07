@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.machine_learning.preprocess &mdash; House prices Prediction 1.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            House prices Prediction
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">House prices Prediction</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.machine_learning.preprocess</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.machine_learning.preprocess</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">xgboost</span> <span class="k">as</span> <span class="nn">xgb</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">PolynomialFeatures</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">OneHotEncoder</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">RandomizedSearchCV</span><span class="p">,</span> <span class="n">GridSearchCV</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
+<span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">SimpleImputer</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+
+<span class="n">trimestres</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2021-T3&#39;</span><span class="p">,</span> <span class="s1">&#39;2021-T4&#39;</span><span class="p">,</span> <span class="s1">&#39;2022-T1&#39;</span><span class="p">,</span> <span class="s1">&#39;2022-T2&#39;</span><span class="p">]</span>
+<span class="n">to_drop</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;adresse_numero&#39;</span><span class="p">,</span> <span class="s1">&#39;adresse_suffixe&#39;</span><span class="p">,</span><span class="s1">&#39;numero_disposition&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;adresse_code_voie&#39;</span><span class="p">,</span> <span class="s1">&#39;code_postal&#39;</span><span class="p">,</span> <span class="s1">&#39;code_commune&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;ancien_code_commune&#39;</span><span class="p">,</span><span class="s1">&#39;ancien_nom_commune&#39;</span> <span class="p">,</span> <span class="s1">&#39;ancien_id_parcelle&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;numero_volume&#39;</span><span class="p">,</span> <span class="s1">&#39;lot1_numero&#39;</span><span class="p">,</span> <span class="s1">&#39;lot1_surface_carrez&#39;</span><span class="p">,</span> <span class="s1">&#39;lot2_numero&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;lot2_surface_carrez&#39;</span><span class="p">,</span> <span class="s1">&#39;lot3_numero&#39;</span><span class="p">,</span> <span class="s1">&#39;lot3_surface_carrez&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;lot4_numero&#39;</span><span class="p">,</span> <span class="s1">&#39;lot4_surface_carrez&#39;</span><span class="p">,</span> <span class="s1">&#39;lot5_numero&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;lot5_surface_carrez&#39;</span><span class="p">,</span><span class="s1">&#39;code_type_local&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;code_nature_culture&#39;</span><span class="p">,</span> <span class="s1">&#39;nature_culture&#39;</span><span class="p">,</span> <span class="s1">&#39;code_nature_culture_speciale&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;nature_culture_speciale&#39;</span><span class="p">,</span><span class="s1">&#39;id_mutation&#39;</span><span class="p">,</span><span class="s1">&#39;id_parcelle&#39;</span><span class="p">,</span><span class="s1">&#39;numero_disposition&#39;</span><span class="p">,</span> <span class="s1">&#39;nature_mutation&#39;</span><span class="p">,</span><span class="s1">&#39;valeur_fonciere&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;id_parcelle&#39;</span><span class="p">,</span><span class="s1">&#39;nature_mutation&#39;</span><span class="p">,</span><span class="s1">&#39;date_mutation&#39;</span><span class="p">,</span><span class="s1">&#39;LIBEPCI&#39;</span><span class="p">,</span><span class="s1">&#39;prix_actualise&#39;</span><span class="p">,</span><span class="s1">&#39;DCOMIRIS&#39;</span><span class="p">,</span><span class="s1">&#39;DCIRIS&#39;</span><span class="p">,</span><span class="s1">&#39;prix_m2&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;type_local&#39;</span><span class="p">,</span><span class="s1">&#39;geometry&#39;</span><span class="p">,</span><span class="s1">&#39;indices&#39;</span><span class="p">,</span><span class="s1">&#39;quantile_prix&#39;</span><span class="p">,</span><span class="s1">&#39;coeff_actu&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="train_test_split"><a class="viewcode-back" href="../../../src.machine_learning.html#src.machine_learning.preprocess.train_test_split">[docs]</a><span class="k">def</span> <span class="nf">train_test_split</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">metropole</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">type_local</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">trimestres</span><span class="o">=</span><span class="n">trimestres</span><span class="p">,</span> <span class="n">quartile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Splits a given dataframe into training and testing sets based on the given parameters.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (pandas.DataFrame): The dataframe to split.</span>
+<span class="sd">        metropole (str): The metropole to filter by.</span>
+<span class="sd">        type_local (str): The type of property to filter by.</span>
+<span class="sd">        random_state (int): The random state to use for shuffling the data.</span>
+<span class="sd">        split (bool): Whether to split the data into training and testing sets or not.</span>
+<span class="sd">        trimestres (list): The trimesters to exclude from the training set.</span>
+<span class="sd">        quartile (float): The quartile to use for filtering by price.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple or pandas.DataFrame: If `split` is True, returns a tuple of (train_x, test_x, train_y, test_y). Otherwise, returns a pandas.DataFrame of the full split dataset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check if quartile is a valid number between 0 and 1</span>
+    <span class="k">if</span> <span class="n">quartile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">quartile</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Quartile must be a number between 0 and 1.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Filter by price quartile if quartile is specified</span>
+    <span class="k">if</span> <span class="n">quartile</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">prix_m2_actualise</span> <span class="o">&lt;</span> <span class="n">df</span><span class="o">.</span><span class="n">prix_m2_actualise</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">quartile</span><span class="p">)]</span>
+        <span class="n">df</span><span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">prix_m2_actualise</span> <span class="o">&gt;</span> <span class="n">df</span><span class="o">.</span><span class="n">prix_m2_actualise</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">quartile</span><span class="p">)]</span>
+
+    <span class="c1"># Filter by metropole if specified</span>
+    <span class="k">if</span> <span class="n">metropole</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;LIBEPCI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">metropole</span><span class="p">)]</span>
+
+    <span class="c1"># Filter by type_local if specified</span>
+    <span class="k">if</span> <span class="n">type_local</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;type_local&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">type_local</span><span class="p">)]</span>
+
+    <span class="c1"># Shuffle entire dataframe</span>
+    <span class="n">shuffled_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+
+    <span class="c1"># Split into training and testing sets if specified</span>
+    <span class="k">if</span> <span class="n">split</span><span class="p">:</span>
+        <span class="c1"># Select training data</span>
+        <span class="n">train_df</span> <span class="o">=</span> <span class="n">shuffled_df</span><span class="p">[</span><span class="o">~</span><span class="n">shuffled_df</span><span class="p">[</span><span class="s1">&#39;trimestre_vente&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">trimestres</span><span class="p">)]</span>
+        <span class="n">train_x</span> <span class="o">=</span> <span class="n">train_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;prix_m2_actualise&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">train_y</span> <span class="o">=</span> <span class="n">train_df</span><span class="p">[</span><span class="s1">&#39;prix_m2_actualise&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Select test data</span>
+        <span class="n">test_df</span> <span class="o">=</span> <span class="n">shuffled_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">train_df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">test_x</span> <span class="o">=</span> <span class="n">test_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;prix_m2_actualise&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">test_y</span> <span class="o">=</span> <span class="n">test_df</span><span class="p">[</span><span class="s1">&#39;prix_m2_actualise&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">train_x</span><span class="p">,</span> <span class="n">test_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">test_y</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Include test data in the full split dataset</span>
+        <span class="n">test_df</span> <span class="o">=</span> <span class="n">shuffled_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">test_df</span><span class="p">[</span><span class="s1">&#39;prix_m2_actualise&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_df</span><span class="p">[</span><span class="s1">&#39;prix_m2&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">shuffled_df</span><span class="p">,</span> <span class="n">test_df</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="preprocess_ml"><a class="viewcode-back" href="../../../src.machine_learning.html#src.machine_learning.preprocess.preprocess_ml">[docs]</a><span class="k">def</span> <span class="nf">preprocess_ml</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">type_local</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clean the input data for use in machine learning models.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (pd.DataFrame): The input dataframe to be cleaned.</span>
+<span class="sd">        type_local (str): The type of local to be cleaned (e.g. &#39;Appartement&#39;, &#39;Maison&#39;).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pd.DataFrame: The cleaned dataframe.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Drop unnecessary columns</span>
+    <span class="n">drop_clean</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">&amp;</span><span class="nb">set</span><span class="p">(</span><span class="n">to_drop</span><span class="p">))</span>
+    <span class="n">data</span>  <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">drop_clean</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    
+    <span class="c1"># get numerical columns and calculate correlation matrix</span>
+    <span class="n">numerical_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;object&quot;</span><span class="p">,</span><span class="s2">&quot;string&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">target</span><span class="o">=</span><span class="s1">&#39;prix_m2_actualise&#39;</span>
+    <span class="n">numerical_columns</span><span class="o">=</span><span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">numerical_columns</span> <span class="k">if</span> <span class="n">col</span><span class="o">!=</span><span class="n">target</span><span class="p">]</span>
+    <span class="n">corr_matrix</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">numerical_columns</span><span class="p">]</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
+
+    <span class="c1"># Remove highly correlated columns</span>
+    <span class="n">upper</span> <span class="o">=</span> <span class="n">corr_matrix</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">corr_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">))</span>
+    <span class="n">to_drop_col</span> <span class="o">=</span> <span class="p">[</span><span class="n">column</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">upper</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">upper</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.95</span><span class="p">)]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">to_drop_col</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Drop surface_terrain column for apartments</span>
+    <span class="k">if</span> <span class="n">type_local</span><span class="o">==</span><span class="s2">&quot;Appartement&quot;</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;surface_terrain&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        
+    <span class="c1"># Drop rows with missing values</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="build_pipeline"><a class="viewcode-back" href="../../../src.machine_learning.html#src.machine_learning.preprocess.build_pipeline">[docs]</a><span class="k">def</span> <span class="nf">build_pipeline</span><span class="p">(</span><span class="n">model</span><span class="p">,</span><span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Build a pipeline using RandomSearchCV or GridSearchCV to optimize the hyperparameters for the specified machine learning model</span>
+<span class="sd">    Args:</span>
+<span class="sd">    model : str, the name of the machine learning model to be used</span>
+<span class="sd">    data : pandas DataFrame, preprocessed data to be used in the pipeline</span>
+<span class="sd">    Returns:</span>
+<span class="sd">    clf : the resulting pipeline after applying the RandomSearchCV or GridSearchCV</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">numerical_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;object&quot;</span><span class="p">,</span><span class="s2">&quot;string&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">target</span><span class="o">=</span><span class="s1">&#39;prix_m2_actualise&#39;</span>
+    <span class="n">numerical_columns</span><span class="o">=</span><span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">numerical_columns</span> <span class="k">if</span> <span class="n">col</span><span class="o">!=</span><span class="n">target</span><span class="p">]</span>
+    <span class="n">categorical_columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;code_departement&#39;</span><span class="p">]</span> 
+    <span class="n">folds</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">numeric_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+        <span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;imputer&quot;</span><span class="p">,</span> <span class="n">SimpleImputer</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;median&quot;</span><span class="p">)),</span> <span class="p">(</span><span class="s2">&quot;scaler&quot;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">())]</span>
+            <span class="p">)</span>
+
+    <span class="n">categorical_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+        <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;encoder&quot;</span><span class="p">,</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">handle_unknown</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">))</span>
+        <span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">preprocessor</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">(</span>
+        <span class="n">transformers</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;num&quot;</span><span class="p">,</span> <span class="n">numeric_transformer</span><span class="p">,</span><span class="n">numerical_columns</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;cat&quot;</span><span class="p">,</span> <span class="n">categorical_transformer</span><span class="p">,</span><span class="n">categorical_columns</span><span class="p">),</span>
+        <span class="p">])</span>
+    <span class="n">rd</span><span class="o">=</span><span class="n">RandomForestRegressor</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">xg_reg</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">XGBRegressor</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">model</span><span class="o">==</span><span class="s1">&#39;linear&#39;</span><span class="p">:</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;poly_features__degree&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]}</span>
+        <span class="n">poly_pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s1">&#39;preprocessor&#39;</span><span class="p">,</span><span class="n">preprocessor</span><span class="p">),(</span><span class="s1">&#39;poly_features&#39;</span><span class="p">,</span> <span class="n">PolynomialFeatures</span><span class="p">()),</span> <span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">LinearRegression</span><span class="p">())])</span>
+        <span class="n">clf</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">poly_pipeline</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">folds</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;r2&#39;</span><span class="p">,</span> <span class="n">param_grid</span><span class="o">=</span><span class="n">params</span><span class="p">,</span><span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">model</span><span class="o">==</span><span class="s1">&#39;xgboost&#39;</span><span class="p">:</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;xg__eta&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">],</span><span class="s1">&#39;xg__n_estimators&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span><span class="mi">500</span><span class="p">,</span><span class="mi">1000</span><span class="p">,</span><span class="mi">5000</span><span class="p">]}</span>
+        <span class="n">xg</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">XGBRegressor</span><span class="p">(</span><span class="n">n_jobs</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">xg_reg</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+        <span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;preprocessor&quot;</span><span class="p">,</span> <span class="n">preprocessor</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;xg&quot;</span><span class="p">,</span> <span class="n">xg</span><span class="p">)],</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">clf</span> <span class="o">=</span> <span class="n">RandomizedSearchCV</span><span class="p">(</span><span class="n">xg_reg</span><span class="p">,</span> <span class="n">param_distributions</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;r2&#39;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">folds</span><span class="p">,</span><span class="n">random_state</span><span class="o">=</span><span class="mi">1001</span> <span class="p">)</span>
+        
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rd_pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+            <span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;preprocessor&quot;</span><span class="p">,</span> <span class="n">preprocessor</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;rd&quot;</span><span class="p">,</span> <span class="n">rd</span><span class="p">)]</span>
+        <span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;rd__n_estimators&#39;</span><span class="p">:[</span><span class="mi">100</span><span class="p">,</span><span class="mi">150</span><span class="p">,</span><span class="mi">200</span><span class="p">,</span><span class="mi">300</span><span class="p">]</span>
+        <span class="p">}</span>
+        <span class="n">clf</span><span class="o">=</span> <span class="n">RandomizedSearchCV</span><span class="p">(</span><span class="n">rd_pipeline</span><span class="p">,</span> <span class="n">param_distributions</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;r2&#39;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">folds</span><span class="p">,</span>
+                                <span class="n">random_state</span><span class="o">=</span><span class="mi">1001</span> <span class="p">)</span>            
+    <span class="k">return</span> <span class="n">clf</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, S.Elmouslih, G.Hubert, N.Julien, A.Noarine, N.Tedonze.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

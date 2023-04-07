@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.machine_learning package &mdash; House prices Prediction 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.utils package" href="src.utils.html" />
+    <link rel="prev" title="src.eda package" href="src.eda.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            House prices Prediction
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">House prices Prediction</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+      <li class="breadcrumb-item active">src.machine_learning package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.machine_learning.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="src-machine-learning-package">
+<h1>src.machine_learning package<a class="headerlink" href="#src-machine-learning-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-src.machine_learning.engine">
+<span id="src-machine-learning-engine-module"></span><h2>src.machine_learning.engine module<a class="headerlink" href="#module-src.machine_learning.engine" title="Permalink to this heading"></a></h2>
+<p>Main engine for machine learning modeling</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.machine_learning.engine.run_model">
+<span class="sig-prename descclassname"><span class="pre">src.machine_learning.engine.</span></span><span class="sig-name descname"><span class="pre">run_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/machine_learning/engine.html#run_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.machine_learning.engine.run_model" title="Permalink to this definition"></a></dt>
+<dd><p>Run the machine learning model benchmark for all metropole, type_local, and model(Linear, xgboost, random).
+It will generate a result.txt, result.csv, and feature importance for ensemble methods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> – tuple
+A tuple of (metro, type_local, mod)</p></li>
+<li><p><strong>data</strong> – pandas.DataFrame
+Preprocessed data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>pandas.DataFrame</dt><dd><p>Result of model training and testing</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.machine_learning.engine.ml_engine">
+<span class="sig-prename descclassname"><span class="pre">src.machine_learning.engine.</span></span><span class="sig-name descname"><span class="pre">ml_engine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data/processed/processed_data.csv'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/machine_learning/engine.html#ml_engine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.machine_learning.engine.ml_engine" title="Permalink to this definition"></a></dt>
+<dd><p>Run machine learning model benchmark for all metropole, type_local, and model(Linear, xgboost, random).
+It will generate a result.txt, result.csv, and feature importance for ensemble methods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> – str, optional
+The path to the preprocessed data file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.machine_learning.preprocess">
+<span id="src-machine-learning-preprocess-module"></span><h2>src.machine_learning.preprocess module<a class="headerlink" href="#module-src.machine_learning.preprocess" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.machine_learning.preprocess.train_test_split">
+<span class="sig-prename descclassname"><span class="pre">src.machine_learning.preprocess.</span></span><span class="sig-name descname"><span class="pre">train_test_split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metropole</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_local</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trimestres</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['2021-T3',</span> <span class="pre">'2021-T4',</span> <span class="pre">'2022-T1',</span> <span class="pre">'2022-T2']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quartile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/machine_learning/preprocess.html#train_test_split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.machine_learning.preprocess.train_test_split" title="Permalink to this definition"></a></dt>
+<dd><p>Splits a given dataframe into training and testing sets based on the given parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – The dataframe to split.</p></li>
+<li><p><strong>metropole</strong> (<em>str</em>) – The metropole to filter by.</p></li>
+<li><p><strong>type_local</strong> (<em>str</em>) – The type of property to filter by.</p></li>
+<li><p><strong>random_state</strong> (<em>int</em>) – The random state to use for shuffling the data.</p></li>
+<li><p><strong>split</strong> (<em>bool</em>) – Whether to split the data into training and testing sets or not.</p></li>
+<li><p><strong>trimestres</strong> (<em>list</em>) – The trimesters to exclude from the training set.</p></li>
+<li><p><strong>quartile</strong> (<em>float</em>) – The quartile to use for filtering by price.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>If <cite>split</cite> is True, returns a tuple of (train_x, test_x, train_y, test_y). Otherwise, returns a pandas.DataFrame of the full split dataset.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple or pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.machine_learning.preprocess.preprocess_ml">
+<span class="sig-prename descclassname"><span class="pre">src.machine_learning.preprocess.</span></span><span class="sig-name descname"><span class="pre">preprocess_ml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_local</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/machine_learning/preprocess.html#preprocess_ml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.machine_learning.preprocess.preprocess_ml" title="Permalink to this definition"></a></dt>
+<dd><p>Clean the input data for use in machine learning models.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>pd.DataFrame</em>) – The input dataframe to be cleaned.</p></li>
+<li><p><strong>type_local</strong> (<em>str</em>) – The type of local to be cleaned (e.g. ‘Appartement’, ‘Maison’).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The cleaned dataframe.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.machine_learning.preprocess.build_pipeline">
+<span class="sig-prename descclassname"><span class="pre">src.machine_learning.preprocess.</span></span><span class="sig-name descname"><span class="pre">build_pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/machine_learning/preprocess.html#build_pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.machine_learning.preprocess.build_pipeline" title="Permalink to this definition"></a></dt>
+<dd><p>Build a pipeline using RandomSearchCV or GridSearchCV to optimize the hyperparameters for the specified machine learning model
+Args:
+model : str, the name of the machine learning model to be used
+data : pandas DataFrame, preprocessed data to be used in the pipeline
+Returns:
+clf : the resulting pipeline after applying the RandomSearchCV or GridSearchCV</p>
+</dd></dl>
+
+</section>
+<section id="module-src.machine_learning.scores">
+<span id="src-machine-learning-scores-module"></span><h2>src.machine_learning.scores module<a class="headerlink" href="#module-src.machine_learning.scores" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.machine_learning.scores.train_score_save">
+<span class="sig-prename descclassname"><span class="pre">src.machine_learning.scores.</span></span><span class="sig-name descname"><span class="pre">train_score_save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metropole</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_local</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/machine_learning/scores.html#train_score_save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.machine_learning.scores.train_score_save" title="Permalink to this definition"></a></dt>
+<dd><p>Trains a machine learning model, computes its performance score, and saves the trained model to disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>sklearn estimator</em>) – the machine learning model to be trained</p></li>
+<li><p><strong>data</strong> (<em>pandas dataframe</em>) – the input data</p></li>
+<li><p><strong>metropole</strong> (<em>str</em>) – the name of the metropolitan area</p></li>
+<li><p><strong>type_local</strong> (<em>str</em>) – the type of local (e.g., apartment, house)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a pandas dataframe containing the performance metrics and characteristics of the input data</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.machine_learning.utilities">
+<span id="src-machine-learning-utilities-module"></span><h2>src.machine_learning.utilities module<a class="headerlink" href="#module-src.machine_learning.utilities" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.machine_learning.utilities.save_result">
+<span class="sig-prename descclassname"><span class="pre">src.machine_learning.utilities.</span></span><span class="sig-name descname"><span class="pre">save_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_local</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metropole</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">best_score</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">best_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rmse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/machine_learning/utilities.html#save_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.machine_learning.utilities.save_result" title="Permalink to this definition"></a></dt>
+<dd><p>Save result as txt file and csv file to disk and dump model
+Args:
+estimator: a sklearn model
+type_local: str
+metropole: str
+best_score:float
+best_parms: dict
+rsme: float
+score:  float
+median: float
+mean: float
+shape:tuple</p>
+<p>Return dataframe</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.machine_learning.utilities.read_data">
+<span class="sig-prename descclassname"><span class="pre">src.machine_learning.utilities.</span></span><span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/machine_learning/utilities.html#read_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.machine_learning.utilities.read_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.machine_learning.utilities.generate_feature_importance">
+<span class="sig-prename descclassname"><span class="pre">src.machine_learning.utilities.</span></span><span class="sig-name descname"><span class="pre">generate_feature_importance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metropole</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_local</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numerical_columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_cat_cols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/machine_learning/utilities.html#generate_feature_importance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.machine_learning.utilities.generate_feature_importance" title="Permalink to this definition"></a></dt>
+<dd><p>Generate feature importance graph and save to disk</p>
+</dd></dl>
+
+</section>
+<section id="module-src.machine_learning">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.machine_learning" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.eda.html" class="btn btn-neutral float-left" title="src.eda package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.utils.html" class="btn btn-neutral float-right" title="src.utils package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, S.Elmouslih, G.Hubert, N.Julien, A.Noarine, N.Tedonze.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
