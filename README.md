@@ -72,7 +72,10 @@ To see the available command-line arguments, run the following command:
 ``` python src/main.py --help``` 
 
 ## Documentation
-The project documentation can be found at `docs/_build/index.html`.
+The original notebooks can be found at the `notebooks` folder.
+
+## Documentation
+The project documentation can be found at `docs/documentation/index.html`.
 
 ## General structure
 
