@@ -101,11 +101,9 @@ The project documentation can be found at `docs/_doc/index.html`.
 │   ├── data_processing
 │   │   ├── amenities.py
 │   │   ├── clean.py
-│   │   ├── clean.pyc
 │   │   ├── discount.py
 │   │   ├── education.py
 │   │   ├── engine.py
-│   │   ├── engine.pyc
 │   │   ├── filters.py
 │   │   ├── stats.py
 │   │   └── utilities.py
