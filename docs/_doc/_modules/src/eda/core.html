@@ -1,37 +1,73 @@
-
 <!DOCTYPE html>
-
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>src.eda.core &#8212; House prices Prediction 1.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/sphinx_highlight.js"></script>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.eda.core &mdash; House prices Prediction 1.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" />
-   
-  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
 
-  </head><body>
-  
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
           
+          
+          <a href="../../../index.html" class="icon icon-home">
+            House prices Prediction
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">src</a></li>
+</ul>
 
-          <div class="body" role="main">
-            
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">House prices Prediction</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.eda.core</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <h1>Source code for src.eda.core</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">EDA Core functions</span>
@@ -52,9 +88,8 @@
 <span class="sd">  either for all metropoles or for a specific metropole, and save the resulting plot to a directory.</span>
 
 <span class="sd">  Args:</span>
-<span class="sd">    data (pandas.DataFrame): Input data containing the columns to be used for computing the correlation matrix.</span>
-<span class="sd">    output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. </span>
-<span class="sd">    If not provided, the plots will only be displayed and not saved. Defaults to None.</span>
+<span class="sd">    - data (pandas.DataFrame): Input data containing the columns to be used for computing the correlation matrix.</span>
+<span class="sd">    - output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file, if not provided, the plots will only be displayed and not saved, defaults to None.</span>
 
 <span class="sd">  Returns:</span>
 <span class="sd">    None</span>
@@ -84,9 +119,8 @@
 <span class="sd">  Compute the correlation matrix and plot it as a heatmap.</span>
 
 <span class="sd">  Args:</span>
-<span class="sd">    data (pandas.DataFrame): Input data.</span>
-<span class="sd">    output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. </span>
-<span class="sd">    If not provided, the plots will only be displayed and not saved. Defaults to None.</span>
+<span class="sd">    - data (pandas.DataFrame): Input data.</span>
+<span class="sd">    - output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. if not provided, the plots will only be displayed and not saved, defaults to None.</span>
 
 <span class="sd">  Returns:</span>
 <span class="sd">    None</span>
@@ -125,12 +159,11 @@
 <span class="sd">    and save the resulting plot to a directory.</span>
 
 <span class="sd">  Args:</span>
-<span class="sd">    data (pandas.DataFrame): Input data containing the column &quot;prix_m2_actualise&quot; and &quot;type_local&quot;.</span>
-<span class="sd">    output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. </span>
-<span class="sd">    If not provided, the plots will only be displayed and not saved. Defaults to None.</span>
+<span class="sd">    - data (pandas.DataFrame): Input data containing the column &quot;prix_m2_actualise&quot; and &quot;type_local&quot;.</span>
+<span class="sd">    - output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. if not provided, the plots will only be displayed and not saved, defaults to None.</span>
 
 <span class="sd">  Returns:</span>
-<span class="sd">  None</span>
+<span class="sd">    None</span>
 <span class="sd">  &quot;&quot;&quot;</span>
   <span class="k">try</span><span class="p">:</span>
 
@@ -156,8 +189,7 @@
 
 <span class="sd">  Args:</span>
 <span class="sd">    data (pandas.DataFrame): Input data containing the columns &quot;LIBEPCI&quot; and &quot;type_local&quot;.</span>
-<span class="sd">    output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file. </span>
-<span class="sd">    If not provided, the plots will only be displayed and not saved. Defaults to None.</span>
+<span class="sd">    output_dir (str, optional): Path to the directory where the box plots will be saved as a PNG file, if not provided, the plots will only be displayed and not saved. Defaults to None.</span>
 
 <span class="sd">  Returns:</span>
 <span class="sd">    None</span>
@@ -166,7 +198,7 @@
   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating percentage of flats and houses for each metropole...&quot;</span><span class="p">)</span>
 
   <span class="c1"># Set the figure size</span>
-  <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 
   <span class="c1"># Calculate the percentage of flats and houses for each LIBEPCI</span>
   <span class="n">total</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;LIBEPCI&#39;</span><span class="p">)[</span><span class="s1">&#39;type_local&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
@@ -213,7 +245,7 @@
   <span class="k">try</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating box plots of &#39;surface_reelle_bati&#39; and &#39;nombre_pieces_principales&#39;...&quot;</span><span class="p">)</span>
 
-    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 
     <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;type_local&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;surface_reelle_bati&quot;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="s1">&#39;orange&#39;</span><span class="p">])</span>
@@ -252,7 +284,7 @@
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating boxen plots of &#39;surface_reelle_bati&#39; and &#39;nombre_pieces_principales&#39;...&quot;</span><span class="p">)</span>
 
     <span class="c1"># Create a figure with two subplots side by side</span>
-    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># Generate the boxen plot for surface_reelle_bati column, comparing flats and houses</span>
@@ -343,7 +375,7 @@
     <span class="n">data</span> <span class="o">=</span> <span class="n">iris</span><span class="p">[</span><span class="n">iris</span><span class="o">.</span><span class="n">NOM_COM</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
       <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The specified area &#39;</span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">&#39; was not found in the IRIS dataset.&quot;</span><span class="p">)</span>
-    <span class="n">figure</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="n">var</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s2">&quot;prix m2 moyen des biens de l&#39;IRIS&quot;</span><span class="p">})</span>
+    <span class="n">figure</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="n">var</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s2">&quot;prix m2 moyen des biens de l&#39;IRIS&quot;</span><span class="p">})</span>
     <span class="n">figure</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">output_dir</span><span class="p">:</span>
@@ -384,10 +416,10 @@
     <span class="k">if</span> <span class="n">area_data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
       <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No data found for </span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="n">base</span> <span class="o">=</span> <span class="n">commune</span><span class="p">[</span><span class="n">commune</span><span class="o">.</span><span class="n">nom</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">commune</span><span class="p">[</span><span class="n">commune</span><span class="o">.</span><span class="n">nom</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
     <span class="n">figure</span> <span class="o">=</span> <span class="n">area_data</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">base</span><span class="p">,</span>
                             <span class="n">column</span><span class="o">=</span><span class="s1">&#39;prix_m2_actualise&#39;</span><span class="p">,</span>
-                            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
+                            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
                             <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
                             <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                             <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
@@ -424,13 +456,13 @@
     <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;jet&quot;</span><span class="p">)</span>
     <span class="n">data</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">iris</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
     <span class="n">base</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iris</span><span class="o">.</span><span class="n">NOM_COM</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;DISP_MED19&#39;</span><span class="p">,</span>
-                                              <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
+                                              <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
                                               <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
                                               <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                               <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s2">&quot;revenu médian dans l&#39;IRIS&quot;</span><span class="p">})</span>
     <span class="n">figure</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">NOM_COM</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">base</span><span class="p">,</span>
                                                 <span class="n">column</span><span class="o">=</span><span class="s1">&#39;prix_m2_actualise&#39;</span><span class="p">,</span>
-                                                <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
+                                                <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
                                                 <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                                 <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
                                                 <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s2">&quot;prix m2 des biens&quot;</span><span class="p">})</span>
@@ -469,9 +501,9 @@
 
     <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;jet&quot;</span><span class="p">)</span>
 
-    <span class="n">inter</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;DCOMIRIS_right&#39;</span><span class="p">])[[</span><span class="n">metrique</span><span class="p">]]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">inter</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;DCOMIRIS&#39;</span><span class="p">])[[</span><span class="n">metrique</span><span class="p">]]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
     <span class="n">inter</span> <span class="o">=</span> <span class="n">inter</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-    <span class="n">iris_moyenne</span> <span class="o">=</span> <span class="n">inter</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;DCOMIRIS_right&#39;</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;DCOMIRIS&#39;</span><span class="p">)</span>
+    <span class="n">iris_moyenne</span> <span class="o">=</span> <span class="n">inter</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;DCOMIRIS&#39;</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;DCOMIRIS&#39;</span><span class="p">)</span>
     <span class="n">iris_moyenne</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">iris_moyenne</span><span class="p">[[</span><span class="n">metrique</span><span class="p">,</span> <span class="s1">&#39;DCOMIRIS&#39;</span><span class="p">,</span> <span class="s1">&#39;NOM_COM&#39;</span><span class="p">]],</span> <span class="n">geometry</span><span class="o">=</span><span class="n">iris_moyenne</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">])</span>
 
     <span class="n">iris_moyenne</span><span class="p">[</span><span class="s1">&#39;center&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iris_moyenne</span><span class="o">.</span><span class="n">centroid</span>
@@ -482,13 +514,13 @@
       <span class="n">iris_moyenne</span> <span class="o">=</span> <span class="n">iris_moyenne</span><span class="o">.</span><span class="n">set_geometry</span><span class="p">(</span><span class="s1">&#39;center&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">iris</span><span class="o">.</span><span class="n">crs</span><span class="p">))</span>
 
     <span class="n">base</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iris</span><span class="o">.</span><span class="n">NOM_COM</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="n">var_iris</span><span class="p">,</span>
-                                                <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
+                                                <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
                                                 <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                                 <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
                                                 <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name_var_iris</span><span class="si">}</span><span class="s2">. dans l&#39;IRIS&quot;</span><span class="p">})</span>
     <span class="n">figure</span> <span class="o">=</span> <span class="n">iris_moyenne</span><span class="p">[</span><span class="n">iris_moyenne</span><span class="o">.</span><span class="n">NOM_COM</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">base</span><span class="p">,</span>
                                                             <span class="n">column</span><span class="o">=</span><span class="n">metrique</span><span class="p">,</span>
-                                                            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
+                                                            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
                                                             <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                                             <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
                                                             <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">metrique</span><span class="si">}</span><span class="s2">. dans l&#39;IRIS&quot;</span><span class="p">})</span>
@@ -521,12 +553,12 @@
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating &#39;equipements&#39; distribution in </span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">num_com</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
 
     <span class="c1"># Create a base map of the commune</span>
-    <span class="n">base</span> <span class="o">=</span> <span class="n">communes</span><span class="p">[</span><span class="n">communes</span><span class="o">.</span><span class="n">nom</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">communes</span><span class="p">[</span><span class="n">communes</span><span class="o">.</span><span class="n">nom</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 
     <span class="c1"># Plot the equipements on the base map</span>
     <span class="n">figure</span> <span class="o">=</span> <span class="n">equipements</span><span class="p">[</span><span class="n">equipements</span><span class="p">[</span><span class="s1">&#39;DEPCOM&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">num_com</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">base</span><span class="p">,</span>
                                                             <span class="n">column</span><span class="o">=</span><span class="s1">&#39;TYPEQU&#39;</span><span class="p">,</span>
-                                                            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
+                                                            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
                                                             <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                                             <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;jet&quot;</span><span class="p">)</span>
                                                             <span class="c1"># legend_kwds={&#39;label&#39;: &quot;Type d&#39;équipement&quot;}</span>
@@ -565,12 +597,12 @@
 
   <span class="k">try</span><span class="p">:</span>
       <span class="c1"># plot the IRIS base map</span>
-    <span class="n">base</span> <span class="o">=</span> <span class="n">iris</span><span class="p">[</span><span class="n">iris</span><span class="o">.</span><span class="n">DCOMIRIS</span> <span class="o">==</span> <span class="n">num_iris</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">iris</span><span class="p">[</span><span class="n">iris</span><span class="o">.</span><span class="n">DCOMIRIS</span> <span class="o">==</span> <span class="n">num_iris</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 
     <span class="c1"># plot the choropleth map</span>
     <span class="n">figure</span> <span class="o">=</span> <span class="n">equipements</span><span class="p">[</span><span class="n">equipements</span><span class="p">[</span><span class="s1">&#39;DCIRIS&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">num_iris</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">base</span><span class="p">,</span>
                                                                         <span class="n">column</span><span class="o">=</span><span class="s1">&#39;TYPEQU&#39;</span><span class="p">,</span>
-                                                                        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
+                                                                        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
                                                                         <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                                                         <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;jet&quot;</span><span class="p">))</span>
 
@@ -652,6 +684,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">try</span><span class="p">:</span>
+      <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Plotting correlation for: </span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2"> using </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2"> correlation..&quot;</span><span class="p">)</span>
+      <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Note: you can specify &#39;pearson&#39; or &#39;kendall &#39;correlations as arguments.&quot;</span><span class="p">)</span>
+
+
       <span class="c1"># Calculate the spatial correlation for each iris in the area</span>
       <span class="n">base_area</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iris</span><span class="o">.</span><span class="n">NOM_COM</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
       <span class="n">column_corr</span> <span class="o">=</span> <span class="p">[]</span>
@@ -661,10 +697,10 @@
       <span class="n">base_area</span><span class="p">[</span><span class="s1">&#39;corr_spatiale&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">column_corr</span>
 
       <span class="c1"># Plot the spatial correlation on the map</span>
-      <span class="n">base</span> <span class="o">=</span> <span class="n">communes</span><span class="p">[</span><span class="n">communes</span><span class="o">.</span><span class="n">nom</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+      <span class="n">base</span> <span class="o">=</span> <span class="n">communes</span><span class="p">[</span><span class="n">communes</span><span class="o">.</span><span class="n">nom</span> <span class="o">==</span> <span class="n">area</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
       <span class="n">figure</span> <span class="o">=</span> <span class="n">base_area</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">base</span><span class="p">,</span>
                             <span class="n">column</span><span class="o">=</span><span class="s1">&#39;corr_spatiale&#39;</span><span class="p">,</span>
-                            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
                             <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                             <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;jet&quot;</span><span class="p">),</span>
                             <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s2">&quot;Corrélation spatiale dans l&#39;IRIS (</span><span class="si">{}</span><span class="s2">) dans la ville de </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">area</span><span class="p">)})</span>
@@ -680,69 +716,31 @@
       <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred while plotting the spatial correlation: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 </pre></div>
 
+           </div>
           </div>
-          
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, S.Elmouslih, G.Hubert, N.Julien, A.Noarine, N.Tedonze.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../../index.html">House prices Prediction</a></h1>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">src</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../../index.html">Documentation overview</a><ul>
-  <li><a href="../../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2023, S.Elmouslih, G.Hubert, N.Julien, A.Noarine, N.Tedonze.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
-      
-    </div>
-
-    
-
-    
-  </body>
+</body>
 </html>

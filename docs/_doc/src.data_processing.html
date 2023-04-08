@@ -235,21 +235,15 @@ trimestre_actu: A string representing the trimester of discount.</p>
 <section id="module-src.data_processing.education">
 <span id="src-data-processing-education-module"></span><h2>src.data_processing.education module<a class="headerlink" href="#module-src.data_processing.education" title="Permalink to this heading"></a></h2>
 <p>This module provides functions to preprocess data on schools and merge it with DVF data.</p>
-<p>Functions:
-- prep_lyc(data: pd.DataFrame, geo_etab: pd.DataFrame) -&gt; gpd.GeoDataFrame</p>
-<blockquote>
-<div><p>Filters the given lycée data to only include lycées généraux, calculates the taux de mention for
+<dl>
+<dt>Functions:</dt><dd><p>prep_lyc(data: pd.DataFrame, geo_etab: pd.DataFrame) -&gt; gpd.GeoDataFrame
+Filters the given lycée data to only include lycées généraux, calculates the taux de mention for
 each lycée and converts the result to a geopandas dataframe, which is then merged with
 the dvf data.</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>prep_brevet(data, geo_etab)</dt><dd><p>Preprocesses brevet data by computing the taux de mention for each college,
+<p>prep_brevet(data, geo_etab): Preprocesses brevet data by computing the taux de mention for each college,
 converting it to a geopandas dataframe, and merging it with the DVF dataframe.</p>
 </dd>
 </dl>
-</li>
-</ul>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.data_processing.education.prep_lyc">
 <span class="sig-prename descclassname"><span class="pre">src.data_processing.education.</span></span><span class="sig-name descname"><span class="pre">prep_lyc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geo_etab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">GeoDataFrame</span></span></span><a class="reference internal" href="_modules/src/data_processing/education.html#prep_lyc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.data_processing.education.prep_lyc" title="Permalink to this definition"></a></dt>
